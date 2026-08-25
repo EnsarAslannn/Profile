@@ -27,3 +27,8 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Agent skills
+# The junctions here point at .agents/skills/, where the real content lives;
+# after cloning they can be recreated with npx skills (see CLAUDE.md).
+.claude/skills/
