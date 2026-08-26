@@ -1,4 +1,4 @@
-import profilePhoto from '../assets/ea.jpg'
+import profilePhoto from '../assets/ea.webp'
 import ContactList from './ContactList'
 import SocialLinks from './SocialLinks'
 
@@ -8,8 +8,8 @@ export default function ProfileCard() {
       <img
         src={profilePhoto}
         alt="Ensar Aslan"
-        width={1536}
-        height={2048}
+        width={640}
+        height={853}
         loading="eager"
         fetchPriority="high"
         decoding="async"

@@ -6,8 +6,8 @@ describe('ProfileCard', () => {
   it('renders the profile photo with intrinsic dimensions and LCP hints', () => {
     render(<ProfileCard />)
     const photo = screen.getByRole('img', { name: 'Ensar Aslan' })
-    expect(photo).toHaveAttribute('width', '1536')
-    expect(photo).toHaveAttribute('height', '2048')
+    expect(photo).toHaveAttribute('width', '640')
+    expect(photo).toHaveAttribute('height', '853')
     expect(photo).toHaveAttribute('loading', 'eager')
     expect(photo).toHaveAttribute('fetchpriority', 'high')
     expect(photo).toHaveAttribute('decoding', 'async')

@@ -1,4 +1,4 @@
-import profilePhoto from '../assets/ea.jpg'
+import profilePhoto from '../assets/ea.webp'
 import Contact from '../components/Contact'
 import Hero from '../components/Hero'
 import Projects from '../components/Projects'

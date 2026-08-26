@@ -12,7 +12,7 @@
 // original: q=75 -> 42.3 dB, q=88 -> 45.4 dB, q=94 -> 46.7 dB. Anything above
 // ~40 dB is considered visually lossless; 90 keeps fine UI text crisp while
 // still cutting the largest file from 3354 KB to well under 100 KB.
-import { readdir, stat, unlink } from 'node:fs/promises'
+import { readdir, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import sharp from 'sharp'
 
@@ -20,6 +20,16 @@ const ASSETS_DIR = 'src/assets'
 const TARGET_WIDTH = 1600
 const QUALITY = 90
 const DELETE_ORIGINALS = process.argv.includes('--delete')
+
+// The profile photo lives at the root of src/assets (not in a project folder)
+// and is portrait, rendered at most ~384 CSS px wide in the sticky card, so it
+// gets its own narrower target: 800px still covers a 2x display.
+const PROFILE_SOURCE = 'src/assets/ea.jpg'
+const PROFILE_TARGET = 'src/assets/ea.webp'
+const PROFILE_TARGET_WIDTH = 640
+// Photographs tolerate more compression than UI screenshots, and the card
+// never renders wider than ~320 CSS px, so 640px at q80 is 2x coverage.
+const PROFILE_QUALITY = 80
 
 async function psnrAgainstOriginal(sourcePath, webpBuffer) {
   const reference = await sharp(sourcePath)
@@ -64,7 +74,7 @@ for (const folder of folders) {
     const psnr = await psnrAgainstOriginal(sourcePath, buffer)
     if (psnr !== null && psnr < worstPsnr) worstPsnr = psnr
 
-    await sharp(buffer).toFile(targetPath)
+    await writeFile(targetPath, buffer)
 
     const before = (await stat(sourcePath)).size
     const after = (await stat(targetPath)).size
@@ -87,3 +97,38 @@ console.log(
 )
 console.log(`worst PSNR across all images: ${worstPsnr.toFixed(1)} dB (>40 dB is visually lossless)`)
 if (DELETE_ORIGINALS) console.log('original PNGs deleted')
+
+// --- Profile photo -----------------------------------------------------------
+try {
+  const before = (await stat(PROFILE_SOURCE)).size
+  const buffer = await sharp(PROFILE_SOURCE)
+    .resize({ width: PROFILE_TARGET_WIDTH, withoutEnlargement: true })
+    .webp({ quality: PROFILE_QUALITY })
+    .toBuffer()
+  const { width, height } = await sharp(buffer).metadata()
+
+  const reference = await sharp(PROFILE_SOURCE)
+    .resize({ width: PROFILE_TARGET_WIDTH })
+    .removeAlpha()
+    .raw()
+    .toBuffer()
+  const decoded = await sharp(buffer).removeAlpha().raw().toBuffer()
+  let squaredError = 0
+  for (let i = 0; i < reference.length; i++) {
+    const delta = reference[i] - decoded[i]
+    squaredError += delta * delta
+  }
+  const psnr = 10 * Math.log10(65025 / (squaredError / reference.length))
+
+  await writeFile(PROFILE_TARGET, buffer)
+  const after = (await stat(PROFILE_TARGET)).size
+  console.log(
+    `\nprofile ea.jpg ${Math.round(before / 1024)} KB -> ${Math.round(after / 1024)} KB ` +
+      `${width}x${height}  PSNR ${psnr.toFixed(1)} dB`,
+  )
+  console.log(`  -> update width/height in src/components/ProfileCard.tsx to ${width}x${height}`)
+  if (DELETE_ORIGINALS) await unlink(PROFILE_SOURCE)
+} catch (error) {
+  if (error.code !== 'ENOENT') throw error
+  console.log('\nprofile photo already converted (no src/assets/ea.jpg)')
+}
