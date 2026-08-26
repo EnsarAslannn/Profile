@@ -12,10 +12,10 @@ export default mergeConfig(
       include: ['src/**/*.{test,spec}.{ts,tsx}'],
       css: true,
       restoreMocks: true,
-      // The repo intentionally ships with no tests yet - builder writes them
-      // per feature. Flip to false once a real suite exists, so a broken
-      // `include` glob fails CI instead of silently passing.
-      passWithNoTests: true,
+      // A real suite exists now (Hero/ProfileCard/ContactList/SocialLinks/App).
+      // false so a broken `include` glob fails loudly instead of silently
+      // passing with zero tests collected.
+      passWithNoTests: false,
     },
   }),
 )

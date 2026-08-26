@@ -22,9 +22,9 @@ Vitest globals are **off** - import `describe` / `it` / `expect` from `vitest` e
 
 ## What this is
 
-Single-page (scroll-navigated) personal portfolio for Furkan Türker. All user-facing copy is **Turkish**; identifiers, types, props, and comments are **English**. Content is currently placeholder text - the sections exist as skeletons waiting for real content.
+Personal portfolio for Ensar Aslan. The home route `/` is a scroll-navigated single page; project detail pages live at `/projects/<slug>` behind a client-side router (`react-router-dom`). All user-facing copy is **Turkish**; identifiers, types, props, and comments are **English**. Content is no longer entirely placeholder: Hakkımda and Projeler carry real owner-supplied content, while Özgeçmiş and İletişim remain skeletons.
 
-Visual direction: dark theme (`bg-neutral-950`), amber accent (`text-amber-400`), centered `max-w-5xl` column. Modeled on furkanturker.com.
+Visual direction: dark navy ground (`bg-navy-950`) with a warm brass accent (`text-accent-400`), defined as `@theme` tokens in `src/index.css`. Modeled on cyze.dev.
 
 ## Agent workflow
 
@@ -65,7 +65,13 @@ Confirm with `npx skills list` that the entry reads `standards-spec-review`; `re
 
 ## Architecture
 
-`src/App.tsx` is the whole page: it stacks the section components in order inside one `<main>`. Each section in `src/components/` is a self-contained `<section>` that owns its own heading and spacing - there is no layout wrapper, no routing layer, and no state management.
+`BrowserRouter` is mounted in `src/main.tsx`. `src/App.tsx` is the chrome shell: `ScrollToHash` + `Navbar` + `<Routes>` + the footer wrapper, rendered outside `<Routes>` so chrome is identical on every route. **`App` requires a Router ancestor** - it throws if rendered bare, so tests render it (or any component that uses `<Link>`/`useLocation`) through `src/test/renderWithRouter.tsx`, which wraps the tree in a `MemoryRouter` at a given route.
+
+Routes: `/` → `src/pages/HomePage.tsx` (the former single-page body: Hero, Resume, Projects, Contact, unchanged); `/projects/:slug` → `src/pages/ProjectDetailPage.tsx`; `*` (including an unknown `:slug`) → `<Navigate to="/" replace />`. There is no 404 page - it would require inventing Turkish copy. Pages live in `src/pages/`, sections and reusable pieces in `src/components/`, content in `src/data/`.
+
+`ScrollToHash` (`src/components/ScrollToHash.tsx`) exists because React Router does not scroll to a `#hash` on navigation by itself. It watches `location.key` (not just `pathname`/`hash`) so clicking the same nav link twice re-scrolls both times, matching native anchor behaviour. Navbar links are **not** plain `<a href="#hakkimda">` - they are router `<Link to={{ pathname: '/', hash: '#hakkimda' }}>` on every route, so a link clicked from `/projects/dolfin` correctly returns to `/` and scrolls, instead of producing a dead `/projects/dolfin#hakkimda` URL.
+
+Each section in `src/components/` is a self-contained `<section>` that owns its own heading and spacing - there is no layout wrapper beyond the chrome above, and no state management.
 
 **Section contract** - every section follows the same shape, and new sections must match it:
 
@@ -75,9 +81,32 @@ Confirm with `npx skills list` that the entry reads `standards-spec-review`; `re
 - heading followed by `<div className="mt-4 h-1 w-12 rounded bg-amber-400" />`
 - `py-16` section padding, `mt-8` from the heading block to the body
 
-**Adding a section requires two edits**: render it in `App.tsx` *and* add its anchor to the `links` array at the top of `src/components/Navbar.tsx`. The navbar builds itself from that array - it is the single source of truth for navigation, so a section added in only one place is silently unreachable.
+**Adding a section requires two edits**: render it in `src/pages/HomePage.tsx` *and* add its anchor to the `links` array at the top of `src/components/Navbar.tsx`. The navbar builds itself from that array - it is the single source of truth for navigation, so a section added in only one place is silently unreachable. This two-edit rule is about **sections** specifically; adding a *project* needs neither edit (see "Adding a project" below), and project detail routes are deliberately not added to the navbar - the grid in Projeler is the only entry point.
 
-`Footer.tsx` is rendered outside `<main>` but inside its own `max-w-5xl` wrapper, so it aligns with the content column without being part of the scroll sections.
+`Footer.tsx` is rendered outside `<Routes>` but inside its own `max-w-7xl` wrapper, so it aligns with the content column without being part of the scroll sections. The navbar, `<main>` (in both `HomePage` and `ProjectDetailPage`), and the footer wrapper share one width token (`max-w-7xl`) and one horizontal-padding ramp (`px-6 sm:px-8 lg:px-10 xl:px-12`) - changing one without the others misaligns the page, and `src/App.test.tsx` enforces the invariant.
+
+## Adding a project
+
+1. **Data** - add an entry to `PROJECT_INPUTS` in `src/data/projects.ts`: `slug` (lowercase, no diacritics), `title`, `subtitle`, `description` (Turkish, verbatim from the owner, never embellished), `imageOrder`.
+2. **Images** - create `src/assets/<slug>/` and drop the raw PNG screenshots in, then run `node scripts/optimize-images.mjs --delete` from the repo root. That resizes to 1600px wide, converts to WebP, prints a PSNR figure per file, and removes the originals. **Only `.webp` is globbed** - a leftover PNG is invisible to the site. **The folder name must equal the slug, lowercase** - `import.meta.glob` keys off it, and Linux build hosts (Vercel) are case-sensitive even though Windows is not. Never hardcode a filename anywhere.
+3. **Ordering** - names in `imageOrder` are filename stems without the extension. They come first, in that order; every other image in the folder follows alphabetically. **Image 0 is both the grid card cover and the detail page's LCP image**, so put the best screenshot first. The current default is `['homePage', 'homePage2']`.
+4. **Route** - nothing to do. `/projects/:slug` is dynamic and looks up the project by slug; an unknown slug redirects to `/`.
+5. **`App.tsx` / `Navbar.tsx`** - nothing to do. The two-edit rule above applies to sections, not projects; the nav is a section list, not a project list.
+6. **Display order** - the order of `PROJECT_INPUTS` is the home-page grid order. Route lookup is by slug, so reordering never changes a URL. `src/components/Projects.test.tsx` asserts the expected order, so update it deliberately when you reorder.
+7. **Tests** - bump the expected counts in `src/data/projects.test.ts` (project count, slug list) and `src/components/Projects.test.tsx` (list items, hrefs), and add the new project's verbatim description assertion.
+8. **New screenshots** should be roughly 1.82:1 to match `PROJECT_IMAGE_WIDTH`/`PROJECT_IMAGE_HEIGHT` in `src/data/projectImages.ts`; a materially different ratio means revisiting those constants and the `aspect-project-cover` token together.
+9. **Alt text** is currently generated as `` `${project.title} ekran görüntüsü ${index + 1}` `` (see the Images section's sanctioned exception above). Real per-image Turkish alt text is an owner-supplied improvement, not something an agent may invent.
+10. If `src/data/projects.ts` approaches 120 lines, split to `src/data/projects/<slug>.ts` with a barrel - not needed at three projects.
+
+## Per-route metadata
+
+`src/components/RouteMeta.tsx` sets `document.title`, `<meta name="description">`, and the Open Graph / Twitter tags for the route that renders it. `HomePage` and `ProjectDetailPage` each render one. Values are **derived, never written by hand**: the home description is trimmed from `ABOUT_PARAGRAPHS[0]` in `Hero.tsx`, and a project description is that project first sentence (`firstSentence` in `src/lib/siteMeta.ts`, which deliberately does not cut at the dot in `.NET`). `og:image` is the profile photo on the home page and the project cover (image 0) on a detail page.
+
+**Known limitation - do not report this as a bug.** These tags are applied by JavaScript after load. Crawlers that execute JS (Google) see them; social-preview scrapers (LinkedIn, X, Slack, WhatsApp) read the raw HTML response and never run scripts, so a shared link always shows the static defaults in `index.html`. Genuine per-route link previews require prerendering or SSG (e.g. `vite-plugin-ssg`, or moving to a framework that renders HTML per route) - a real change of architecture, not a tweak.
+
+## Deployment
+
+`vercel.json` rewrites every path to `/index.html`, so a direct hit or refresh on `/projects/*` (or any client-side route) does not 404 on Vercel's static hosting. Deleting it breaks every deep link while leaving local dev (`vite dev`/`vite preview`, which have their own SPA fallback) perfectly healthy - the failure only shows up on a real deploy, so do not remove this file without verifying on a preview deployment first.
 
 ## Component standards
 
@@ -113,6 +142,8 @@ Every `<img>` must have, without exception:
 - a meaningful `alt`, or `alt=""` when the image is purely decorative
 
 The single permitted exception: a genuinely above-the-fold LCP image (such as the profile photo) may use `loading="eager"` with `fetchpriority="high"` - it still needs `width`, `height`, and `alt`.
+
+**Sanctioned exception - project screenshots.** Project images (`src/assets/<slug>/*.png`) are collected by a single `import.meta.glob` call in `src/data/projectImages.ts`, which yields hashed URL strings and no dimension metadata - the entire point of globbing is to avoid a per-file table that has to be hand-maintained every time a screenshot is added or renamed. Their `<img>` elements therefore carry the **nominal** shared constants `PROJECT_IMAGE_WIDTH` (2530) / `PROJECT_IMAGE_HEIGHT` (1390) exported from that file, not per-file measured intrinsics. CLS is still genuinely prevented: every project image renders inside a fixed `aspect-project-cover` box (`@theme` token in `src/index.css`, ratio ~1.82:1) that reserves its height from CSS before the image loads, independent of what the `width`/`height` attributes say - so an approximate attribute cannot produce a shift. This is a deliberate, bounded exception to the "matching the intrinsic pixel size" rule above, and it applies **only** to globbed project screenshots consumed via `getProjectImages`; the profile photo and any other `<img>` added elsewhere still need true intrinsic `width`/`height`. Treat this as sanctioned, not as a defect to flag.
 
 ## Accessibility
 

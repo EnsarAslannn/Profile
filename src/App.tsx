@@ -1,21 +1,21 @@
-import Contact from './components/Contact'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import Footer from './components/Footer'
-import Hero from './components/Hero'
 import Navbar from './components/Navbar'
-import Projects from './components/Projects'
-import Resume from './components/Resume'
+import ScrollToHash from './components/ScrollToHash'
+import HomePage from './pages/HomePage'
+import ProjectDetailPage from './pages/ProjectDetailPage'
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-300">
+    <div className="min-h-screen bg-navy-950 text-navy-300">
+      <ScrollToHash />
       <Navbar />
-      <main className="mx-auto max-w-5xl px-6">
-        <Hero />
-        <Resume />
-        <Projects />
-        <Contact />
-      </main>
-      <div className="mx-auto max-w-5xl px-6">
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/projects/:slug" element={<ProjectDetailPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10 xl:px-12">
         <Footer />
       </div>
     </div>

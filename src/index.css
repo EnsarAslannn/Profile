@@ -1,3 +1,39 @@
 /* source(".") limits Tailwind's automatic content detection to src/, so class
    names inside .agents/skills/ data files never leak into the bundle. */
 @import "tailwindcss" source(".");
+
+/* Navy design tokens - owner-directed departure from CLAUDE.md's
+   neutral-950/amber-400 palette for the #hakkimda rebuild (documented in the
+   ui-agent handoff for this task; CLAUDE.md's palette section is superseded
+   and should be updated by the owner, not by this file).
+
+   Numbering follows Tailwind's own convention: lower number = lighter, higher
+   number = darker, matching how neutral-100/950 already read elsewhere in
+   this codebase, so bg-navy-950 / text-navy-100 behave exactly as expected. */
+@theme {
+  /* Ground + surface. #0F172A / #1E293B sit on the blue-grey "slate" hue,
+     not Tailwind's neutral/grey, so the page reads as navy rather than as a
+     black-and-white theme with one color swapped in. Neither is pure black. */
+  --color-navy-950: #0f172a; /* page background */
+  --color-navy-900: #1e293b; /* card / elevated surface */
+  --color-navy-700: #334155; /* decorative low-contrast dividers (section border-t, card hairline) */
+  --color-navy-500: #64748b; /* visible UI borders (card outline, icon-link ring) - ~3:1 vs navy-900 */
+  --color-navy-400: #94a3b8; /* muted / de-emphasized text - ~7:1 vs navy-950 */
+  --color-navy-300: #cbd5e1; /* body copy - ~12:1 vs navy-950 */
+  --color-navy-100: #f8fafc; /* headings - ~17:1 vs navy-950 */
+
+  /* Accent - warm brass/gold, chosen to sit opposite navy's cool hue (the
+     classic navy+gold pairing) rather than a cooler blue that would recede
+     into the ground. Replaces amber-400 site-wide; see handoff for the swap. */
+  --color-accent-300: #e8c384; /* hover / lighter tint - ~11:1 vs navy-950 */
+  --color-accent-400: #d4a657; /* base: links, icons, focus ring, heading divider - ~8:1 vs navy-950 */
+  --color-accent-600: #b8863a; /* active / pressed - ~5.5:1 vs navy-950 */
+
+  /* Project screenshot ratio - nominal 2530x1390 (see src/data/projectImages.ts),
+     simplified to 253/139 (~1.82:1). Reused by ProjectCard's cover image and
+     ProjectGallery's detail-page images, so it is named once here rather than
+     repeated as a bare aspect-[...] arbitrary value in two component files.
+     Built-in aspect-video (16/9 = 1.778) is measurably off this ratio, which
+     is why an arbitrary value is used at all - see the ui-agent handoff. */
+  --aspect-project-cover: 253 / 139;
+}
