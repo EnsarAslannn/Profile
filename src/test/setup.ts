@@ -14,3 +14,20 @@ afterEach(() => {
 // (which only restores spies) does not undo them between tests.
 Element.prototype.scrollIntoView = () => {}
 window.scrollTo = () => {}
+
+// jsdom does not implement window.matchMedia at all - calling it throws.
+// FooterWordmark reads it to detect prefers-reduced-motion and (hover: hover)
+// before attaching its pointermove listener. Plain assignment, not
+// vi.spyOn, because restoreMocks: true in vitest.config.ts only restores
+// spies, not plain property assignments - a spy here would be undone
+// between tests and every subsequent test would throw again.
+window.matchMedia = (media: string) => ({
+  matches: false,
+  media,
+  onchange: null,
+  addEventListener: () => {},
+  removeEventListener: () => {},
+  addListener: () => {},
+  removeListener: () => {},
+  dispatchEvent: () => false,
+})

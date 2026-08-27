@@ -67,9 +67,11 @@ export function getProjectImages(folder: string, preferredOrder: readonly string
   return ordered
 }
 
-// One template, two call sites (ProjectCard cover, ProjectGallery). Index is
-// zero-based; the rendered text is 1-based. Interim until the owner supplies
-// real per-screenshot Turkish alt text.
+// Alt text for a screenshot. One call site: ProjectScreens (the detail-page
+// walkthrough). Index is zero-based; the rendered text is 1-based. Interim
+// until the owner supplies real per-screenshot Turkish alt text. Project
+// covers do not use this - they are decorative (alt="") because the card
+// link carries the accessible name.
 export function getProjectImageAlt(projectTitle: string, index: number): string {
   return `${projectTitle} ekran görüntüsü ${index + 1}`
 }

@@ -1,13 +1,15 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import Footer from './components/Footer'
 import Navbar from './components/Navbar'
+import PageBackdrop from './components/PageBackdrop'
 import ScrollToHash from './components/ScrollToHash'
 import HomePage from './pages/HomePage'
 import ProjectDetailPage from './pages/ProjectDetailPage'
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-navy-950 text-navy-300">
+    <div className="relative isolate min-h-screen bg-surface-base text-ink-body">
+      <PageBackdrop />
       <ScrollToHash />
       <Navbar />
       <Routes>

@@ -1,28 +1,4 @@
-import type { ComponentType } from 'react'
-import GitHubIcon from './icons/GitHubIcon'
-import LinkedInIcon from './icons/LinkedInIcon'
-
-type SocialLink = {
-  id: string
-  label: string
-  href: string
-  icon: ComponentType<{ className?: string }>
-}
-
-const SOCIAL_LINKS: SocialLink[] = [
-  {
-    id: 'linkedin',
-    label: 'LinkedIn profili',
-    href: 'https://linkedin.com/in/ensaraslannn',
-    icon: LinkedInIcon,
-  },
-  {
-    id: 'github',
-    label: 'GitHub profili',
-    href: 'https://github.com/EnsarAslannn',
-    icon: GitHubIcon,
-  },
-]
+import { SOCIAL_LINKS } from '../data/social'
 
 export default function SocialLinks() {
   return (
@@ -36,7 +12,7 @@ export default function SocialLinks() {
               aria-label={link.label}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-navy-500 text-navy-300 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-400 hover:text-accent-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-400 active:translate-y-0 active:text-accent-600 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-line-strong text-ink-body transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-hover hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:translate-y-0 active:text-accent-active motion-reduce:transition-none motion-reduce:hover:translate-y-0"
             >
               <Icon className="h-5 w-5" />
             </a>

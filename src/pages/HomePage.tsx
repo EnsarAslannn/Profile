@@ -1,5 +1,4 @@
 import profilePhoto from '../assets/ea.webp'
-import Contact from '../components/Contact'
 import Hero from '../components/Hero'
 import Projects from '../components/Projects'
 import Resume from '../components/Resume'
@@ -22,9 +21,8 @@ export default function HomePage() {
       />
       <main className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10 xl:px-12">
         <Hero />
-        <Resume />
         <Projects />
-        <Contact />
+        <Resume />
       </main>
     </>
   )

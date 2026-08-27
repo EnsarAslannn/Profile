@@ -2,38 +2,128 @@
    names inside .agents/skills/ data files never leak into the bundle. */
 @import "tailwindcss" source(".");
 
-/* Navy design tokens - owner-directed departure from CLAUDE.md's
-   neutral-950/amber-400 palette for the #hakkimda rebuild (documented in the
-   ui-agent handoff for this task; CLAUDE.md's palette section is superseded
-   and should be updated by the owner, not by this file).
-
-   Numbering follows Tailwind's own convention: lower number = lighter, higher
-   number = darker, matching how neutral-100/950 already read elsewhere in
-   this codebase, so bg-navy-950 / text-navy-100 behave exactly as expected. */
+/* Semantic light-theme tokens - replaces the navy/gold dark palette for the
+   full light-theme conversion (planner: docs/.../plan3.md Task 4-5; see the
+   ui-agent handoff for the contrast measurements behind every value below).
+   Tokens are named by ROLE, not by literal color, on purpose: it is what
+   makes a future prefers-color-scheme variant a one-file edit instead of a
+   second full migration across every component. CLAUDE.md's palette section
+   already documents this semantic set (surface-, line-, ink-, accent- families) -
+   the earlier note claiming it still described neutral-950/amber-400 was
+   itself stale and has been removed (ui-agent, six-owner-changes handoff). */
 @theme {
-  /* Ground + surface. #0F172A / #1E293B sit on the blue-grey "slate" hue,
-     not Tailwind's neutral/grey, so the page reads as navy rather than as a
-     black-and-white theme with one color swapped in. Neither is pure black. */
-  --color-navy-950: #0f172a; /* page background */
-  --color-navy-900: #1e293b; /* card / elevated surface */
-  --color-navy-700: #334155; /* decorative low-contrast dividers (section border-t, card hairline) */
-  --color-navy-500: #64748b; /* visible UI borders (card outline, icon-link ring) - ~3:1 vs navy-900 */
-  --color-navy-400: #94a3b8; /* muted / de-emphasized text - ~7:1 vs navy-950 */
-  --color-navy-300: #cbd5e1; /* body copy - ~12:1 vs navy-950 */
-  --color-navy-100: #f8fafc; /* headings - ~17:1 vs navy-950 */
+  /* Surfaces. surface-base is the page's flat ground once the top gradient
+     band (see backdrop-from/to below) has faded out. surface-raised is kept
+     a touch lighter than surface-base (pure white vs. slate-50) so cards
+     read as "lifted" by tone + a hairline border, not by a heavy shadow -
+     a dark-card shadow recipe reads as dirt on a light ground. surface-sunken
+     is for the image-letterbox guard behind screenshots whose aspect ratio
+     doesn't exactly match the reserved box. */
+  --color-surface-base: #f8fafc; /* slate-50 - page ground */
+  --color-surface-raised: #ffffff; /* card / elevated surface */
+  --color-surface-sunken: #e2e8f0; /* slate-200 - image letterbox guard */
 
-  /* Accent - warm brass/gold, chosen to sit opposite navy's cool hue (the
-     classic navy+gold pairing) rather than a cooler blue that would recede
-     into the ground. Replaces amber-400 site-wide; see handoff for the swap. */
-  --color-accent-300: #e8c384; /* hover / lighter tint - ~11:1 vs navy-950 */
-  --color-accent-400: #d4a657; /* base: links, icons, focus ring, heading divider - ~8:1 vs navy-950 */
-  --color-accent-600: #b8863a; /* active / pressed - ~5.5:1 vs navy-950 */
+  /* Lines. line-subtle is purely decorative (section border-t, card
+     hairlines) and is not held to a contrast floor - WCAG 1.4.11 exempts
+     decorative separators. line-strong is a real UI boundary (card outline,
+     icon-link ring) and clears 3:1 against every surface it appears on:
+     4.76:1 on surface-raised, 4.55:1 on surface-base, 3.90:1 against
+     backdrop-from (the gradient's bluest point) - all above the 3:1 floor. */
+  --color-line-subtle: #e2e8f0; /* slate-200 */
+  --color-line-strong: #64748b; /* slate-500 */
 
-  /* Project screenshot ratio - nominal 2530x1390 (see src/data/projectImages.ts),
-     simplified to 253/139 (~1.82:1). Reused by ProjectCard's cover image and
-     ProjectGallery's detail-page images, so it is named once here rather than
-     repeated as a bare aspect-[...] arbitrary value in two component files.
-     Built-in aspect-video (16/9 = 1.778) is measurably off this ratio, which
-     is why an arbitrary value is used at all - see the ui-agent handoff. */
+  /* Ink. ink-strong is near-black for headings (17.9:1 on surface-raised,
+     17.1:1 on surface-base, 14.6:1 on backdrop-from). ink-body is a dark
+     slate for paragraph copy, deliberately darker than the minimum so it
+     keeps >6:1 even over the gradient's lightest-blue point (7.58:1 on
+     surface-raised, 7.24:1 on surface-base, 6.21:1 on backdrop-from).
+     ink-muted is for de-emphasized text (Footer) and card body copy
+     (ProjectCard's description) - it clears 4.5:1 on both surfaces
+     (4.76:1 raised, 4.55:1 base) but FAILS at 3.90:1 against backdrop-from,
+     so ink-muted must only be used inside an opaque surface-raised
+     container, or below the gradient band - never as text sitting directly
+     on the bare page ground within the first viewport height. */
+  --color-ink-strong: #0f172a; /* slate-900 */
+  --color-ink-body: #475569; /* slate-600 */
+  --color-ink-muted: #64748b; /* slate-500 */
+
+  /* Accent - blue, replacing the warm brass that dark-theme token relied on
+     (brass drops to roughly 1.6:1 on white and is unusable here). Matches
+     the ui-ux-pro-max "Portfolio/Personal" palette precedent (monochrome +
+     blue accent, data/colors.csv row 11). hover/active go DARKER than base -
+     inverted from the dark theme, where hover lightened - because a lighter
+     tint fades toward invisible on a light ground. Measured: accent-base
+     4.94:1 on surface-base, 5.17:1 on surface-raised, 4.24:1 on
+     backdrop-from (below 4.5:1 - fine for the 3:1 heading-rule/UI use, but
+     do not use accent-base as running link text directly on the bare
+     gradient; use accent-hover there, which holds 5.49:1 even at the
+     gradient's bluest point). accent-hover: 6.41:1 base / 6.70:1 raised /
+     5.49:1 backdrop-from. accent-active is darker again; contrast only
+     increases from accent-hover's figures. */
+  --color-accent-base: #2563eb; /* blue-600 - links, icons, heading rule */
+  --color-accent-hover: #1d4ed8; /* blue-700 - hover, and gradient-safe link color */
+  --color-accent-active: #1e40af; /* blue-800 - active / pressed */
+
+  /* Focus - decoupled from accent-base per the token-layer rationale, even
+     though accent-base itself already clears 3:1 everywhere measured. One
+     step darker for margin against the palest surface. 6.70:1 on
+     surface-raised, 6.41:1 on surface-base, 5.49:1 on backdrop-from - all
+     comfortably above the 3:1 non-text floor. */
+  --color-focus: #1d4ed8; /* blue-700 */
+
+  /* Gradient stops for PageBackdrop (src/components/PageBackdrop.tsx).
+     backdrop-to is set to the EXACT hex of surface-base, not merely "a
+     similar light color" - that identity is what makes the fade disappear
+     seamlessly into the flat page ground instead of leaving a visible edge
+     where the backdrop element ends. */
+  --color-backdrop-from: #dbeafe; /* blue-100 - soft top-of-page wash */
+  --color-backdrop-to: #f8fafc; /* = surface-base, by design */
+
+  /* Project screenshot ratio - nominal 1600x879 (see src/data/projectImages.ts),
+     simplified to 253/139 (~1.82:1). Used only by ProjectScreens (the narrated
+     detail-page walkthrough) for its per-screenshot figures - NOT by
+     ProjectCard and NOT by any project cover. Covers (src/data/projectCovers.ts)
+     carry true, per-project intrinsic width/height and each render at their own
+     aspect ratio via `w-full h-auto` (letting the browser derive `aspect-ratio`
+     natively from the img's width/height attributes) instead of this shared
+     token - a portrait cover, a landscape cover, and a near-square cover must
+     keep their own silhouettes for the asymmetric mosaic to read as asymmetric;
+     forcing them through this token would defeat the entire layout. Built-in
+     aspect-video (16/9 = 1.778) is measurably off this ratio, which is why an
+     arbitrary value is used at all - see the ui-agent handoff. */
   --aspect-project-cover: 253 / 139;
+}
+
+/* Custom-property registrations for FooterWordmark's cursor-tracking mask
+   (src/components/FooterWordmark.tsx, six-owner-changes Task 9). A plain
+   CSS custom property is not interpolated by `transition` - only a
+   type-registered one is - so these two are declared with @property to let
+   a short transition ease the radial-gradient mask center as the pointer
+   moves, instead of the highlight snapping instantly from point to point.
+   Not a @theme entry: @property registers a custom-property TYPE, not a
+   design token consumed by a utility class, so it lives at the stylesheet's
+   top level like the `html` rule below, not inside the token block above.
+   initial-value -9999px keeps the highlight's spotlight fully off-canvas
+   until FooterWordmark's pointermove listener writes real coordinates -
+   the static, cursor-less state must render as if these rules did not
+   exist at all, which is exactly what an off-canvas center achieves. */
+@property --wordmark-x {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: -9999px;
+}
+@property --wordmark-y {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: -9999px;
+}
+
+/* Overscroll/rubber-band area outside the document bounds (mobile bounce,
+   trackpad overscroll) shows this color, not a themed element - it cannot
+   carry the gradient. Matched to surface-base, the color the page is flat
+   in for all but its very top, so the overscroll edge never reads as a
+   jarring color switch. Not a @theme token: this is a base-layer element
+   style, not a design token consumed by any utility class. */
+html {
+  background-color: var(--color-surface-base);
 }
