@@ -25,7 +25,7 @@ export default function ProjectCard({ project, featured }: Props) {
             height={cover.height}
             loading="lazy"
             decoding="async"
-            className="w-full h-auto transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+            className="w-full h-auto transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100 md:h-full md:object-cover md:object-center"
           />
         )}
         {/*

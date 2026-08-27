@@ -24,3 +24,16 @@ describe('theme token migration', () => {
     expect(offenders).toEqual([])
   })
 })
+
+describe('heading rule removal', () => {
+  it('no component still renders the heading accent bar', () => {
+    const files = collectTsxFiles(join(process.cwd(), 'src'))
+    const offenders = files.filter((file) => {
+      const lines = readFileSync(file, 'utf-8').split('\n')
+      return lines.some(
+        (line) => line.includes('h-1') && line.includes('w-12') && line.includes('bg-accent-base'),
+      )
+    })
+    expect(offenders).toEqual([])
+  })
+})

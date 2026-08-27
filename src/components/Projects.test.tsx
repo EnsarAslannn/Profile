@@ -47,4 +47,10 @@ describe('Projects', () => {
     const ul = container.querySelector('ul')!
     expect(ul.className).toMatch(/\bgrid\b/)
   })
+
+  it("the ul's class list defines an explicit md: row-sizing mechanism for the mosaic", () => {
+    const { container } = renderWithRouter(<Projects />)
+    const ul = container.querySelector('ul')!
+    expect(ul.className).toMatch(/md:(grid-rows|auto-rows|h-|aspect-)/)
+  })
 })

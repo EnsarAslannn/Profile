@@ -9,8 +9,8 @@ describe('App', () => {
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1)
   })
 
-  it('links every navbar anchor to a section that exists', () => {
-    // Navbar renders router Links with absolute-to-home hash hrefs
+  it('links every footer nav anchor to a section that exists', () => {
+    // FooterNav renders router Links with absolute-to-home hash hrefs
     // (`/#hakkimda`), so this reads the fragment after `/#`.
     const { container } = renderWithRouter(<App />)
     const anchors = Array.from(container.querySelectorAll('nav a[href^="/#"]'))
@@ -21,19 +21,16 @@ describe('App', () => {
     }
   })
 
-  it('aligns navbar, main and footer on one container width', () => {
+  it('aligns main and the footer wrapper on one container width', () => {
     const { container } = renderWithRouter(<App />)
-    const nav = container.querySelector('nav')
     const main = container.querySelector('main')
     const footerWrapper = container.querySelector('footer')?.parentElement
     const widthOf = (el: Element | null | undefined) =>
       el?.className.split(' ').find((token) => token.startsWith('max-w-'))
     const paddingOf = (el: Element | null | undefined) =>
       el?.className.split(' ').find((token) => token === 'px-6' || token.startsWith('px-6'))
-    expect(widthOf(nav)).toBeDefined()
-    expect(widthOf(nav)).toEqual(widthOf(main))
+    expect(widthOf(main)).toBeDefined()
     expect(widthOf(main)).toEqual(widthOf(footerWrapper))
-    expect(paddingOf(nav)).toEqual(paddingOf(main))
     expect(paddingOf(main)).toEqual(paddingOf(footerWrapper))
   })
 

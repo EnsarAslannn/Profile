@@ -2,10 +2,11 @@
 //
 // This is a small hand-maintained table, not a glob like projectImages.ts,
 // and deliberately so: there are exactly three covers (one per project),
-// added once and rarely changed, and each carries a genuinely different
-// aspect ratio that is load-bearing for the asymmetric mosaic layout - a
-// glob only yields a hashed URL string with no dimension metadata, and the
-// whole point here is to keep the TRUE intrinsic width/height per file. The
+// added once and rarely changed. A glob only yields a hashed URL string with
+// no dimension metadata, and the whole point here is to keep the TRUE
+// intrinsic width/height per file so the covers reserve their space before
+// they load. (The mosaic cell geometry, not the covers own silhouettes, is
+// what drives the layout now - see Projects.tsx and CLAUDE.md.) The
 // glob's per-file-table-would-rot argument does not apply at this scale.
 //
 // Files live flat in src/assets/ (not inside src/assets/<slug>/), which

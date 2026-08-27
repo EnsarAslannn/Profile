@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import Resume from './Resume'
 
 describe('Resume', () => {
-  it('keeps the section anchor the navbar links to', () => {
+  it('keeps the section anchor the footer links to', () => {
     const { container } = render(<Resume />)
     expect(container.querySelector('section#ozgecmis')).not.toBeNull()
   })
@@ -54,5 +54,28 @@ describe('Resume', () => {
     render(<Resume />)
     expect(screen.queryByText(/Yetenekler/)).not.toBeInTheDocument()
     expect(screen.queryByText(/Placeholder/)).not.toBeInTheDocument()
+  })
+
+  it('renders exactly two experience descriptions', () => {
+    const { container } = render(<Resume />)
+    expect(container.querySelectorAll('p[data-resume-description]')).toHaveLength(2)
+  })
+
+  it('renders the Brisa internship description verbatim', () => {
+    render(<Resume />)
+    expect(
+      screen.getByText(
+        'Üretim sektöründeki kurumsal yazılım geliştirme süreçleri gözlemlenerek toplantılara katılım sağlandı. Agile iş akışları ve proje yönetimi metodolojilerinin analiz edilmesine katkı sağlandı.',
+      ),
+    ).toBeInTheDocument()
+  })
+
+  it('renders the AZR internship description verbatim', () => {
+    render(<Resume />)
+    expect(
+      screen.getByText(
+        'Uzaktan çalışma modelinde; ekip proje planlama ve yazılım geliştirme süreçlerinde aktif görev alındı.',
+      ),
+    ).toBeInTheDocument()
   })
 })

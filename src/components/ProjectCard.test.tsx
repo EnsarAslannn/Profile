@@ -53,6 +53,16 @@ describe('ProjectCard', () => {
     expect(img.getAttribute('fetchpriority')).toBeNull()
   })
 
+  it('the cover image fills its mosaic cell at md: with an object-fit utility', () => {
+    const { container } = renderWithRouter(
+      <ul>
+        <ProjectCard project={dolfin} featured={false} />
+      </ul>,
+    )
+    const img = container.querySelector('img')!
+    expect(img.className).toMatch(/md:object-cover/)
+  })
+
   it('does not render the subtitle as visible text, but keeps it in the accessible name', () => {
     renderWithRouter(
       <ul>

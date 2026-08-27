@@ -9,7 +9,7 @@ describe('Hero', () => {
     expect(screen.getAllByRole('heading')).toHaveLength(1)
   })
 
-  it('keeps the section anchor the navbar links to', () => {
+  it('keeps the section anchor the footer links to', () => {
     const { container } = render(<Hero />)
     expect(container.querySelector('section#hakkimda')).not.toBeNull()
   })

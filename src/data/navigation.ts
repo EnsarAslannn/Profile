@@ -1,7 +1,7 @@
-// Single source of truth for section navigation. Consumed by Navbar.tsx and
-// Footer.tsx (via FooterNav.tsx) so the two never drift apart. Adding or
-// removing a section means editing this file AND src/pages/HomePage.tsx -
-// see CLAUDE.md's two-edit rule.
+// Single source of truth for section navigation. Its only consumer is
+// FooterNav.tsx (there is no navbar - it was removed at the owner's request,
+// five-owner-changes Task 4). Adding or removing a section means editing
+// this file AND src/pages/HomePage.tsx - see CLAUDE.md's two-edit rule.
 export type NavLink = {
   anchor: string
   label: string

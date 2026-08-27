@@ -1,6 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import Footer from './components/Footer'
-import Navbar from './components/Navbar'
 import PageBackdrop from './components/PageBackdrop'
 import ScrollToHash from './components/ScrollToHash'
 import HomePage from './pages/HomePage'
@@ -11,7 +10,6 @@ export default function App() {
     <div className="relative isolate min-h-screen bg-surface-base text-ink-body">
       <PageBackdrop />
       <ScrollToHash />
-      <Navbar />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/projects/:slug" element={<ProjectDetailPage />} />

@@ -19,7 +19,11 @@ export default function HomePage() {
         image={profilePhoto}
         type="website"
       />
-      <main className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10 xl:px-12">
+      <main
+        id="main"
+        tabIndex={-1}
+        className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10 xl:px-12 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+      >
         <Hero />
         <Projects />
         <Resume />

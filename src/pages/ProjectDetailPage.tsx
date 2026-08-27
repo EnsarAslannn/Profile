@@ -1,4 +1,5 @@
 import { Link, Navigate, useParams } from 'react-router-dom'
+import ArrowLeftIcon from '../components/icons/ArrowLeftIcon'
 import ProjectScreens from '../components/ProjectScreens'
 import RouteMeta from '../components/RouteMeta'
 import { getProjectBySlug } from '../data/projects'
@@ -23,8 +24,20 @@ export default function ProjectDetailPage() {
         image={ogImage}
         type="article"
       />
-    <main className="mx-auto max-w-7xl px-6 py-16 sm:px-8 lg:px-10 xl:px-12">
+    <main
+      id="main"
+      tabIndex={-1}
+      className="mx-auto max-w-7xl px-6 py-16 sm:px-8 lg:px-10 xl:px-12 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+    >
       <div className="mx-auto max-w-3xl">
+        <Link
+          to="/"
+          className="mb-6 inline-flex items-center gap-2 rounded px-3 py-3 text-sm font-medium text-accent-base transition-colors duration-200 hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:text-accent-active sm:mb-8"
+        >
+          <ArrowLeftIcon className="h-4 w-4 shrink-0" />
+          Geri
+        </Link>
+
         {cover && (
           <figure className="mb-8 overflow-hidden rounded-2xl border border-line-subtle bg-surface-sunken sm:mb-10">
             <img
@@ -42,11 +55,10 @@ export default function ProjectDetailPage() {
 
         <h1 className="text-4xl font-bold tracking-tight text-ink-strong sm:text-5xl">{project.title}</h1>
         <p className="mt-3 text-lg font-medium text-accent-base sm:text-xl">{project.subtitle}</p>
-        <div className="mt-4 h-1 w-12 rounded bg-accent-base" />
 
         <ul
           aria-label="Kullanılan teknolojiler"
-          className="mt-6 flex flex-wrap items-center gap-y-2 text-sm font-medium text-ink-body sm:text-base"
+          className="mt-10 flex flex-wrap items-center gap-y-2 text-sm font-medium text-ink-body sm:text-base"
         >
           {project.technologies.map((tech, index) => (
             <li key={tech}>
@@ -65,7 +77,6 @@ export default function ProjectDetailPage() {
         </p>
 
         <h2 className="mt-12 text-3xl font-bold text-ink-strong sm:mt-16">Ekranlar</h2>
-        <div className="mt-4 h-1 w-12 rounded bg-accent-base" />
 
         <ProjectScreens screens={project.screens} projectTitle={project.title} />
 
@@ -73,15 +84,7 @@ export default function ProjectDetailPage() {
           to={{ pathname: '/', hash: '#projeler' }}
           className="mt-12 inline-flex items-center gap-2 rounded px-3 py-3 text-sm font-medium text-accent-base transition-colors hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
-          <svg aria-hidden="true" className="h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="none">
-            <path
-              d="M12.5 15L7.5 10L12.5 5"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <ArrowLeftIcon className="h-4 w-4 shrink-0" />
           Projelere dön
         </Link>
       </div>

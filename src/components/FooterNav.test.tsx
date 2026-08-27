@@ -3,13 +3,16 @@ import { describe, expect, it } from 'vitest'
 import FooterNav from './FooterNav'
 import { renderWithRouter } from '../test/renderWithRouter'
 import { NAV_LINKS } from '../data/navigation'
-import { PROJECTS } from '../data/projects'
 
 describe('FooterNav', () => {
-  it('renders both column headings', () => {
+  it('renders no heading - it is a single centred row, not headed columns', () => {
+    const { container } = renderWithRouter(<FooterNav />)
+    expect(container.querySelectorAll('h3')).toHaveLength(0)
+  })
+
+  it('renders exactly NAV_LINKS.length links', () => {
     renderWithRouter(<FooterNav />)
-    expect(screen.getByRole('heading', { level: 3, name: 'Bölümler' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { level: 3, name: 'Projeler' })).toBeInTheDocument()
+    expect(screen.getAllByRole('link')).toHaveLength(NAV_LINKS.length)
   })
 
   it("the sections column's hrefs match NAV_LINKS exactly, absolute-to-home", () => {
@@ -18,16 +21,6 @@ describe('FooterNav', () => {
       expect(screen.getByRole('link', { name: link.label })).toHaveAttribute(
         'href',
         `/#${link.anchor}`,
-      )
-    }
-  })
-
-  it("the projects column's hrefs match PROJECTS exactly", () => {
-    renderWithRouter(<FooterNav />)
-    for (const project of PROJECTS) {
-      expect(screen.getByRole('link', { name: project.title })).toHaveAttribute(
-        'href',
-        `/projects/${project.slug}`,
       )
     }
   })

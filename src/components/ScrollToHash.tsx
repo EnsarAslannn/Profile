@@ -4,8 +4,8 @@ import { useLocation } from 'react-router-dom'
 // React Router does not scroll to a #hash on navigation - this component
 // does it. It keys on location.key (not just pathname/hash) because Router
 // mints a fresh key on every push, including a push to the identical URL,
-// which is what makes clicking a nav link a second time re-scroll instead
-// of being a no-op.
+// which is what makes clicking a footer section link a second time re-scroll
+// instead of being a no-op.
 export default function ScrollToHash() {
   const location = useLocation()
 

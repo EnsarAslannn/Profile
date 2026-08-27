@@ -4,8 +4,9 @@
 // (see App.tsx's `relative isolate` root for the positioning context this
 // depends on). Never add overflow-hidden/transform/filter/contain to an
 // ancestor of this element - any of them would change what `position:
-// absolute` is sized against and can break the sticky navbar/profile card
-// elsewhere on the page.
+// absolute` is sized against, and would break the sticky profile card in
+// Hero.tsx. The footer card carries its own overflow-hidden, which is fine -
+// it is a sibling of this element, never an ancestor.
 export default function PageBackdrop() {
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-dvh bg-[linear-gradient(to_bottom,var(--color-backdrop-from)_0%,var(--color-backdrop-to)_55%)]" />

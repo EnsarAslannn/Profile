@@ -40,7 +40,7 @@ export default function FooterWordmark() {
           fontWeight={800}
           fontSize={170}
           letterSpacing="-4"
-          className="font-sans text-line-strong"
+          className="font-sans text-white/10"
           fill="currentColor"
         >
           {SITE_NAME}
@@ -53,7 +53,7 @@ export default function FooterWordmark() {
           fontWeight={800}
           fontSize={170}
           letterSpacing="-4"
-          className="font-sans text-accent-base [mask-image:radial-gradient(circle_170px_at_var(--wordmark-x,-9999px)_var(--wordmark-y,-9999px),black_0%,black_35%,transparent_100%)] [-webkit-mask-image:radial-gradient(circle_170px_at_var(--wordmark-x,-9999px)_var(--wordmark-y,-9999px),black_0%,black_35%,transparent_100%)] transition-[--wordmark-x,--wordmark-y] duration-150 ease-out motion-reduce:transition-none"
+          className="font-sans text-white/45 [mask-image:radial-gradient(circle_170px_at_var(--wordmark-x,-9999px)_var(--wordmark-y,-9999px),black_0%,black_35%,transparent_100%)] [-webkit-mask-image:radial-gradient(circle_170px_at_var(--wordmark-x,-9999px)_var(--wordmark-y,-9999px),black_0%,black_35%,transparent_100%)] transition-[--wordmark-x,--wordmark-y] duration-150 ease-out motion-reduce:transition-none"
           fill="currentColor"
         >
           {SITE_NAME}

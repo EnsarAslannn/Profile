@@ -87,6 +87,25 @@ describe('ProjectDetailPage', () => {
     expect(link).toHaveAttribute('href', '/#projeler')
   })
 
+  it('has a "Geri" link back to the home page, at the top of the page', () => {
+    const { container } = renderWithRouter(<App />, '/projects/dolfin')
+    const link = screen.getByRole('link', { name: 'Geri' })
+    expect(link).toHaveAttribute('href', '/')
+
+    const h1 = screen.getByRole('heading', { level: 1, name: 'DOLFIN' })
+    expect(link.compareDocumentPosition(h1) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    // sanity: link is actually inside this page, not e.g. a stray global element
+    expect(container.contains(link)).toBe(true)
+  })
+
+  it('coexists with "Projelere dön" - the two back controls target different places', () => {
+    renderWithRouter(<App />, '/projects/dolfin')
+    const geri = screen.getByRole('link', { name: 'Geri' })
+    const backToGrid = screen.getByRole('link', { name: 'Projelere dön' })
+    expect(geri).toHaveAttribute('href', '/')
+    expect(backToGrid).toHaveAttribute('href', '/#projeler')
+  })
+
   it('does not also mount the home page hero', () => {
     renderWithRouter(<App />, '/projects/dolfin')
     expect(screen.queryByRole('heading', { level: 1, name: 'Hakkımda' })).not.toBeInTheDocument()
