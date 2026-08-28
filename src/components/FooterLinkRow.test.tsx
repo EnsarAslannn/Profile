@@ -6,13 +6,15 @@ import { CONTACT_ITEMS } from '../data/contact'
 import { SOCIAL_LINKS } from '../data/social'
 
 describe('FooterLinkRow', () => {
-  it('renders LinkedIn, GitHub and E-posta links in that order, plus the back-to-top button as a 4th item', () => {
+  it('renders LinkedIn, GitHub and E-posta links in that order, and nothing else', () => {
     const { container } = renderWithRouter(<FooterLinkRow />)
     const items = container.querySelectorAll('li')
-    expect(items).toHaveLength(4)
+    expect(items).toHaveLength(3)
     const links = screen.getAllByRole('link')
     expect(links.map((link) => link.textContent)).toEqual(['LinkedIn', 'GitHub', 'E-posta'])
-    expect(screen.getByRole('button', { name: 'Yukarı çık' })).toBeInTheDocument()
+    // The back-to-top button was removed at the owner's request; the row is
+    // links only, so a stray button here is a regression.
+    expect(screen.queryAllByRole('button')).toHaveLength(0)
   })
 
   it('resolves the LinkedIn and GitHub hrefs from SOCIAL_LINKS and opens them safely in a new tab', () => {

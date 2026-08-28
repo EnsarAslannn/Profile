@@ -1,5 +1,4 @@
 import type { ComponentType } from 'react'
-import BackToTopButton from './BackToTopButton'
 import GitHubIcon from './icons/GitHubIcon'
 import LinkedInIcon from './icons/LinkedInIcon'
 import MailIcon from './icons/MailIcon'
@@ -64,9 +63,6 @@ export default function FooterLinkRow() {
           </li>
         )
       })}
-      <li>
-        <BackToTopButton />
-      </li>
     </ul>
   )
 }

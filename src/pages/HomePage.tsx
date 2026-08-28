@@ -21,8 +21,7 @@ export default function HomePage() {
       />
       <main
         id="main"
-        tabIndex={-1}
-        className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10 xl:px-12 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10 xl:px-12"
       >
         <Hero />
         <Projects />
