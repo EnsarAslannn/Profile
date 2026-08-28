@@ -9,7 +9,11 @@ export default function Hero() {
         <div className="lg:sticky lg:top-24 lg:col-start-1">
           <ProfileCard />
         </div>
-        <div className="lg:col-start-2 lg:min-w-0">
+        {/* data-reveal sits on the prose column, and on ProfileCard's own root
+            rather than on the sticky wrapper above - a transform on the
+            sticky element would fight its offset while the reveal runs, and
+            CLAUDE.md bans transforms on anything above it. */}
+        <div data-reveal className="[--reveal-delay:120ms] lg:col-start-2 lg:min-w-0">
           <h1 className="text-4xl font-bold tracking-tight text-ink-strong sm:text-5xl">Hakkımda</h1>
           <div className="mt-10 space-y-5">
             {ABOUT_PARAGRAPHS.map((paragraph) => (

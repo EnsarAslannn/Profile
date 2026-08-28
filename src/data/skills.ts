@@ -4,6 +4,12 @@
 // sourced from that project's GitHub repo). The grouping and the group names
 // are editorial - the facts are not.
 //
+// The group headings are ENGLISH by the owner's explicit request, and are the
+// one deliberate exception to the Turkish-copy rule in CLAUDE.md. They read as
+// stack labels next to entries that are themselves English product names
+// (ASP.NET Core, Entity Framework Core), which is why the mixed language is
+// intentional here and nowhere else. The section heading stays "Yetenekler".
+//
 // Deliberately NO proficiency levels, percentages, star ratings or "years of
 // experience" numbers. There is no owner-supplied figure for any of those, so
 // a bar reading "C# 85%" would be a number this repo made up - exactly what
@@ -15,18 +21,15 @@ export type SkillGroup = {
   items: readonly string[]
 }
 
-export const SKILLS_INTRO =
-  'Aşağıdaki teknolojileri hobi düzeyinde değil, bu sayfada yer alan projelerin içinde uçtan uca kullandım.'
-
 export const SKILL_GROUPS: SkillGroup[] = [
   {
     id: 'languages',
-    heading: 'Diller & Çatılar',
+    heading: 'Languages & Frameworks',
     items: ['C#', '.NET', 'ASP.NET Core', 'TypeScript', 'React'],
   },
   {
     id: 'architecture',
-    heading: 'Mimari & Desenler',
+    heading: 'Architecture & Patterns',
     items: [
       'Clean Architecture',
       'Vertical Slice Architecture',
@@ -37,22 +40,22 @@ export const SKILL_GROUPS: SkillGroup[] = [
   },
   {
     id: 'data',
-    heading: 'Veri & Önbellek',
+    heading: 'Data & Caching',
     items: ['PostgreSQL', 'Entity Framework Core', 'Redis', 'HybridCache'],
   },
   {
     id: 'messaging',
-    heading: 'Mesajlaşma & Arka Plan',
+    heading: 'Messaging & Background Jobs',
     items: ['RabbitMQ', 'MassTransit', 'SignalR', 'Hangfire'],
   },
   {
     id: 'frontend',
-    heading: 'Frontend Araçları',
+    heading: 'Frontend',
     items: ['Vite', 'Tailwind CSS', 'Zustand', 'React Router', 'Axios'],
   },
   {
     id: 'quality',
-    heading: 'Test & DevOps',
+    heading: 'Testing & DevOps',
     items: [
       'xUnit',
       'Testcontainers',

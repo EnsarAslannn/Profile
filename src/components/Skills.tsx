@@ -1,4 +1,5 @@
-import { SKILL_GROUPS, SKILLS_INTRO } from '../data/skills'
+import { SKILL_GROUPS } from '../data/skills'
+import { revealDelayClass } from '../lib/useReveal'
 
 // Cards reuse the surface/border/shadow recipe already established by
 // ProfileCard and ProjectCard rather than introducing a new one, so the
@@ -16,28 +17,37 @@ const CHIP_CLASS =
 export default function Skills() {
   return (
     <section id="yetenekler" className="scroll-mt-8 border-t border-line-subtle py-16">
-      <h2 className="text-3xl font-bold text-ink-strong sm:text-4xl">Yetenekler</h2>
-      <div className="mt-10">
-        <p className="max-w-2xl text-base leading-relaxed text-ink-body sm:text-lg">
-          {SKILLS_INTRO}
-        </p>
-        <ul className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-          {SKILL_GROUPS.map((group) => (
-            <li key={group.id} className={CARD_CLASS}>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
-                {group.heading}
-              </h3>
-              <ul className="mt-4 flex flex-wrap gap-2">
-                {group.items.map((item) => (
-                  <li key={item} className={CHIP_CLASS}>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <h2 data-reveal className="text-3xl font-bold text-ink-strong sm:text-4xl">
+        Yetenekler
+      </h2>
+      {/* No intro paragraph: removed at the owner's request. The heading now
+          leads straight into the grid, so the mt- value lives here rather
+          than on a paragraph that no longer exists. */}
+      <ul className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+        {SKILL_GROUPS.map((group, index) => (
+          <li key={group.id} data-reveal className={`${CARD_CLASS} ${revealDelayClass(index)}`}>
+            {/* lang="en" is load-bearing, not decoration. The document is
+                lang="tr", and CSS text-transform casing is locale-aware, so
+                a Turkish-tagged "Architecture" uppercases to "ARCHİTECTURE"
+                (dotted capital I) - Turkish maps i -> İ. Tagging the label as
+                English restores ARCHITECTURE and also stops a screen reader
+                reading these labels with Turkish pronunciation. */}
+            <h3
+              lang="en"
+              className="text-xs font-semibold uppercase tracking-wider text-ink-muted"
+            >
+              {group.heading}
+            </h3>
+            <ul className="mt-4 flex flex-wrap gap-2">
+              {group.items.map((item) => (
+                <li key={item} className={CHIP_CLASS}>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
     </section>
   )
 }

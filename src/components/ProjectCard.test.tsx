@@ -12,7 +12,7 @@ describe('ProjectCard', () => {
   it('renders an h3 named after the project title', () => {
     renderWithRouter(
       <ul>
-        <ProjectCard project={dolfin} featured={false} />
+        <ProjectCard project={dolfin} index={1} />
       </ul>,
     )
     expect(screen.getByRole('heading', { level: 3, name: 'DOLFIN' })).toBeInTheDocument()
@@ -21,7 +21,7 @@ describe('ProjectCard', () => {
   it('contains exactly one link pointing at the project route', () => {
     renderWithRouter(
       <ul>
-        <ProjectCard project={dolfin} featured={false} />
+        <ProjectCard project={dolfin} index={1} />
       </ul>,
     )
     const links = screen.getAllByRole('link')
@@ -32,7 +32,7 @@ describe('ProjectCard', () => {
   it("the link's accessible name contains the project title", () => {
     renderWithRouter(
       <ul>
-        <ProjectCard project={dolfin} featured={false} />
+        <ProjectCard project={dolfin} index={1} />
       </ul>,
     )
     expect(screen.getByRole('link')).toHaveAccessibleName(/DOLFIN/)
@@ -41,7 +41,7 @@ describe('ProjectCard', () => {
   it('renders the cover image with the true intrinsic attributes', () => {
     const { container } = renderWithRouter(
       <ul>
-        <ProjectCard project={dolfin} featured={false} />
+        <ProjectCard project={dolfin} index={1} />
       </ul>,
     )
     const img = container.querySelector('img')!
@@ -56,7 +56,7 @@ describe('ProjectCard', () => {
   it('the cover image fills its mosaic cell at md: with an object-fit utility', () => {
     const { container } = renderWithRouter(
       <ul>
-        <ProjectCard project={dolfin} featured={false} />
+        <ProjectCard project={dolfin} index={1} />
       </ul>,
     )
     const img = container.querySelector('img')!
@@ -66,7 +66,7 @@ describe('ProjectCard', () => {
   it('does not render the subtitle as visible text, but keeps it in the accessible name', () => {
     renderWithRouter(
       <ul>
-        <ProjectCard project={dolfin} featured={false} />
+        <ProjectCard project={dolfin} index={1} />
       </ul>,
     )
     expect(screen.queryByText(dolfin.subtitle)).not.toBeInTheDocument()
@@ -76,7 +76,7 @@ describe('ProjectCard', () => {
   it('never renders the description on the card', () => {
     renderWithRouter(
       <ul>
-        <ProjectCard project={dolfin} featured={false} />
+        <ProjectCard project={dolfin} index={1} />
       </ul>,
     )
     for (const paragraph of dolfin.description) {
@@ -87,7 +87,7 @@ describe('ProjectCard', () => {
   it('keeps the title in the DOM and the accessibility tree with no hover or focus simulated', () => {
     renderWithRouter(
       <ul>
-        <ProjectCard project={dolfin} featured={false} />
+        <ProjectCard project={dolfin} index={1} />
       </ul>,
     )
     const heading = screen.getByRole('heading', { level: 3, name: 'DOLFIN' })
@@ -98,7 +98,7 @@ describe('ProjectCard', () => {
   it('the bar reveal is gated on group-hover and group-focus-visible variants', () => {
     const { container } = renderWithRouter(
       <ul>
-        <ProjectCard project={dolfin} featured={false} />
+        <ProjectCard project={dolfin} index={1} />
       </ul>,
     )
     const bar = container.querySelector('[data-card-bar]')!
@@ -109,7 +109,7 @@ describe('ProjectCard', () => {
   it('gates the hide/reveal rules behind a hover-capable-pointer media query, so touch devices see the bar unconditionally', () => {
     const { container } = renderWithRouter(
       <ul>
-        <ProjectCard project={dolfin} featured={false} />
+        <ProjectCard project={dolfin} index={1} />
       </ul>,
     )
     const bar = container.querySelector('[data-card-bar]')!
@@ -120,7 +120,7 @@ describe('ProjectCard', () => {
   it('renders exactly one decorative arrow icon that is not announced, and keeps the accessible name exact', () => {
     renderWithRouter(
       <ul>
-        <ProjectCard project={dolfin} featured={false} />
+        <ProjectCard project={dolfin} index={1} />
       </ul>,
     )
     const svgs = screen.getAllByRole('link')[0].querySelectorAll('svg')
@@ -130,19 +130,21 @@ describe('ProjectCard', () => {
     expect(screen.getByRole('link')).toHaveAccessibleName(`${dolfin.title} - ${dolfin.subtitle}`)
   })
 
-  it('toggles a placement class based on featured', () => {
+  it('gives index 0 the tall featured cell and later cards the right column', () => {
     const { container: featuredContainer } = renderWithRouter(
       <ul>
-        <ProjectCard project={dolfin} featured={true} />
+        <ProjectCard project={dolfin} index={0} />
       </ul>,
     )
     const { container: plainContainer } = renderWithRouter(
       <ul>
-        <ProjectCard project={dolfin} featured={false} />
+        <ProjectCard project={dolfin} index={1} />
       </ul>,
     )
     const featuredLi = featuredContainer.querySelector('li')
     const plainLi = plainContainer.querySelector('li')
-    expect(featuredLi!.className).not.toBe(plainLi!.className)
+    expect(featuredLi!.className).toMatch(/md:row-span-2/)
+    expect(plainLi!.className).not.toMatch(/md:row-span-2/)
+    expect(plainLi!.className).toMatch(/md:col-start-2/)
   })
 })

@@ -10,7 +10,7 @@ export default function ProjectScreens({ screens, projectTitle }: Props) {
   return (
     <ul className="mt-8 space-y-8 sm:space-y-12">
       {screens.map((screen, index) => (
-        <li key={screen.name}>
+        <li key={screen.name} data-reveal>
           <figure>
             <div className="overflow-hidden rounded-2xl bg-surface-sunken">
               <img

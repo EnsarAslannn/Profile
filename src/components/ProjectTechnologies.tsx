@@ -17,6 +17,7 @@ type Props = {
 export default function ProjectTechnologies({ groups }: Props) {
   return (
     <dl
+      data-reveal
       aria-label="Kullanılan teknolojiler"
       className="mt-10 space-y-5 sm:grid sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-x-8 sm:gap-y-4 sm:space-y-0"
     >

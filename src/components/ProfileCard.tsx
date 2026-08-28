@@ -4,7 +4,10 @@ import SocialLinks from './SocialLinks'
 
 export default function ProfileCard() {
   return (
-    <div className="mx-auto w-full max-w-xs rounded-2xl border border-line-subtle bg-surface-raised p-6 shadow-sm shadow-slate-950/5 sm:p-8 lg:mx-0 lg:max-w-none lg:p-5 xl:p-6">
+    <div
+      data-reveal
+      className="mx-auto w-full max-w-xs rounded-2xl border border-line-subtle bg-surface-raised p-6 shadow-sm shadow-slate-950/5 sm:p-8 lg:mx-0 lg:max-w-none lg:p-5 xl:p-6"
+    >
       <img
         src={profilePhoto}
         alt="Ensar Aslan"

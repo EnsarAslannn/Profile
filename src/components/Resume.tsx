@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
 import { RESUME_GROUPS, toMachineDate } from '../data/resume'
+import { revealDelayClass } from '../lib/useReveal'
 import BriefcaseIcon from './icons/BriefcaseIcon'
 import GraduationCapIcon from './icons/GraduationCapIcon'
 
@@ -14,12 +15,18 @@ const GROUP_ICONS: Record<string, ComponentType<{ className?: string }>> = {
 export default function Resume() {
   return (
     <section id="ozgecmis" className="scroll-mt-8 border-t border-line-subtle py-16">
-      <h2 className="text-3xl font-bold text-ink-strong sm:text-4xl">Özgeçmiş</h2>
-      <div className="mt-10 space-y-14">
-        {RESUME_GROUPS.map((group) => {
+      <h2 data-reveal className="text-3xl font-bold text-ink-strong sm:text-4xl">
+        Özgeçmiş
+      </h2>
+      {/* Two columns from md: up - Eğitim left, Deneyim right (owner's
+          request). `items-start` so the shorter column does not stretch its
+          rail to match the taller one, and gap-14 below md: reproduces the
+          vertical rhythm the stacked layout had before. */}
+      <div className="mt-10 grid grid-cols-1 items-start gap-14 md:grid-cols-2 md:gap-10 lg:gap-16">
+        {RESUME_GROUPS.map((group, index) => {
           const Icon = GROUP_ICONS[group.id]
           return (
-            <div key={group.id}>
+            <div key={group.id} data-reveal className={revealDelayClass(index)}>
               <div className="flex items-center gap-4">
                 {Icon && (
                   <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-line-subtle bg-surface-raised text-accent-base shadow-sm shadow-slate-950/5">

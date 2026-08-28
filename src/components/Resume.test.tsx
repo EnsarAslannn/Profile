@@ -87,6 +87,24 @@ describe('Resume', () => {
     expect(icons).toHaveLength(2)
   })
 
+  // Owner's request: Deneyim sits to the right of Eğitim from md: up. The
+  // grid lives on the groups' shared parent, so a future edit that swaps it
+  // back for a stacked space-y wrapper fails here.
+  it('lays the two groups out side by side from md: up', () => {
+    render(<Resume />)
+    const heading = screen.getByRole('heading', { level: 3, name: 'Eğitim' })
+    const column = heading.closest('div')!.parentElement!
+    const grid = column.parentElement!
+    expect(grid.className).toMatch(/\bgrid\b/)
+    expect(grid.className).toMatch(/\bgrid-cols-1\b/)
+    expect(grid.className).toMatch(/\bmd:grid-cols-2\b/)
+    expect(grid.className).not.toMatch(/\bspace-y-/)
+    // Eğitim must be the first column, Deneyim the second.
+    expect(Array.from(grid.children)).toHaveLength(2)
+    expect(grid.children[0].textContent).toContain('Eğitim')
+    expect(grid.children[1].textContent).toContain('Deneyim')
+  })
+
   it('keeps the group headings visually smaller than the section heading', () => {
     render(<Resume />)
     const h2 = screen.getByRole('heading', { level: 2, name: 'Özgeçmiş' })

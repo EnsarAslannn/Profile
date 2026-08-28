@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import Skills from './Skills'
-import { SKILL_GROUPS, SKILLS_INTRO } from '../data/skills'
+import { SKILL_GROUPS } from '../data/skills'
 import { ABOUT_PARAGRAPHS } from '../data/about'
 import { PROJECTS } from '../data/projects'
 
@@ -19,13 +19,46 @@ describe('Skills', () => {
     )
   })
 
-  it('renders the intro and every skill in every group', () => {
+  it('renders every skill in every group', () => {
     render(<Skills />)
-    expect(screen.getByText(SKILLS_INTRO)).toBeInTheDocument()
     for (const group of SKILL_GROUPS) {
       for (const item of group.items) {
         expect(screen.getByText(item)).toBeInTheDocument()
       }
+    }
+  })
+
+  // The intro sentence was removed at the owner's request; the heading now
+  // leads straight into the grid. Asserting the absence keeps a later edit
+  // from quietly reintroducing a paragraph nobody asked for.
+  it('renders no intro paragraph above the grid', () => {
+    const { container } = render(<Skills />)
+    expect(container.querySelectorAll('section > p')).toHaveLength(0)
+    expect(container.querySelectorAll('p')).toHaveLength(0)
+  })
+
+  // Owner's request: the group labels are English even though the rest of
+  // the site's copy is Turkish. Pinned so a well-meaning 'fix the language'
+  // pass has to be a deliberate decision, not a silent one.
+  it('labels the groups in English', () => {
+    render(<Skills />)
+    expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual([
+      'Languages & Frameworks',
+      'Architecture & Patterns',
+      'Data & Caching',
+      'Messaging & Background Jobs',
+      'Frontend',
+      'Testing & DevOps',
+    ])
+  })
+
+  // Not cosmetic: the document is lang='tr' and CSS text-transform casing
+  // is locale-aware, so an untagged 'Architecture' uppercases to
+  // 'ARCHITECTURE' with a Turkish dotted capital I.
+  it('tags the English labels with lang=en so uppercasing stays English', () => {
+    render(<Skills />)
+    for (const heading of screen.getAllByRole('heading', { level: 3 })) {
+      expect(heading).toHaveAttribute('lang', 'en')
     }
   })
 

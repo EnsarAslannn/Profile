@@ -1,17 +1,23 @@
 import { Link } from 'react-router-dom'
 import ArrowUpRightIcon from './icons/ArrowUpRightIcon'
 import type { Project } from '../data/projects'
+import { revealDelayClass } from '../lib/useReveal'
 
 type Props = {
   project: Project
-  featured: boolean
+  // Position in the mosaic, not just a key: index 0 takes the tall featured
+  // cell, and the same number drives the reveal stagger so the cards arrive
+  // in the order they are read.
+  index: number
 }
 
-export default function ProjectCard({ project, featured }: Props) {
+export default function ProjectCard({ project, index }: Props) {
   const cover = project.cover
+  const placement =
+    index === 0 ? 'md:col-start-1 md:row-start-1 md:row-span-2' : 'md:col-start-2'
 
   return (
-    <li className={featured ? 'h-full md:col-start-1 md:row-start-1 md:row-span-2' : 'h-full md:col-start-2'}>
+    <li data-reveal className={`h-full ${placement} ${revealDelayClass(index)}`}>
       <Link
         to={`/projects/${project.slug}`}
         aria-label={`${project.title} - ${project.subtitle}`}

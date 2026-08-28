@@ -6,8 +6,10 @@ import ProjectTechnologies from '../components/ProjectTechnologies'
 import RouteMeta from '../components/RouteMeta'
 import { getProjectBySlug } from '../data/projects'
 import { SITE_NAME, firstSentence, truncateForDescription } from '../lib/siteMeta'
+import { useReveal } from '../lib/useReveal'
 
 export default function ProjectDetailPage() {
+  const revealRoot = useReveal<HTMLElement>()
   const { slug } = useParams<{ slug: string }>()
   const project = getProjectBySlug(slug)
 
@@ -27,6 +29,7 @@ export default function ProjectDetailPage() {
         type="article"
       />
     <main
+      ref={revealRoot}
       id="main"
       className="mx-auto max-w-7xl px-6 py-16 sm:px-8 lg:px-10 xl:px-12"
     >
@@ -40,7 +43,7 @@ export default function ProjectDetailPage() {
         </Link>
 
         {cover && (
-          <figure className="mb-8 overflow-hidden rounded-2xl border border-line-subtle bg-surface-sunken sm:mb-10">
+          <figure data-reveal className="mb-8 overflow-hidden rounded-2xl border border-line-subtle bg-surface-sunken sm:mb-10">
             <img
               src={cover.src}
               alt=""
@@ -54,8 +57,12 @@ export default function ProjectDetailPage() {
           </figure>
         )}
 
-        <h1 className="text-4xl font-bold tracking-tight text-ink-strong sm:text-5xl">{project.title}</h1>
-        <p className="mt-3 text-lg font-medium text-accent-base sm:text-xl">{project.subtitle}</p>
+        <div data-reveal className="[--reveal-delay:80ms]">
+          <h1 className="text-4xl font-bold tracking-tight text-ink-strong sm:text-5xl">
+            {project.title}
+          </h1>
+          <p className="mt-3 text-lg font-medium text-accent-base sm:text-xl">{project.subtitle}</p>
+        </div>
 
         {project.liveUrl && (
           <a
@@ -71,7 +78,7 @@ export default function ProjectDetailPage() {
 
         <ProjectTechnologies groups={project.technologies} />
 
-        <div className="mt-6 space-y-5">
+        <div data-reveal className="mt-6 space-y-5">
           {project.description.map((paragraph) => (
             <p
               key={paragraph}
@@ -82,7 +89,7 @@ export default function ProjectDetailPage() {
           ))}
         </div>
 
-        <h2 className="mt-12 text-3xl font-bold text-ink-strong sm:mt-16 sm:text-4xl">Ekranlar</h2>
+        <h2 data-reveal className="mt-12 text-3xl font-bold text-ink-strong sm:mt-16 sm:text-4xl">Ekranlar</h2>
 
         <ProjectScreens screens={project.screens} projectTitle={project.title} />
 
