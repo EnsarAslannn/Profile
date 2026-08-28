@@ -3,6 +3,7 @@ import Hero from '../components/Hero'
 import Projects from '../components/Projects'
 import Resume from '../components/Resume'
 import RouteMeta from '../components/RouteMeta'
+import Skills from '../components/Skills'
 import { ABOUT_PARAGRAPHS } from '../data/about'
 import { DEFAULT_TITLE, truncateForDescription } from '../lib/siteMeta'
 
@@ -26,6 +27,7 @@ export default function HomePage() {
         <Hero />
         <Projects />
         <Resume />
+        <Skills />
       </main>
     </>
   )

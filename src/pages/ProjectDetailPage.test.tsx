@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import App from '../App'
-import { getProjectBySlug } from '../data/projects'
+import { PROJECTS, getProjectBySlug } from '../data/projects'
 import { renderWithRouter } from '../test/renderWithRouter'
 
 describe('ProjectDetailPage', () => {
@@ -15,11 +15,18 @@ describe('ProjectDetailPage', () => {
     // link/figure around it already carries the accessible name) - so the
     // total is counted directly via querySelectorAll instead.
     expect(container.querySelectorAll('img')).toHaveLength(6)
-    expect(
-      screen.getByText(
-        'Kullanıcıların sanal cüzdanla hisse senedi alıp satabildiği full-stack bir finansal portföy yönetim platformu. .NET ve PostgreSQL ile geliştirildi. JWT ve CSRF korumalı kimlik doğrulama ile güvenli kullanıcı girişi sağlandı, Redis ile performans artırıcı önbellekleme yapıldı. xUnit ve Playwright ile test edildi, Docker ve GitHub Actions ile CI/CD sürecine entegre edildi.',
-      ),
-    ).toBeInTheDocument()
+    // Sourced from the data, not re-typed: the wording is pinned once in
+    // src/data/projects/index.test.ts, and repeating it here would mean two
+    // places to update for one copy edit. What this asserts is the page's own
+    // job - that every paragraph reaches the DOM, as its own <p>, in order.
+    const dolfin = getProjectBySlug('dolfin')!
+    const paragraphs = [...container.querySelectorAll('main p')].map((p) => p.textContent)
+    for (const paragraph of dolfin.description) {
+      expect(paragraphs).toContain(paragraph)
+    }
+    expect(paragraphs.filter((text) => dolfin.description.includes(text ?? ''))).toEqual([
+      ...dolfin.description,
+    ])
   })
 
   it('renders the takeauction project at /projects/takeauction', () => {
@@ -50,19 +57,50 @@ describe('ProjectDetailPage', () => {
     expect(firstImage).toHaveAttribute('height', '2161')
   })
 
-  it('renders the technologies list with the accessible name and items in order, for dolfin', () => {
-    renderWithRouter(<App />, '/projects/dolfin')
-    const list = screen.getByRole('list', { name: 'Kullanılan teknolojiler' })
-    const items = list.querySelectorAll('li')
-    expect(items).toHaveLength(6)
-    expect([...items].map((li) => li.textContent?.replace('·', '').trim())).toEqual([
-      '.NET',
-      'PostgreSQL',
-      'Redis',
-      'JWT',
-      'Playwright',
-      'Docker',
-    ])
+  it('links to the live demo of whichever project is on screen, opened safely', () => {
+    for (const slug of ['dolfin', 'takeauction', 'altitudelog']) {
+      const { unmount } = renderWithRouter(<App />, `/projects/${slug}`)
+      const link = screen.getByRole('link', { name: 'Canlı demoyu aç' })
+      expect(link).toHaveAttribute('href', getProjectBySlug(slug)!.liveUrl)
+      expect(link).toHaveAttribute('target', '_blank')
+      // Without noopener the opened tab gets a handle on this one via
+      // window.opener; noreferrer keeps the referrer off the request.
+      expect(link.getAttribute('rel')).toContain('noopener')
+      expect(link.getAttribute('rel')).toContain('noreferrer')
+      unmount()
+    }
+  })
+
+  it('renders the technologies as a labelled description list, one row per group, for dolfin', () => {
+    const { container } = renderWithRouter(<App />, '/projects/dolfin')
+    const list = container.querySelector('dl[aria-label="Kullanılan teknolojiler"]')
+    expect(list).not.toBeNull()
+
+    const dolfin = PROJECTS.find((project) => project.slug === 'dolfin')!
+    expect([...list!.querySelectorAll('dt')].map((dt) => dt.textContent)).toEqual(
+      dolfin.technologies.map((group) => group.label),
+    )
+
+    // Each dd must carry that group's entries, separated by the aria-hidden
+    // dot. Stripping the dots is what proves the separator is decoration
+    // rather than part of a technology's name.
+    const values = [...list!.querySelectorAll('dd')].map((dd) =>
+      (dd.textContent ?? '')
+        .split('·')
+        .map((entry) => entry.trim())
+        .filter(Boolean),
+    )
+    expect(values).toEqual(dolfin.technologies.map((group) => [...group.items]))
+  })
+
+  it('keeps the dot separators out of the accessibility tree', () => {
+    const { container } = renderWithRouter(<App />, '/projects/dolfin')
+    const list = container.querySelector('dl[aria-label="Kullanılan teknolojiler"]')!
+    const separators = list.querySelectorAll('span[aria-hidden="true"]')
+    expect(separators.length).toBeGreaterThan(0)
+    for (const separator of separators) {
+      expect(separator.textContent?.trim()).toBe('·')
+    }
   })
 
   it('has exactly one h2, named Ekranlar', () => {

@@ -7,9 +7,62 @@ export const altitudelog: ProjectInput = {
   slug: 'altitudelog',
   title: 'AltitudELog',
   subtitle: 'Uçuş & Mürettebat Yönetim Sistemi',
-  description:
-    'Pilotların uçuş kaydı tutup mürettebat atayabildiği bir uçuş ve mürettebat yönetim sistemi. Clean Architecture ve CQRS (MediatR) prensipleriyle, .NET ve PostgreSQL üzerinde geliştirildi. Hangfire ile arka planda çalışan işler sayesinde dış hava durumu servisinden otomatik veri entegrasyonu yapıldı, Redis ile önbellekleme uygulandı. JWT ile rol bazlı yetkilendirme sağlandı; xUnit ve Testcontainers ile test edildi, Docker üzerinden CI/CD sürecine entegre edilip canlıya alındı.',
-  technologies: ['.NET', 'PostgreSQL', 'Redis', 'Hangfire', 'MediatR', 'JWT', 'Docker'],
+  liveUrl: 'https://altitudelog.vercel.app',
+  description: [
+    'Pilotların rütbeleriyle sisteme kayıt olduğu, uçuş kaydı oluşturduğu, her uçuşa mürettebat üyelerini görev rolleriyle atadığı ve isteğe bağlı olarak anonim CRM (Crew Resource Management) güvenlik raporu doldurabildiği bir uçuş ve mürettebat yönetim platformu. Hedef basit bir kayıt ekranı değil; rol tabanlı yetkilendirmeyi, arka plan işlerini, önbellek katmanını ve gerçek bir dağıtım sürecini bir araya getiren uçtan uca bir uygulamaydı.',
+    'Proje Clean Architecture prensipleriyle katmanlara ayrıldı. Domain katmanı Pilot, Flight, Crew ve CRMReport gibi çekirdek varlıkları hiçbir dış bağımlılık olmadan taşıyor; Application katmanı CQRS komut ve sorgularını MediatR üzerinden yürütüyor, doğrulama kurallarını ve önbellek soyutlamalarını barındırıyor; Infrastructure katmanı veritabanı erişimini, JWT üretimini, Redis bağlantısını ve METAR servisini üstleniyor.',
+    'Bir uçuş oluşturulduğunda kalkış havalimanının METAR hava durumu raporu arka planda tetiklenen bir Hangfire işiyle dış servisten çekilip uçuşa işleniyor. Dış API çağrısı yazma işleminden ayrıştırıldığı için kullanıcı raporun gelmesini beklemeden devam ediyor.',
+    'Pilotun rütbesi aynı zamanda sistemdeki yetki seviyesi: uçuş ve mürettebat oluşturma gibi yazma işlemleri komuta rütbeleriyle sınırlı ve bu bilgi JWT üzerinde rol olarak taşınıyor. Aynı kurallar arayüzde de rota koruması olarak uygulanıyor. Kayda özel kurallar controller katmanında değil işleyicinin içinde duruyor, böylece arayüzden dolaşılamıyor: bir pilotun uçuş kaydı dökümünü yalnızca kendisi ya da bir komuta rütbesi indirebiliyor.',
+    'Sık sorgulanan veriler Redis üzerinde önbelleğe alınıyor, güncelliğini yitirdiğinde ilgili kayıtlar otomatik geçersiz kılınıyor; önbellek servisi çökse dahi sistem doğrudan veritabanına düşerek çalışmaya devam ediyor. Pilot uçuş kayıtları CSV olarak ya da QuestPDF ile üretilen bir PDF olarak dışa aktarılabiliyor. API dokümantasyonu Scalar üzerinden gezilebiliyor, arka plan iş kuyruğu paneli parola korumalı bir uçta duruyor.',
+  ],
+  // Source: github.com/EnsarAslannn/AltitudELog - README "Kullanılan
+  // Teknolojiler" + src/AltitudELog.*/*.csproj + frontend/package.json +
+  // tests/* + .github/workflows/ci.yml. MediatR and QuestPDF are not in the
+  // README's list but are real PackageReferences (Application/Infrastructure
+  // and API respectively); QuestPDF is what backs the PDF export shown in the
+  // pilot-profile screenshot below.
+  technologies: [
+    {
+      label: 'Backend',
+      items: [
+        '.NET 10',
+        'ASP.NET Core Web API',
+        'PostgreSQL',
+        'Entity Framework Core',
+        'Redis',
+        'Hangfire',
+        'MediatR',
+        'FluentValidation',
+        'Serilog',
+        'QuestPDF',
+        'Scalar (OpenAPI)',
+        'JWT',
+      ],
+    },
+    {
+      label: 'Frontend',
+      items: [
+        'React 19',
+        'TypeScript',
+        'Vite',
+        'Tailwind CSS',
+        'Zustand',
+        'Axios',
+        'React Router',
+        'React Three Fiber',
+        'Three.js',
+        'Framer Motion',
+      ],
+    },
+    {
+      label: 'Test',
+      items: ['xUnit', 'Testcontainers', 'Vitest', 'React Testing Library'],
+    },
+    {
+      label: 'Deployment',
+      items: ['Docker', 'GitHub Actions', 'Railway', 'Vercel'],
+    },
+  ],
   screens: [
     {
       name: 'homePage',

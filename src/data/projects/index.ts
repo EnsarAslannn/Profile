@@ -1,6 +1,11 @@
 // Content here is owner-supplied and verbatim (Turkish project copy). Do not
-// edit, embellish, or add fields (tech-stack chips, dates, repo links) without
-// the owner - see CLAUDE.md's no-fabrication rule.
+// edit, embellish, or add fields (dates, repo links, metrics) without the
+// owner - see CLAUDE.md's no-fabrication rule.
+//
+// `technologies` is the one field with a second sanctioned source: the
+// owner asked for it to be filled from their own GitHub repos, so each entry
+// traces to that repo's README plus its real manifests. That is still not a
+// licence to infer - see the TechGroup comment below.
 //
 // Split into one file per project (this barrel plus <slug>.ts) once the data
 // crossed the ~120-line threshold that a single projects.ts file allowed -
@@ -26,12 +31,28 @@ export type ProjectScreen = {
   caption: string | undefined
 }
 
+// A project's stack, grouped the way the project's own README groups it
+// (Backend / Frontend / Test / Deployment). Grouped rather than one flat array
+// because the full stack of these projects runs past twenty entries, and a
+// single dot-separated run of twenty names is a wall, not a list.
+//
+// Every entry is verified against that repo: the README's own
+// "Kullanılan Teknolojiler" section plus the real manifests (*.csproj
+// PackageReference, package.json dependencies, .github/workflows). Nothing
+// here is inferred from what a project of this kind usually uses - if it is
+// not in the repo, it does not go in this list.
+export type TechGroup = {
+  label: string
+  items: readonly string[]
+}
+
 export type Project = {
   slug: string
   title: string
   subtitle: string
-  description: string
-  technologies: readonly string[]
+  liveUrl: string | undefined
+  description: readonly string[]
+  technologies: readonly TechGroup[]
   cover: ProjectCover | undefined
   screens: ProjectScreen[]
 }
@@ -40,8 +61,9 @@ export type ProjectInput = {
   slug: string
   title: string
   subtitle: string
-  description: string
-  technologies: readonly string[]
+  liveUrl?: string
+  description: readonly string[]
+  technologies: readonly TechGroup[]
   screens: readonly ProjectScreenInput[]
 }
 
@@ -85,6 +107,7 @@ export const PROJECTS: Project[] = PROJECT_INPUTS.map((input) => ({
   slug: input.slug,
   title: input.title,
   subtitle: input.subtitle,
+  liveUrl: input.liveUrl,
   description: input.description,
   technologies: input.technologies,
   cover: getProjectCover(input.slug),

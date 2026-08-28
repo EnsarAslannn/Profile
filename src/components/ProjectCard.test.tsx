@@ -79,7 +79,9 @@ describe('ProjectCard', () => {
         <ProjectCard project={dolfin} featured={false} />
       </ul>,
     )
-    expect(screen.queryByText(dolfin.description)).not.toBeInTheDocument()
+    for (const paragraph of dolfin.description) {
+      expect(screen.queryByText(paragraph)).not.toBeInTheDocument()
+    }
   })
 
   it('keeps the title in the DOM and the accessibility tree with no hover or focus simulated', () => {

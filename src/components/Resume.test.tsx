@@ -56,26 +56,48 @@ describe('Resume', () => {
     expect(screen.queryByText(/Placeholder/)).not.toBeInTheDocument()
   })
 
-  it('renders exactly two experience descriptions', () => {
+  // Removed at the owner's request: each internship is now title +
+  // organization + dates only. Asserting their absence keeps them from
+  // creeping back in a later edit.
+  it('renders no prose description under any entry', () => {
     const { container } = render(<Resume />)
-    expect(container.querySelectorAll('p[data-resume-description]')).toHaveLength(2)
+    expect(container.querySelectorAll('p[data-resume-description]')).toHaveLength(0)
+    expect(screen.queryByText(/Agile iş akışları/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Uzaktan çalışma modelinde/)).not.toBeInTheDocument()
   })
 
-  it('renders the Brisa internship description verbatim', () => {
-    render(<Resume />)
-    expect(
-      screen.getByText(
-        'Üretim sektöründeki kurumsal yazılım geliştirme süreçleri gözlemlenerek toplantılara katılım sağlandı. Agile iş akışları ve proje yönetimi metodolojilerinin analiz edilmesine katkı sağlandı.',
-      ),
-    ).toBeInTheDocument()
+  it('draws each entry as a timeline row: one accent dot, hidden from screen readers', () => {
+    const { container } = render(<Resume />)
+    const items = container.querySelectorAll('li')
+    expect(items).toHaveLength(4)
+    for (const item of items) {
+      const dots = item.querySelectorAll('span[aria-hidden="true"]')
+      expect(dots).toHaveLength(1)
+      // Decoration only - it must carry no text a screen reader would read
+      // out between the entry title and its organization.
+      expect(dots[0].textContent).toBe('')
+    }
   })
 
-  it('renders the AZR internship description verbatim', () => {
+  it('gives each group an aria-hidden icon, so the heading text stays the only accessible name', () => {
+    const { container } = render(<Resume />)
+    const headings = screen.getAllByRole('heading', { level: 3 })
+    expect(headings.map((h) => h.textContent)).toEqual(['Eğitim', 'Deneyim'])
+    const icons = container.querySelectorAll('svg[aria-hidden="true"]')
+    expect(icons).toHaveLength(2)
+  })
+
+  it('keeps the group headings visually smaller than the section heading', () => {
     render(<Resume />)
-    expect(
-      screen.getByText(
-        'Uzaktan çalışma modelinde; ekip proje planlama ve yazılım geliştirme süreçlerinde aktif görev alındı.',
-      ),
-    ).toBeInTheDocument()
+    const h2 = screen.getByRole('heading', { level: 2, name: 'Özgeçmiş' })
+    const h3 = screen.getByRole('heading', { level: 3, name: 'Deneyim' })
+    // jsdom does not do layout, so this compares the utilities that set the
+    // size rather than measured pixels. The owner asked for a visible step
+    // down from Özgeçmiş to Eğitim/Deneyim; equal classes would erase it.
+    expect(h2.className).toMatch(/\btext-3xl\b/)
+    expect(h2.className).toMatch(/\bsm:text-4xl\b/)
+    expect(h3.className).toMatch(/\btext-xl\b/)
+    expect(h3.className).toMatch(/\bsm:text-2xl\b/)
+    expect(h3.className).not.toMatch(/\btext-3xl\b/)
   })
 })

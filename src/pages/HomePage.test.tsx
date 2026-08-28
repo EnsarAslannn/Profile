@@ -7,7 +7,7 @@ describe('HomePage', () => {
   it('renders the sections in the owner-specified order', () => {
     const { container } = renderWithRouter(<HomePage />, '/')
     const ids = Array.from(container.querySelectorAll('section[id]')).map((section) => section.id)
-    expect(ids).toEqual(['hakkimda', 'projeler', 'ozgecmis'])
+    expect(ids).toEqual(['hakkimda', 'projeler', 'ozgecmis', 'yetenekler'])
   })
 
   // This is what makes the two-edit rule (CLAUDE.md: HomePage.tsx + NAV_LINKS)

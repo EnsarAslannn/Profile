@@ -11,4 +11,5 @@ export const NAV_LINKS: NavLink[] = [
   { anchor: 'hakkimda', label: 'Hakkımda' },
   { anchor: 'projeler', label: 'Projeler' },
   { anchor: 'ozgecmis', label: 'Özgeçmiş' },
+  { anchor: 'yetenekler', label: 'Yetenekler' },
 ]

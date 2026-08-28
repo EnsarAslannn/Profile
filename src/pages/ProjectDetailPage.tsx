@@ -1,6 +1,8 @@
 import { Link, Navigate, useParams } from 'react-router-dom'
 import ArrowLeftIcon from '../components/icons/ArrowLeftIcon'
+import ArrowUpRightIcon from '../components/icons/ArrowUpRightIcon'
 import ProjectScreens from '../components/ProjectScreens'
+import ProjectTechnologies from '../components/ProjectTechnologies'
 import RouteMeta from '../components/RouteMeta'
 import { getProjectBySlug } from '../data/projects'
 import { SITE_NAME, firstSentence, truncateForDescription } from '../lib/siteMeta'
@@ -20,7 +22,7 @@ export default function ProjectDetailPage() {
     <>
       <RouteMeta
         title={`${project.title} | ${SITE_NAME}`}
-        description={truncateForDescription(firstSentence(project.description))}
+        description={truncateForDescription(firstSentence(project.description[0]))}
         image={ogImage}
         type="article"
       />
@@ -55,27 +57,32 @@ export default function ProjectDetailPage() {
         <h1 className="text-4xl font-bold tracking-tight text-ink-strong sm:text-5xl">{project.title}</h1>
         <p className="mt-3 text-lg font-medium text-accent-base sm:text-xl">{project.subtitle}</p>
 
-        <ul
-          aria-label="Kullanılan teknolojiler"
-          className="mt-10 flex flex-wrap items-center gap-y-2 text-sm font-medium text-ink-body sm:text-base"
-        >
-          {project.technologies.map((tech, index) => (
-            <li key={tech}>
-              {tech}
-              {index < project.technologies.length - 1 && (
-                <span aria-hidden="true" className="mx-2 text-ink-body">
-                  ·
-                </span>
-              )}
-            </li>
+        {project.liveUrl && (
+          <a
+            href={project.liveUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent-base px-5 py-3 text-sm font-semibold text-white transition-colors duration-200 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:bg-accent-active"
+          >
+            Canlı demoyu aç
+            <ArrowUpRightIcon className="h-4 w-4 shrink-0" />
+          </a>
+        )}
+
+        <ProjectTechnologies groups={project.technologies} />
+
+        <div className="mt-6 space-y-5">
+          {project.description.map((paragraph) => (
+            <p
+              key={paragraph}
+              className="text-base leading-relaxed text-ink-body sm:text-lg sm:leading-loose"
+            >
+              {paragraph}
+            </p>
           ))}
-        </ul>
+        </div>
 
-        <p className="mt-6 text-base leading-relaxed text-ink-body sm:text-lg sm:leading-loose">
-          {project.description}
-        </p>
-
-        <h2 className="mt-12 text-3xl font-bold text-ink-strong sm:mt-16">Ekranlar</h2>
+        <h2 className="mt-12 text-3xl font-bold text-ink-strong sm:mt-16 sm:text-4xl">Ekranlar</h2>
 
         <ProjectScreens screens={project.screens} projectTitle={project.title} />
 

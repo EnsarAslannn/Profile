@@ -2,14 +2,14 @@ import { describe, expect, it } from 'vitest'
 import { getProjectBySlug, PROJECTS } from './index'
 import { getProjectImages } from '../projectImages'
 
-const DOLFIN_DESCRIPTION =
-  'Kullanıcıların sanal cüzdanla hisse senedi alıp satabildiği full-stack bir finansal portföy yönetim platformu. .NET ve PostgreSQL ile geliştirildi. JWT ve CSRF korumalı kimlik doğrulama ile güvenli kullanıcı girişi sağlandı, Redis ile performans artırıcı önbellekleme yapıldı. xUnit ve Playwright ile test edildi, Docker ve GitHub Actions ile CI/CD sürecine entegre edildi.'
+const DOLFIN_SUMMARY =
+  'Kullanıcıların sanal bir cüzdanla hisse senedi alıp satabildiği, portföylerinin dağılımını ve performansını izleyebildiği, hisse sayfalarına yorum bırakabildiği kurumsal odaklı bir finansal yönetim platformu. Uygulama harici bir piyasa verisi servisine bağlı değil; TSLA, NVDA, AAPL, GOOGL ve MSFT için elle hazırlanmış yerel bir veri seti üzerinde çalışıyor.'
 
-const TAKEAUCTION_DESCRIPTION =
-  'Gerçek zamanlı, yüksek trafikli bir online açık artırma sistemi. .NET ve Vertical Slice Architecture ile geliştirildi, PostgreSQL üzerinde çalışıyor. RabbitMQ ile olay tabanlı mesajlaşma, Hangfire ile otomatik lot kapanışı, SignalR ile anlık teklif bildirimleri sağlandı. JWT ile kimlik doğrulama yapıldı; xUnit, Testcontainers ve Playwright ile test edildi, Docker ve GitHub Actions ile CI/CD sürecine entegre edildi.'
+const TAKEAUCTION_SUMMARY =
+  'Satıcıların lot listelediği, alıcıların gizli tavan değerleriyle yarıştığı, yüksek trafikli ve eşzamanlı çalışan gerçek zamanlı bir açık artırma sistemi. Amaç yalnızca teklif butonu olan bir CRUD uygulaması değil; gerçek rekabet altında eşzamanlılığı, teslimat garantilerini ve kapanış mantığını doğru ele alan uçtan uca bir sistem kurmaktı. Kod yatay katmanlar yerine Vertical Slice Architecture ile örgütlendi: her özellik kendi isteğini, işleyicisini ve doğrulamasını uçtan uca kendisi taşıyor.'
 
-const ALTITUDELOG_DESCRIPTION =
-  'Pilotların uçuş kaydı tutup mürettebat atayabildiği bir uçuş ve mürettebat yönetim sistemi. Clean Architecture ve CQRS (MediatR) prensipleriyle, .NET ve PostgreSQL üzerinde geliştirildi. Hangfire ile arka planda çalışan işler sayesinde dış hava durumu servisinden otomatik veri entegrasyonu yapıldı, Redis ile önbellekleme uygulandı. JWT ile rol bazlı yetkilendirme sağlandı; xUnit ve Testcontainers ile test edildi, Docker üzerinden CI/CD sürecine entegre edilip canlıya alındı.'
+const ALTITUDELOG_SUMMARY =
+  'Pilotların rütbeleriyle sisteme kayıt olduğu, uçuş kaydı oluşturduğu, her uçuşa mürettebat üyelerini görev rolleriyle atadığı ve isteğe bağlı olarak anonim CRM (Crew Resource Management) güvenlik raporu doldurabildiği bir uçuş ve mürettebat yönetim platformu. Hedef basit bir kayıt ekranı değil; rol tabanlı yetkilendirmeyi, arka plan işlerini, önbellek katmanını ve gerçek bir dağıtım sürecini bir araya getiren uçtan uca bir uygulamaydı.'
 
 describe('PROJECTS', () => {
   it('has three entries in the owner-specified mosaic order: dolfin, takeauction, altitudelog', () => {
@@ -29,48 +29,113 @@ describe('PROJECTS', () => {
     expect(altitudelog?.subtitle).toBe('Uçuş & Mürettebat Yönetim Sistemi')
   })
 
-  it('has the verbatim Turkish description for each project', () => {
-    expect(PROJECTS.find((p) => p.slug === 'dolfin')?.description).toBe(DOLFIN_DESCRIPTION)
-    expect(PROJECTS.find((p) => p.slug === 'takeauction')?.description).toBe(TAKEAUCTION_DESCRIPTION)
-    expect(PROJECTS.find((p) => p.slug === 'altitudelog')?.description).toBe(ALTITUDELOG_DESCRIPTION)
+  it('opens each description with the verbatim summary paragraph', () => {
+    expect(PROJECTS.find((p) => p.slug === 'dolfin')?.description[0]).toBe(DOLFIN_SUMMARY)
+    expect(PROJECTS.find((p) => p.slug === 'takeauction')?.description[0]).toBe(TAKEAUCTION_SUMMARY)
+    expect(PROJECTS.find((p) => p.slug === 'altitudelog')?.description[0]).toBe(ALTITUDELOG_SUMMARY)
   })
 
-  it('no description contains a digit-only year or an http substring', () => {
+  // description[0] is what RouteMeta trims into the route's meta description,
+  // so it has to read as a standalone summary of the whole project rather
+  // than as the first instalment of a story the later paragraphs finish.
+  it('gives every project a multi-paragraph description whose first paragraph can stand alone', () => {
     for (const project of PROJECTS) {
-      expect(project.description).not.toMatch(/\b(19|20)\d{2}\b/)
-      expect(project.description).not.toMatch(/http/i)
+      expect(project.description.length).toBeGreaterThan(1)
+      for (const paragraph of project.description) {
+        expect(paragraph.trim()).toBe(paragraph)
+        expect(paragraph.length).toBeGreaterThan(80)
+      }
+    }
+  })
+
+  it('no description paragraph contains a digit-only year or an http substring', () => {
+    for (const project of PROJECTS) {
+      for (const paragraph of project.description) {
+        expect(paragraph).not.toMatch(/\b(19|20)\d{2}\b/)
+        // URLs belong in liveUrl, never inline in prose - a bare URL in a
+        // paragraph would render as unclickable text and land in the meta
+        // description. Matches a real scheme, not the bare substring "http":
+        // "httpOnly cookie" is a correct technical term in the DOLFIN copy,
+        // and a substring match would reject it.
+        expect(paragraph).not.toMatch(/https?:\/\//i)
+        expect(paragraph).not.toMatch(/\bwww\./i)
+      }
     }
   })
 })
 
+describe('liveUrl', () => {
+  it('gives every project an https demo link, with no trailing slash', () => {
+    for (const project of PROJECTS) {
+      expect(project.liveUrl).toBeDefined()
+      expect(project.liveUrl).toMatch(/^https:\/\//)
+      expect(project.liveUrl).not.toMatch(/\/$/)
+    }
+  })
+
+  it('points each project at its own demo', () => {
+    const urls = Object.fromEntries(PROJECTS.map((p) => [p.slug, p.liveUrl]))
+    expect(urls).toEqual({
+      dolfin: 'https://dol-fin.com',
+      takeauction: 'https://take-auction.vercel.app',
+      altitudelog: 'https://altitudelog.vercel.app',
+    })
+  })
+})
+
 describe('technologies', () => {
-  it('has the exact owner-supplied technology list per project', () => {
-    expect(PROJECTS.find((p) => p.slug === 'dolfin')?.technologies).toEqual([
-      '.NET',
-      'PostgreSQL',
-      'Redis',
-      'JWT',
-      'Playwright',
-      'Docker',
-    ])
-    expect(PROJECTS.find((p) => p.slug === 'takeauction')?.technologies).toEqual([
-      '.NET',
-      'PostgreSQL',
-      'RabbitMQ',
-      'SignalR',
-      'Hangfire',
-      'JWT',
-      'Docker',
-    ])
-    expect(PROJECTS.find((p) => p.slug === 'altitudelog')?.technologies).toEqual([
-      '.NET',
-      'PostgreSQL',
-      'Redis',
-      'Hangfire',
-      'MediatR',
-      'JWT',
-      'Docker',
-    ])
+  // Deliberately NOT a re-listing of all ~40 entries per project. That would
+  // be a copy of the data with no independent judgement in it: every real
+  // edit would fail it, so it would be updated reflexively rather than read.
+  // These assertions instead pin the shape, and spot-check the entries that
+  // distinguish one project's repo from another's.
+  it('groups every project as Backend / Frontend / Test / Deployment, in that order', () => {
+    for (const project of PROJECTS) {
+      expect(project.technologies.map((group) => group.label)).toEqual([
+        'Backend',
+        'Frontend',
+        'Test',
+        'Deployment',
+      ])
+    }
+  })
+
+  it('has no empty group and no repeated entry within a project', () => {
+    for (const project of PROJECTS) {
+      const all: string[] = []
+      for (const group of project.technologies) {
+        expect(group.items.length).toBeGreaterThan(0)
+        all.push(...group.items)
+      }
+      expect(new Set(all).size).toBe(all.length)
+    }
+  })
+
+  // One distinctive entry per repo, so a copy-paste between project files
+  // shows up as a failure instead of quietly attributing one stack to another.
+  it('carries the stack that is actually specific to each repo', () => {
+    const items = (slug: string) =>
+      PROJECTS.find((p) => p.slug === slug)!.technologies.flatMap((group) => group.items)
+
+    // github.com/EnsarAslannn/TakeAuction - outbox over RabbitMQ and live
+    // bid push over SignalR.
+    expect(items('takeauction')).toEqual(
+      expect.arrayContaining(['RabbitMQ', 'MassTransit', 'SignalR']),
+    )
+    // github.com/EnsarAslannn/AltitudELog - CQRS via MediatR, METAR enrichment
+    // on Hangfire, QuestPDF behind the logbook PDF export.
+    expect(items('altitudelog')).toEqual(
+      expect.arrayContaining(['MediatR', 'Hangfire', 'QuestPDF']),
+    )
+    // github.com/EnsarAslannn/DOLFIN - Identity-backed auth and the L1+L2
+    // HybridCache tier.
+    expect(items('dolfin')).toEqual(
+      expect.arrayContaining(['ASP.NET Core Identity', 'HybridCache', 'Playwright']),
+    )
+    // ...and each of those is genuinely specific: not present in the others.
+    expect(items('dolfin')).not.toContain('RabbitMQ')
+    expect(items('altitudelog')).not.toContain('RabbitMQ')
+    expect(items('takeauction')).not.toContain('QuestPDF')
   })
 })
 
