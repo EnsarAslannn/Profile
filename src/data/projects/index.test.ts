@@ -137,6 +137,37 @@ describe('technologies', () => {
     expect(items('altitudelog')).not.toContain('RabbitMQ')
     expect(items('takeauction')).not.toContain('QuestPDF')
   })
+
+  // The owner asked for these to be dropped: Prometheus, OpenTelemetry, GSAP,
+  // Lenis, NSubstitute, k6 and CodeQL from TakeAuction, Respawn and
+  // NSubstitute from AltitudELog. Cleaning the technology lists was not
+  // enough - TakeAuction's closing paragraph went on naming three of them for
+  // a round afterwards, because prose and list are separate fields. The ban
+  // is checked across BOTH fields, for every project, so a name cannot come
+  // back through the door the first pass left open.
+  it('names none of the technologies the owner removed, in a list or in prose', () => {
+    const removed = [
+      'Prometheus',
+      'OpenTelemetry',
+      'GSAP',
+      'Lenis',
+      'NSubstitute',
+      'k6',
+      'CodeQL',
+      'Respawn',
+    ]
+    for (const project of PROJECTS) {
+      const text = [
+        ...project.description,
+        ...project.technologies.flatMap((group) => group.items),
+      ].join(' ')
+      for (const name of removed) {
+        expect(text, `${project.slug} still names "${name}"`).not.toMatch(
+          new RegExp(`\\b${name}\\b`, 'i'),
+        )
+      }
+    }
+  })
 })
 
 describe('screens', () => {
