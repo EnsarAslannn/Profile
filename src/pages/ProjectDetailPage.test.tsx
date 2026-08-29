@@ -103,10 +103,13 @@ describe('ProjectDetailPage', () => {
     }
   })
 
-  it('has exactly one h2, named Ekranlar', () => {
+  // Two h2s on a detail route now, not one: the İletişim section is site
+  // chrome (App.tsx renders it outside <Routes>), so it lands on every page.
+  // Ekranlar stays the only h2 the ROUTE itself contributes.
+  it('contributes exactly one h2 of its own, named Ekranlar', () => {
     renderWithRouter(<App />, '/projects/dolfin')
-    expect(screen.getAllByRole('heading', { level: 2 })).toHaveLength(1)
-    expect(screen.getByRole('heading', { level: 2, name: 'Ekranlar' })).toBeInTheDocument()
+    const names = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
+    expect(names).toEqual(['Ekranlar', 'İletişim'])
   })
 
   it('renders five figcaptions for dolfin, with the companyProfile caption verbatim', () => {
@@ -150,8 +153,9 @@ describe('ProjectDetailPage', () => {
   })
 
   it('redirects an unknown slug to the home page', () => {
-    renderWithRouter(<App />, '/projects/bilinmeyen')
-    expect(screen.getByRole('heading', { level: 1, name: 'Hakkımda' })).toBeInTheDocument()
+    const { container } = renderWithRouter(<App />, '/projects/bilinmeyen')
+    expect(container.querySelector('section#anasayfa')).not.toBeNull()
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('ENSAR ASLANPORTFOLYO')
   })
 
   it('points og:image at the project cover, not the first screenshot', () => {

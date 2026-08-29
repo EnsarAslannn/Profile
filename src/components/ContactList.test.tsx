@@ -17,8 +17,8 @@ describe('ContactList', () => {
 
   it('renders konum as plain text, not a link', () => {
     render(<ContactList />)
-    expect(screen.getByText('Türkiye / Kocaeli')).toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Türkiye / Kocaeli' })).toBeNull()
+    expect(screen.getByText('Türkiye / Kocaeli / İstanbul')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Türkiye / Kocaeli / İstanbul' })).toBeNull()
   })
 
   it('exposes a Turkish label for every row', () => {

@@ -1,23 +1,49 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import Resume from './Resume'
+import { RESUME_GROUPS, ROADMAP_ENTRIES } from '../data/resume'
 
 describe('Resume', () => {
-  it('keeps the section anchor the footer links to', () => {
+  it('keeps the section anchor the navbar links to', () => {
     const { container } = render(<Resume />)
     expect(container.querySelector('section#ozgecmis')).not.toBeNull()
   })
 
-  it('renders Özgeçmiş as an h2 and the two group headings as h3', () => {
-    render(<Resume />)
+  it('renders Özgeçmiş as an h2, with no section index above it', () => {
+    const { container } = render(<Resume />)
     expect(screen.getByRole('heading', { level: 2, name: 'Özgeçmiş' })).toBeInTheDocument()
-    const h3s = screen.getAllByRole('heading', { level: 3 })
-    expect(h3s.map((h) => h.textContent)).toEqual(['Eğitim', 'Deneyim'])
+    expect(container.textContent).not.toMatch(/\[\d{3}]/)
   })
 
-  it('renders two entries in each group as list items', () => {
-    render(<Resume />)
-    expect(screen.getAllByRole('listitem')).toHaveLength(4)
+  // Owner-supplied photograph per year, keyed by year in src/data/resume.ts.
+  // Decoration: alt="" and aria-hidden, because the year it illustrates is
+  // right there as text and the photo says nothing a screen reader needs.
+  it('paints each card with its own year photo, as decoration', () => {
+    const { container } = render(<Resume />)
+    const images = Array.from(container.querySelectorAll('img'))
+    expect(images).toHaveLength(ROADMAP_ENTRIES.length)
+    for (const [index, image] of images.entries()) {
+      const entry = ROADMAP_ENTRIES[index]
+      expect(image.getAttribute('src')).toBe(entry.background!.src)
+      expect(image.getAttribute('alt')).toBe('')
+      expect(image.getAttribute('aria-hidden')).toBe('true')
+      expect(image.getAttribute('width')).toBe(String(entry.background!.width))
+      expect(image.getAttribute('height')).toBe(String(entry.background!.height))
+      expect(image.getAttribute('loading')).toBe('lazy')
+    }
+    // Four distinct photographs, not the same one four times.
+    expect(new Set(images.map((i) => i.getAttribute('src'))).size).toBe(images.length)
+  })
+
+  // A roadmap is a timeline, so the two Özgeçmiş groups interleave by date
+  // rather than standing as two columns. Losing that ordering would turn the
+  // spine into a meaningless zig-zag, which is why it is pinned here.
+  it('lists every entry once, oldest first, as an ordered list', () => {
+    const { container } = render(<Resume />)
+    expect(container.querySelector('ol')).not.toBeNull()
+    const totalEntries = RESUME_GROUPS.reduce((sum, group) => sum + group.entries.length, 0)
+    expect(container.querySelectorAll('li')).toHaveLength(totalEntries)
+    expect(ROADMAP_ENTRIES.map((entry) => entry.year)).toEqual(['2020', '2023', '2024', '2025'])
   })
 
   it('renders every entry title and organization verbatim', () => {
@@ -31,6 +57,14 @@ describe('Resume', () => {
       screen.getByText('Brisa Bridgestone Sabancı Lastik Sanayi ve Ticaret A.Ş.'),
     ).toBeInTheDocument()
     expect(screen.getByText('AZR Bilişim Eğitim Mühendislik ve Danışmanlık')).toBeInTheDocument()
+  })
+
+  // Flattening the two groups must not lose which group an entry came from -
+  // that is the entire information content of the old two-column layout.
+  it('keeps the group of every entry visible as a chip', () => {
+    render(<Resume />)
+    expect(screen.getAllByText('Eğitim')).toHaveLength(2)
+    expect(screen.getAllByText('Deneyim')).toHaveLength(2)
   })
 
   it('renders each date range as two time elements with machine-readable months', () => {
@@ -50,15 +84,10 @@ describe('Resume', () => {
     expect(times[0].textContent).toBe('08/2020')
   })
 
-  it('no longer renders a skills placeholder', () => {
-    render(<Resume />)
-    expect(screen.queryByText(/Yetenekler/)).not.toBeInTheDocument()
-    expect(screen.queryByText(/Placeholder/)).not.toBeInTheDocument()
-  })
-
-  // Removed at the owner's request: each internship is now title +
-  // organization + dates only. Asserting their absence keeps them from
-  // creeping back in a later edit.
+  // The reference design's roadmap cards carry a prose paragraph. This site's
+  // entries deliberately have none - the owner had the internship
+  // descriptions removed - and this asserts none was invented to fill the
+  // slot the reference leaves open.
   it('renders no prose description under any entry', () => {
     const { container } = render(<Resume />)
     expect(container.querySelectorAll('p[data-resume-description]')).toHaveLength(0)
@@ -66,56 +95,13 @@ describe('Resume', () => {
     expect(screen.queryByText(/Uzaktan çalışma modelinde/)).not.toBeInTheDocument()
   })
 
-  it('draws each entry as a timeline row: one accent dot, hidden from screen readers', () => {
+  // One dot and one background photo per card, both decoration.
+  it('hides the timeline decoration from screen readers', () => {
     const { container } = render(<Resume />)
     const items = container.querySelectorAll('li')
     expect(items).toHaveLength(4)
-    for (const item of items) {
-      const dots = item.querySelectorAll('span[aria-hidden="true"]')
-      expect(dots).toHaveLength(1)
-      // Decoration only - it must carry no text a screen reader would read
-      // out between the entry title and its organization.
-      expect(dots[0].textContent).toBe('')
+    for (const item of Array.from(items)) {
+      expect(item.querySelectorAll('[aria-hidden="true"]')).toHaveLength(2)
     }
-  })
-
-  it('gives each group an aria-hidden icon, so the heading text stays the only accessible name', () => {
-    const { container } = render(<Resume />)
-    const headings = screen.getAllByRole('heading', { level: 3 })
-    expect(headings.map((h) => h.textContent)).toEqual(['Eğitim', 'Deneyim'])
-    const icons = container.querySelectorAll('svg[aria-hidden="true"]')
-    expect(icons).toHaveLength(2)
-  })
-
-  // Owner's request: Deneyim sits to the right of Eğitim from md: up. The
-  // grid lives on the groups' shared parent, so a future edit that swaps it
-  // back for a stacked space-y wrapper fails here.
-  it('lays the two groups out side by side from md: up', () => {
-    render(<Resume />)
-    const heading = screen.getByRole('heading', { level: 3, name: 'Eğitim' })
-    const column = heading.closest('div')!.parentElement!
-    const grid = column.parentElement!
-    expect(grid.className).toMatch(/\bgrid\b/)
-    expect(grid.className).toMatch(/\bgrid-cols-1\b/)
-    expect(grid.className).toMatch(/\bmd:grid-cols-2\b/)
-    expect(grid.className).not.toMatch(/\bspace-y-/)
-    // Eğitim must be the first column, Deneyim the second.
-    expect(Array.from(grid.children)).toHaveLength(2)
-    expect(grid.children[0].textContent).toContain('Eğitim')
-    expect(grid.children[1].textContent).toContain('Deneyim')
-  })
-
-  it('keeps the group headings visually smaller than the section heading', () => {
-    render(<Resume />)
-    const h2 = screen.getByRole('heading', { level: 2, name: 'Özgeçmiş' })
-    const h3 = screen.getByRole('heading', { level: 3, name: 'Deneyim' })
-    // jsdom does not do layout, so this compares the utilities that set the
-    // size rather than measured pixels. The owner asked for a visible step
-    // down from Özgeçmiş to Eğitim/Deneyim; equal classes would erase it.
-    expect(h2.className).toMatch(/\btext-3xl\b/)
-    expect(h2.className).toMatch(/\bsm:text-4xl\b/)
-    expect(h3.className).toMatch(/\btext-xl\b/)
-    expect(h3.className).toMatch(/\bsm:text-2xl\b/)
-    expect(h3.className).not.toMatch(/\btext-3xl\b/)
   })
 })

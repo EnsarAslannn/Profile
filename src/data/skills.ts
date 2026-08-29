@@ -7,7 +7,7 @@
 // The group headings are ENGLISH by the owner's explicit request, and are the
 // one deliberate exception to the Turkish-copy rule in CLAUDE.md. They read as
 // stack labels next to entries that are themselves English product names
-// (ASP.NET Core, Entity Framework Core), which is why the mixed language is
+// (Entity Framework Core, GitHub Actions), which is why the mixed language is
 // intentional here and nowhere else. The section heading stays "Yetenekler".
 //
 // Deliberately NO proficiency levels, percentages, star ratings or "years of
@@ -25,23 +25,17 @@ export const SKILL_GROUPS: SkillGroup[] = [
   {
     id: 'languages',
     heading: 'Languages & Frameworks',
-    items: ['C#', '.NET', 'ASP.NET Core', 'TypeScript', 'React'],
+    items: ['C#', '.NET', 'TypeScript', 'React'],
   },
   {
     id: 'architecture',
     heading: 'Architecture & Patterns',
-    items: [
-      'Clean Architecture',
-      'Vertical Slice Architecture',
-      'CQRS',
-      'MediatR',
-      'Transactional Outbox',
-    ],
+    items: ['Clean Architecture', 'Vertical Slice Architecture', 'CQRS', 'MediatR'],
   },
   {
     id: 'data',
     heading: 'Data & Caching',
-    items: ['PostgreSQL', 'Entity Framework Core', 'Redis', 'HybridCache'],
+    items: ['PostgreSQL', 'Entity Framework Core', 'Redis'],
   },
   {
     id: 'messaging',

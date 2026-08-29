@@ -29,7 +29,7 @@ export const CONTACT_ITEMS: ContactItem[] = [
   {
     id: 'location',
     label: 'Konum',
-    value: 'Türkiye / Kocaeli',
+    value: 'Türkiye / Kocaeli / İstanbul',
     href: null,
     icon: MapPinIcon,
   },

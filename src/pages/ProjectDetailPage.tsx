@@ -5,6 +5,7 @@ import ProjectScreens from '../components/ProjectScreens'
 import ProjectTechnologies from '../components/ProjectTechnologies'
 import RouteMeta from '../components/RouteMeta'
 import { getProjectBySlug } from '../data/projects'
+import { CONTENT_CONTAINER } from '../lib/layout'
 import { SITE_NAME, firstSentence, truncateForDescription } from '../lib/siteMeta'
 import { useReveal } from '../lib/useReveal'
 
@@ -31,7 +32,7 @@ export default function ProjectDetailPage() {
     <main
       ref={revealRoot}
       id="main"
-      className="mx-auto max-w-7xl px-6 py-16 sm:px-8 lg:px-10 xl:px-12"
+      className={`py-16 ${CONTENT_CONTAINER}`}
     >
       <div className="mx-auto max-w-3xl">
         <Link

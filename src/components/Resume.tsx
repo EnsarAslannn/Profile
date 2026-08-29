@@ -1,69 +1,34 @@
-import type { ComponentType } from 'react'
-import { RESUME_GROUPS, toMachineDate } from '../data/resume'
-import { revealDelayClass } from '../lib/useReveal'
-import BriefcaseIcon from './icons/BriefcaseIcon'
-import GraduationCapIcon from './icons/GraduationCapIcon'
+import RoadmapCard from './RoadmapCard'
+import SectionHeading from './SectionHeading'
+import { ROADMAP_ENTRIES } from '../data/resume'
 
-// Keyed by ResumeGroup.id, not by array position, so reordering the groups in
-// src/data/resume.ts never silently swaps the icons. A group whose id has no
-// entry here simply renders without one rather than crashing.
-const GROUP_ICONS: Record<string, ComponentType<{ className?: string }>> = {
-  education: GraduationCapIcon,
-  experience: BriefcaseIcon,
-}
-
+// The reference design's ROADMAP: one chronological spine with cards
+// alternating either side of it. The two Özgeçmiş groups are flattened and
+// re-sorted by date in src/data/resume.ts - a roadmap is a timeline, so
+// Eğitim and Deneyim interleave here instead of standing as two columns, and
+// each card keeps its group name as a chip so nothing is lost.
 export default function Resume() {
   return (
-    <section id="ozgecmis" className="scroll-mt-8 border-t border-line-subtle py-16">
-      <h2 data-reveal className="text-3xl font-bold text-ink-strong sm:text-4xl">
-        Özgeçmiş
-      </h2>
-      {/* Two columns from md: up - Eğitim left, Deneyim right (owner's
-          request). `items-start` so the shorter column does not stretch its
-          rail to match the taller one, and gap-14 below md: reproduces the
-          vertical rhythm the stacked layout had before. */}
-      <div className="mt-10 grid grid-cols-1 items-start gap-14 md:grid-cols-2 md:gap-10 lg:gap-16">
-        {RESUME_GROUPS.map((group, index) => {
-          const Icon = GROUP_ICONS[group.id]
-          return (
-            <div key={group.id} data-reveal className={revealDelayClass(index)}>
-              <div className="flex items-center gap-4">
-                {Icon && (
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-line-subtle bg-surface-raised text-accent-base shadow-sm shadow-slate-950/5">
-                    <Icon className="h-5 w-5" />
-                  </span>
-                )}
-                <h3 className="text-xl font-bold text-ink-strong sm:text-2xl">{group.heading}</h3>
-              </div>
+    <section id="ozgecmis" className="scroll-mt-24 border-t border-line-subtle py-20 sm:py-24">
+      <SectionHeading
+        title="Özgeçmiş"
+        subtitle="Yazılım yolculuğumda edindiğim eğitim ve iş deneyimlerinin zaman çizelgesi."
+        align="center"
+      />
 
-              {/* The timeline rail. `ml-6` is load-bearing at EVERY breakpoint,
-                  not just sm:+ - it puts the border under the centre of the
-                  12-unit icon box above it (half of 3rem), so the line reads as
-                  dropping out of the icon rather than floating beside it. Each
-                  dot then lands on that border by cancelling the ul's own
-                  padding (`-left-5`/`sm:-left-8`) and shifting half its width. */}
-              <ul className="mt-6 ml-6 space-y-8 border-l border-line-subtle pl-5 sm:pl-8">
-                {group.entries.map((entry) => (
-                  <li key={entry.id} className="relative">
-                    <span
-                      aria-hidden="true"
-                      className="absolute -left-5 top-2 h-3 w-3 -translate-x-1/2 rounded-full bg-accent-base ring-4 ring-surface-base sm:-left-8"
-                    />
-                    <p className="font-semibold text-ink-strong">{entry.title}</p>
-                    <p className="mt-1 text-sm font-medium text-accent-base sm:text-base">
-                      {entry.organization}
-                    </p>
-                    <p className="mt-1 text-sm tabular-nums text-ink-muted">
-                      <time dateTime={toMachineDate(entry.start)}>{entry.start}</time>
-                      {' – '}
-                      <time dateTime={toMachineDate(entry.end)}>{entry.end}</time>
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )
-        })}
+      {/* The spine. `absolute` inside a `relative` list, so it spans exactly
+          the cards' height without a magic number: left edge on mobile, dead
+          centre from md: up, matching where the dots sit. */}
+      <div className="relative mt-16 sm:mt-20">
+        <div
+          aria-hidden="true"
+          className="absolute top-0 bottom-0 left-[7px] w-px bg-line-subtle md:left-1/2 md:-translate-x-1/2"
+        />
+        <ol className="relative space-y-12 sm:space-y-16">
+          {ROADMAP_ENTRIES.map((entry, index) => (
+            <RoadmapCard key={entry.id} entry={entry} index={index} />
+          ))}
+        </ol>
       </div>
     </section>
   )

@@ -1,77 +1,85 @@
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import Hero from './Hero'
-import { ABOUT_PARAGRAPHS } from '../data/about'
+import { renderWithRouter } from '../test/renderWithRouter'
+import { CV_FILE, HERO_IMAGES, HERO_PARAGRAPH, HERO_TITLE_LINES } from '../data/hero'
 
 describe('Hero', () => {
-  it('renders Hakkımda as the only h1', () => {
-    render(<Hero />)
-    expect(screen.getByRole('heading', { level: 1, name: 'Hakkımda' })).toBeInTheDocument()
-    expect(screen.getAllByRole('heading')).toHaveLength(1)
+  it('carries the anasayfa anchor the navbar links to', () => {
+    const { container } = renderWithRouter(<Hero />)
+    expect(container.querySelector('section#anasayfa')).not.toBeNull()
   })
 
-  it('keeps the section anchor the footer links to', () => {
-    const { container } = render(<Hero />)
-    expect(container.querySelector('section#hakkimda')).not.toBeNull()
+  it('renders the wordmark as the page h1, one line per element', () => {
+    const { container } = renderWithRouter(<Hero />)
+    const h1 = screen.getByRole('heading', { level: 1 })
+    expect(Array.from(h1.querySelectorAll('span')).map((s) => s.textContent)).toEqual([
+      ...HERO_TITLE_LINES,
+    ])
+    expect(container.querySelectorAll('h1')).toHaveLength(1)
   })
 
-  it('renders the About prose as four paragraphs', () => {
-    const { container } = render(<Hero />)
-    expect(container.querySelectorAll('p[data-about-paragraph]')).toHaveLength(4)
-  })
-
-  // Rendering is Hero's contract; the verbatim wording is guarded once, in
-  // src/data/about.test.ts. Asserting the strings again here would mean a
-  // third copy to update on every copy change, and would fail for the wrong
-  // reason - a copy edit is not a Hero regression.
-  it('renders every owner-supplied paragraph, in order', () => {
-    const { container } = render(<Hero />)
-    const rendered = [...container.querySelectorAll('p[data-about-paragraph]')].map(
-      (paragraph) => paragraph.textContent,
+  it('offers the three calls to action, the first two as router links', () => {
+    renderWithRouter(<Hero />)
+    expect(screen.getByRole('link', { name: /İletişime geç/ })).toHaveAttribute('href', '/#iletisim')
+    expect(screen.getByRole('link', { name: /Projeleri keşfet/ })).toHaveAttribute(
+      'href',
+      '/#projeler',
     )
-    expect(rendered).toEqual(ABOUT_PARAGRAPHS.map((paragraph) => paragraph.text))
   })
 
-  it('renders the profile card alongside the prose', () => {
-    render(<Hero />)
-    expect(screen.getByRole('img', { name: 'Ensar Aslan' })).toBeInTheDocument()
+  // A plain <a download>, not a router link: the CV is a static file in
+  // public/, and without the download attribute the browser would navigate
+  // the tab to a PDF viewer instead of saving it.
+  it('offers the CV as a download rather than a navigation', () => {
+    renderWithRouter(<Hero />)
+    const cv = screen.getByRole('link', { name: /CV indir/ })
+    expect(cv).toHaveAttribute('href', CV_FILE)
+    expect(cv).toHaveAttribute('download')
+    expect(cv.getAttribute('target')).toBeNull()
   })
 
-  it('places the card and the prose in adjacent grid columns separated by a real gap', () => {
-    const { container } = render(<Hero />)
-    const grid = container.querySelector('section#hakkimda > div')
-    expect(grid).not.toBeNull()
-    const gridClasses = grid!.className
+  // The paragraph is the owner's own Hakkımda opening, split for emphasis.
+  // Rendering it segment-by-segment must still read as one continuous
+  // sentence - a stray space or a dropped fragment would only show up here.
+  it('reads out as the owner-supplied paragraph, uninterrupted', () => {
+    const { container } = renderWithRouter(<Hero />)
+    const paragraph = container.querySelector('p')
+    expect(paragraph?.textContent).toBe(HERO_PARAGRAPH)
+  })
 
-    // Structure only, never the exact numbers - ui-agent must stay free to
-    // retune the card width. Two tracks: a fixed card track, then a
-    // minmax(0,1fr) prose track that absorbs the slack. The previous layout
-    // put a `1fr` gutter BETWEEN them, which meant every pixel of slack piled
-    // up in the middle - ~240px of empty space on a wide screen, reading as a
-    // hole between two islands. minmax(0,...) rather than a bare 1fr so a long
-    // unbreakable token cannot push the track past the container.
-    expect(gridClasses).toMatch(/lg:grid-cols-\[\S+?_minmax\(0,1fr\)\]/)
-    expect(gridClasses).toMatch(/xl:grid-cols-\[\S+?_minmax\(0,1fr\)\]/)
-    // A gap utility is now the only thing separating the columns, so losing it
-    // would butt the prose straight against the card.
-    expect(gridClasses).toMatch(/lg:gap-[1-9]/)
+  it('renders each gallery image twice, so the drift loop can wrap seamlessly', () => {
+    const { container } = renderWithRouter(<Hero />)
+    const sources = Array.from(container.querySelectorAll('img')).map((img) =>
+      img.getAttribute('src'),
+    )
+    for (const image of HERO_IMAGES) {
+      // Two columns, two copies each - but the columns hold different
+      // subsets, so the guarantee is "at least twice", never "exactly once".
+      expect(sources.filter((src) => src === image.src).length).toBeGreaterThanOrEqual(2)
+    }
+  })
 
-    const cardWrapper = screen.getByRole('img', { name: 'Ensar Aslan' }).closest('div[class*="lg:sticky"]')
-    expect(cardWrapper).not.toBeNull()
-    expect(cardWrapper!.className).toMatch(/lg:col-start-1\b/)
+  // The whole collage is decoration; the owner's name is the h1 and both
+  // screenshots are real content in Projeler. Every tile is also rendered
+  // twice, so exposing them would mean hearing the same list through twice.
+  it('hides the decorative gallery from screen readers and gives no image an alt text', () => {
+    const { container } = renderWithRouter(<Hero />)
+    const images = Array.from(container.querySelectorAll('img'))
+    expect(images.length).toBeGreaterThan(0)
+    for (const image of images) {
+      expect(image.getAttribute('alt')).toBe('')
+      expect(image.closest('[aria-hidden="true"]')).not.toBeNull()
+    }
+  })
 
-    const proseWrapper = screen.getByRole('heading', { level: 1 }).closest('div[class*="lg:col-start-2"]')
-    expect(proseWrapper).not.toBeNull()
-    // min-w-0 is load-bearing: without it the prose track refuses to shrink
-    // below its content's min-content width and overflows the container.
-    expect(proseWrapper!.className).toMatch(/lg:min-w-0\b/)
-
-    // The grid track is the sole measure authority, so a stale max-w-prose on
-    // a paragraph would silently re-introduce the leftward drift this layout
-    // was built to correct.
-    const paragraphs = container.querySelectorAll('p[data-about-paragraph]')
-    for (const paragraph of paragraphs) {
-      expect(paragraph.className).not.toMatch(/max-w-prose/)
+  it('gives every image the CLS-preventing width, height and lazy attributes', () => {
+    const { container } = renderWithRouter(<Hero />)
+    for (const image of Array.from(container.querySelectorAll('img'))) {
+      expect(image.getAttribute('width')).toBeTruthy()
+      expect(image.getAttribute('height')).toBeTruthy()
+      expect(image.getAttribute('loading')).toBe('lazy')
+      expect(image.getAttribute('decoding')).toBe('async')
     }
   })
 })

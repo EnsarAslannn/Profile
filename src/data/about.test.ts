@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { ABOUT_PARAGRAPHS } from './about'
+import { ABOUT_PARAGRAPHS, ABOUT_STATEMENT, ABOUT_TEASER } from './about'
+import { SITE_ROLE } from '../lib/siteMeta'
 
 const INTRO_TEXT =
   'Merhaba, ben Ensar Aslan. Karabük Üniversitesi Bilgisayar Mühendisliği %100 İngilizce bölümü mezunu bir yazılım geliştiriciyim. Modern web teknolojileriyle ölçeklenebilir, performanslı ve sürdürülebilir uygulamalar geliştiriyorum.'
@@ -40,5 +41,39 @@ describe('ABOUT_PARAGRAPHS', () => {
     expect(allText).not.toContain('Erasmus+')
     expect(allText).not.toContain('Futbol')
     expect(allText).not.toContain('zamanla iyi bir Full Stack geliştirici olmayı')
+  })
+})
+
+describe('ABOUT_STATEMENT', () => {
+  // The single sentence on this site that is not lifted verbatim from the
+  // owner. It is allowed to exist only because it states no new fact: the
+  // title is the one already shown in ProfileCard, and the adjectives are
+  // the owner's own. Both halves are pinned, so a rewrite that smuggles in a
+  // fresh claim ("5 yıllık deneyim", a framework nobody named) fails here.
+  it('reads as one sentence and claims nothing new', () => {
+    const joined = ABOUT_STATEMENT.map((segment) => segment.text).join('')
+    expect(joined).toBe(
+      'Full Stack .NET Developer olarak ölçeklenebilir, performanslı ve sürdürülebilir sistemler kuruyorum.',
+    )
+    expect(joined).toContain(SITE_ROLE)
+    expect(ABOUT_PARAGRAPHS[0].text).toContain(
+      'ölçeklenebilir, performanslı ve sürdürülebilir',
+    )
+  })
+
+  it('emphasises only the title and the owner-supplied adjectives', () => {
+    expect(
+      ABOUT_STATEMENT.filter((segment) => segment.emphasis).map((segment) => segment.text),
+    ).toEqual([SITE_ROLE, 'ölçeklenebilir, performanslı ve sürdürülebilir'])
+  })
+})
+
+describe('ABOUT_TEASER', () => {
+  // The section shows one paragraph before "Tam metni oku". Index 0 is the
+  // hero's and index 1 is what Yetenekler covers, so this is the first that
+  // repeats nothing already on the screen.
+  it('is the tooling paragraph, so the home page never says the same thing twice', () => {
+    expect(ABOUT_TEASER.id).toBe('tooling')
+    expect(ABOUT_TEASER).toBe(ABOUT_PARAGRAPHS[2])
   })
 })

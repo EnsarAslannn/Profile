@@ -1,0 +1,85 @@
+import { describe, expect, it } from 'vitest'
+import { CONTACT_ROWS } from './contactRows'
+import { CONTACT_ITEMS } from './contact'
+import { SOCIAL_LINKS } from './social'
+
+describe('CONTACT_ROWS', () => {
+  it('lists the four rows in the owner-specified order', () => {
+    expect(CONTACT_ROWS.map((row) => row.id)).toEqual([
+      'email',
+      'linkedin',
+      'github',
+      'location',
+    ])
+    expect(CONTACT_ROWS.map((row) => row.label)).toEqual([
+      'E-posta',
+      'LinkedIn',
+      'GitHub',
+      'Konum',
+    ])
+  })
+
+  // Resolved from the existing data, never re-typed. A URL changed in
+  // src/data/social.ts has to move the visible text with it, or the row would
+  // display one address and link to another.
+  it('derives every href and value from the existing contact and social data', () => {
+    const email = CONTACT_ROWS.find((row) => row.id === 'email')!
+    expect(email.value).toBe(CONTACT_ITEMS.find((item) => item.id === 'email')!.value)
+    // Copyable, not clickable (owner's request). CONTACT_ITEMS still carries
+    // the mailto, which ProfileCard uses on /hakkimda - dropping it here must
+    // not drop it there.
+    expect(email.href).toBeNull()
+    expect(email.copyable).toBe(true)
+    expect(CONTACT_ITEMS.find((item) => item.id === 'email')!.href).toBe(
+      'mailto:ensaraslannn@gmail.com',
+    )
+
+    const location = CONTACT_ROWS.find((row) => row.id === 'location')!
+    expect(location.value).toBe(CONTACT_ITEMS.find((item) => item.id === 'location')!.value)
+    expect(location.href).toBeNull()
+
+    // The owner asked for the handle on screen rather than the whole domain,
+    // and it is CUT FROM THE HREF - so a changed URL moves the visible text
+    // with it, and the row can never show one account while linking to
+    // another.
+    for (const id of ['linkedin', 'github']) {
+      const row = CONTACT_ROWS.find((r) => r.id === id)!
+      const social = SOCIAL_LINKS.find((s) => s.id === id)!
+      expect(row.href).toBe(social.href)
+      expect(new URL(social.href).pathname).toContain(row.value.replace(/^@/, ''))
+      expect(row.value).not.toContain('http')
+      expect(row.value).not.toContain('.com')
+    }
+    expect(CONTACT_ROWS.find((row) => row.id === 'linkedin')!.value).toBe('/in/ensaraslannn')
+    expect(CONTACT_ROWS.find((row) => row.id === 'github')!.value).toBe('@EnsarAslannn')
+  })
+
+  it('states the location and the remote note the owner supplied', () => {
+    const location = CONTACT_ROWS.find((row) => row.id === 'location')!
+    expect(location.value).toBe('Türkiye / Kocaeli / İstanbul')
+    expect(location.note).toBe('Remote çalışmaya açığım.')
+  })
+
+  it('marks only the profile rows as external', () => {
+    expect(CONTACT_ROWS.filter((row) => row.external).map((row) => row.id)).toEqual([
+      'linkedin',
+      'github',
+    ])
+  })
+
+  // The labels are CSS-uppercased in a lang="tr" document, where casing maps
+  // i -> İ. Untagged, these two render LİNKEDIN and GİTHUB.
+  it('tags the English brand labels, and only those', () => {
+    expect(CONTACT_ROWS.filter((row) => row.lang === 'en').map((row) => row.id)).toEqual([
+      'linkedin',
+      'github',
+    ])
+  })
+
+  // Dropped from the footer at the owner's request (five-owner-changes Task 5)
+  // and still on /hakkimda in ProfileCard. Adding rows must not smuggle it back.
+  it('still leaves the phone number out', () => {
+    expect(CONTACT_ROWS.some((row) => row.id === 'phone')).toBe(false)
+    expect(CONTACT_ROWS.some((row) => row.href?.startsWith('tel:'))).toBe(false)
+  })
+})

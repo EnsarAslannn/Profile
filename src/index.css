@@ -79,34 +79,14 @@
   --color-backdrop-from: #dbeafe; /* blue-100 - soft top-of-page wash */
   --color-backdrop-to: #f8fafc; /* = surface-base, by design */
 
-  /* Footer card gradient (Footer.tsx, five-owner-changes Task 5). References
-     existing tokens rather than repeating their hex, so a future palette
-     change updates the footer automatically: footer-from is a solid alias of
-     accent-base (the card's "flat blue" band, holding the nav row and the
-     icon row at full saturation) and footer-to is a solid alias of
-     surface-base (the card's fade target), matching the same
-     fade-to-page-ground identity backdrop-to already uses above, so the
-     card's bottom edge disappears into the page ground instead of leaving a
-     visible seam. Both are role names, not literal-colour names, per the
-     palette rule - they describe WHERE in the footer gradient the colour is
-     used, not WHICH colour it is. */
-  --color-footer-from: var(--color-accent-base);
-  --color-footer-to: var(--color-surface-base);
+  /* Availability status. A role name, not a colour name, per the palette rule
+     - it marks 'open to work', and would follow if that state ever needed a
+     different hue. Used only as a small dot beside text that says the same
+     thing, so it carries no information on its own and is not held to a text
+     contrast floor; it clears the 3:1 non-text floor on surface-base
+     (3.35:1) so the dot itself stays visible. */
+  --color-status-open: #15803d; /* green-700 */
 
-  /* Focus ring color for controls sitting on the footer card's solid
-     footer-from band (FooterNav's links, FooterLinkRow's three links and the
-     back-to-top button - see Footer.tsx / FooterLinkRow.tsx). The default
-     `focus` token (#1d4ed8, blue-700) is a dark blue on a dark blue
-     (footer-from = accent-base, #2563eb) background - contrast between the
-     two is roughly 1.2:1, invisible. Decoupled the same way `focus` is
-     already decoupled from `accent-base`, for the same reason: white against
-     footer-from measures (1.05)/(0.15326+0.05) = 5.17:1 - comfortably above
-     the 3:1 non-text/UI floor and reused verbatim from the accent-base
-     contrast figure already measured above (white text is the same pair,
-     inverted). Scope this token to `focus-visible:outline-focus-on-accent`
-     on elements inside the footer card only - everywhere else keeps the
-     plain `focus` token. */
-  --color-focus-on-accent: #ffffff;
 
   /* Project screenshot ratio - nominal 1600x879 (see src/data/projectImages.ts),
      simplified to 253/139 (~1.82:1). Used only by ProjectScreens (the narrated
@@ -134,6 +114,57 @@
      on the img tags for the natural-ratio mobile case and for the detail
      page's LCP figure, where they still do the reserving directly. */
   --aspect-project-cover: 253 / 139;
+
+  /* Marquee motion for the example.mp4 redesign: one horizontal text strip
+     between sections, and the hero's two image columns drifting in opposite
+     directions. Registered as @theme --animate-* tokens rather than bare CSS
+     classes so they stay real Tailwind utilities (animate-marquee-x, etc.)
+     and compose with motion-reduce:animate-none like any other utility -
+     CLAUDE.md's utility-first rule with no @apply.
+
+     Every track renders its content TWICE and travels exactly 50%, which is
+     what makes the wrap seamless: at -50% the second copy sits precisely
+     where the first started, so the reset is invisible. Changing one without
+     the other (a third copy, a different distance) produces a visible jump. */
+  /* The image columns are deliberately much slower than the word strip, and
+     the gap widened when the gallery went from three images to six: twice the
+     tiles means twice the travel distance, so the same duration would have
+     doubled the apparent speed. 150s is slower per pixel than the 52s the
+     three-image version ran at, which is what the owner asked for - change
+     the image count and this number has to move with it. */
+  /* Same coupling as the columns below: the strip lists every technology, so
+     its track length follows src/data/skills.ts. Adding technologies without
+     raising this speeds the strip up. */
+  --animate-marquee-x: marquee-x 115s linear infinite;
+  --animate-drift-up: drift-up 95s linear infinite;
+  --animate-drift-down: drift-down 95s linear infinite;
+
+  @keyframes marquee-x {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes drift-up {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-50%);
+    }
+  }
+
+  @keyframes drift-down {
+    from {
+      transform: translateY(-50%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
 }
 
 /* Custom-property registrations for FooterWordmark's cursor-tracking mask
@@ -179,16 +210,26 @@
 [data-reveal] {
   opacity: 0;
   transform: translateY(1.5rem);
+  filter: blur(6px);
   transition:
     opacity 600ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+    transform 600ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 600ms cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: var(--reveal-delay, 0ms);
   will-change: opacity, transform;
 }
 
+/* `filter: none`, never `blur(0)`. Any non-none filter value makes the
+   element a containing block for absolutely-positioned and sticky
+   descendants - the same trap documented for `transform` in CLAUDE.md - so
+   leaving blur(0) behind would silently change layout for every revealed
+   element on the page, permanently. Interpolating a filter list to `none`
+   is well-defined (the list animates toward its identity), so the blur still
+   eases out; it just does not leave a containing block behind when it lands. */
 [data-reveal='in'] {
   opacity: 1;
   transform: none;
+  filter: none;
   will-change: auto;
 }
 
@@ -200,6 +241,7 @@
   [data-reveal='in'] {
     opacity: 1;
     transform: none;
+    filter: none;
     transition: none;
     will-change: auto;
   }

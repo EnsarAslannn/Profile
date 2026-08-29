@@ -1,31 +1,75 @@
-import { ABOUT_PARAGRAPHS } from '../data/about'
-import ProfileCard from './ProfileCard'
-
+import { Link } from 'react-router-dom'
+import ArrowUpRightIcon from './icons/ArrowUpRightIcon'
+import DownloadIcon from './icons/DownloadIcon'
+import HeroGallery from './HeroGallery'
+import SegmentedText from './SegmentedText'
+import { CV_FILE, HERO_DESCRIPTION, HERO_TITLE_LINES } from '../data/hero'
 
 export default function Hero() {
   return (
-    <section id="hakkimda" className="scroll-mt-8 py-16">
-      <div className="flex flex-col gap-10 lg:grid lg:grid-cols-[288px_minmax(0,1fr)] lg:items-start lg:gap-12 xl:grid-cols-[320px_minmax(0,1fr)] xl:gap-16">
-        <div className="lg:sticky lg:top-24 lg:col-start-1">
-          <ProfileCard />
-        </div>
-        {/* data-reveal sits on the prose column, and on ProfileCard's own root
-            rather than on the sticky wrapper above - a transform on the
-            sticky element would fight its offset while the reveal runs, and
-            CLAUDE.md bans transforms on anything above it. */}
-        <div data-reveal className="[--reveal-delay:120ms] lg:col-start-2 lg:min-w-0">
-          <h1 className="text-4xl font-bold tracking-tight text-ink-strong sm:text-5xl">Hakkımda</h1>
-          <div className="mt-10 space-y-5">
-            {ABOUT_PARAGRAPHS.map((paragraph) => (
-              <p
-                key={paragraph.id}
-                data-about-paragraph
-                className="text-base leading-relaxed text-ink-body sm:text-lg sm:leading-loose xl:text-xl"
+    <section id="anasayfa" className="scroll-mt-24 pt-10 pb-16 sm:pt-14 lg:pt-16">
+      <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] xl:gap-20">
+        <div className="lg:min-w-0">
+          <h1
+            data-reveal
+            className="text-[clamp(2.5rem,6.2vw,5.5rem)] font-bold leading-[0.95] tracking-tight text-ink-strong"
+          >
+            {HERO_TITLE_LINES.map((line, index) => (
+              <span
+                key={line}
+                className={
+                  index === 0
+                    ? 'block whitespace-nowrap'
+                    : 'block whitespace-nowrap text-accent-base/70'
+                }
               >
-                {paragraph.text}
-              </p>
+                {line}
+              </span>
             ))}
+          </h1>
+
+          <p
+            data-reveal
+            className="mt-8 max-w-xl text-base leading-relaxed text-ink-body [--reveal-delay:120ms] sm:text-lg sm:leading-loose"
+          >
+            <SegmentedText segments={HERO_DESCRIPTION} />
+          </p>
+
+          <div
+            data-reveal
+            className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4 [--reveal-delay:240ms]"
+          >
+            <Link
+              to={{ pathname: '/', hash: '#iletisim' }}
+              className="inline-flex items-center gap-3 rounded-full bg-accent-base px-7 py-4 text-sm font-semibold tracking-widest text-white uppercase transition-colors duration-200 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:bg-accent-active"
+            >
+              İletişime geç
+              <ArrowUpRightIcon className="h-4 w-4 shrink-0" />
+            </Link>
+            <Link
+              to={{ pathname: '/', hash: '#projeler' }}
+              className="inline-flex items-center gap-3 rounded-full px-4 py-4 text-sm font-semibold tracking-widest text-ink-body uppercase underline-offset-4 transition-colors duration-200 hover:text-accent-hover hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:text-accent-active"
+            >
+              Projeleri keşfet
+            </Link>
+            {/* A plain <a download> to a file in public/, not a router Link:
+                the CV is a static asset, not a route, and `download` is what
+                makes the browser save it instead of navigating the tab to a
+                PDF viewer. src/data/hero.test.ts asserts the file is actually
+                there, so this link cannot quietly become a 404. */}
+            <a
+              href={CV_FILE}
+              download
+              className="inline-flex items-center gap-3 rounded-full border border-line-strong px-6 py-4 text-sm font-semibold tracking-widest text-ink-strong uppercase transition-colors duration-200 hover:border-accent-base hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:text-accent-active"
+            >
+              CV indir
+              <DownloadIcon className="h-4 w-4 shrink-0" />
+            </a>
           </div>
+        </div>
+
+        <div data-reveal className="[--reveal-delay:160ms]">
+          <HeroGallery />
         </div>
       </div>
     </section>
