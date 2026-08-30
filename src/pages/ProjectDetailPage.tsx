@@ -1,5 +1,6 @@
 import { Link, Navigate, useParams } from 'react-router-dom'
 import ArrowLeftIcon from '../components/icons/ArrowLeftIcon'
+import GlowButton from '../components/ui/GlowButton'
 import ArrowUpRightIcon from '../components/icons/ArrowUpRightIcon'
 import ProjectScreens from '../components/ProjectScreens'
 import ProjectTechnologies from '../components/ProjectTechnologies'
@@ -66,15 +67,12 @@ export default function ProjectDetailPage() {
         </div>
 
         {project.liveUrl && (
-          <a
-            href={project.liveUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent-base px-5 py-3 text-sm font-semibold text-white transition-colors duration-200 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:bg-accent-active"
-          >
-            Canlı demoyu aç
-            <ArrowUpRightIcon className="h-4 w-4 shrink-0" />
-          </a>
+          <div className="mt-6">
+            <GlowButton href={project.liveUrl} external>
+              Projeyi aç
+              <ArrowUpRightIcon className="h-4 w-4 shrink-0" />
+            </GlowButton>
+          </div>
         )}
 
         <ProjectTechnologies groups={project.technologies} />

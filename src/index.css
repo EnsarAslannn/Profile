@@ -139,6 +139,23 @@
   --animate-drift-up: drift-up 95s linear infinite;
   --animate-drift-down: drift-down 95s linear infinite;
 
+  /* The rotating sweep behind a GlowButton's rim
+     (src/components/ui/GlowButton.tsx). Registered here rather than as the
+     inline <style> block the component was supplied with: a <style> tag
+     re-declares the same @keyframes once per rendered instance, and
+     CLAUDE.md's utility-first rule wants the animation addressable as a real
+     Tailwind utility so it composes with motion-reduce:animate-none like
+     every other one. 4s is the supplied duration, kept as-is - unlike the
+     marquee tokens above it is not coupled to any content length, because
+     the sweep travels one full turn regardless of how wide the button is. */
+  --animate-glow-spin: glow-spin 4s linear infinite;
+
+  @keyframes glow-spin {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+
   @keyframes marquee-x {
     from {
       transform: translateX(0);

@@ -193,6 +193,18 @@ Raising it means re-measuring the **rendered pixels**. The site-wide contrast sw
 - Never fabricate biographical facts, employers, dates, project descriptions, metrics, or links. Use an explicit placeholder and report what real content the owner must supply.
 - **No `motion`/`framer-motion`, no `lucide-react`.** Neither is installed, and this is deliberate, not an oversight. This site's motion is a reference-design redesign with a hero gallery, two marquees and a blur-and-lift reveal on every section, and all of it is plain CSS - `@theme --animate-*` keyframes plus one attribute the reveal hook flips. If that much motion did not need an animation library, the next thing does not either. Icons are the five-plus local inline SVGs in `src/components/icons/`, matching `MailIcon.tsx`'s convention (`viewBox="0 0 24 24"`, `stroke="currentColor"`, `aria-hidden="true"`, `focusable="false"`) - add a new one there rather than installing an icon package.
 
+**There is no shadcn/ui in this repo, and adding it is not a small step.** No `components.json`, no `@/` alias, no `clsx`/`tailwind-merge`/`class-variance-authority`, no `lib/utils.ts`. `shadcn init` would install `lucide-react` (banned above), claim `src/index.css` for its own base layer and token set - the file that carries every measured contrast figure on this site - and add a path alias nothing else uses. When a component arrives written for that structure, port the *effect* into this one instead. `GlowButton` (below) is what that looks like in practice.
+
+## The pill CTA
+
+`src/components/ui/GlowButton.tsx` is the site's action button - the hero's "İletişime geç" and "CV indir", and a project's "Projeyi aç". It is the owner-supplied shadcn-style `button-ui.tsx` rewritten for this stack: `"use client"` dropped (a Next.js directive), the dark-theme colours (`bg-white/15`, `bg-gray-900/80`, a white sweep) mapped onto `accent-*`, and the `@keyframes` lifted out of an inline `<style>` tag into the `--animate-glow-spin` `@theme` token, because a `<style>` tag re-declares them once per instance and cannot carry a `motion-reduce:` variant.
+
+**It renders the interactive element itself rather than wrapping one**, and that is structural, not stylistic. The rim needs `overflow-hidden` to clip the rotating sweep, and `overflow: hidden` clips a *descendant's* outline - so a decorative `<div>` wrapped around a `<Link>` would swallow the focus ring. An element's own overflow cannot clip its own outline, so the clipping and the focus ring have to live on the same box. `GlowButton.test.tsx` pins that pairing.
+
+`isolate` is the other load-bearing utility: inside a stacking context an element's own background paints before its negative-z children, so `-z-10` puts the sweep *over* the pale rim and *under* the opaque face. Drop `isolate` and the sweep disappears behind the page.
+
+Applied to the pill CTAs only. Deliberately **not** applied to the text links ("Projeleri keşfet", "Tam metni oku", "Geri"), the navbar (`Navbar.test.tsx` asserts zero buttons), `CopyButton`, or `SocialLinks` - a permanently rotating glow around a 40px icon affordance is noise, and a ring around a bare inline link has no pill to ring.
+
 ## Reveal on load and on scroll
 
 The page fades, lifts and un-blurs its content in as you arrive at it - on first paint for anything above the fold, and on scroll for everything below. Two pieces, and no library:

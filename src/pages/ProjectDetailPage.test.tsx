@@ -60,7 +60,7 @@ describe('ProjectDetailPage', () => {
   it('links to the live demo of whichever project is on screen, opened safely', () => {
     for (const slug of ['dolfin', 'takeauction', 'altitudelog']) {
       const { unmount } = renderWithRouter(<App />, `/projects/${slug}`)
-      const link = screen.getByRole('link', { name: 'Canlı demoyu aç' })
+      const link = screen.getByRole('link', { name: 'Projeyi aç' })
       expect(link).toHaveAttribute('href', getProjectBySlug(slug)!.liveUrl)
       expect(link).toHaveAttribute('target', '_blank')
       // Without noopener the opened tab gets a handle on this one via
@@ -117,7 +117,7 @@ describe('ProjectDetailPage', () => {
     expect(container.querySelectorAll('figcaption')).toHaveLength(5)
     expect(
       screen.getByText(
-        'Şirket profili; fiyat, değişim, piyasa değeri ve beta bilgisinin yanında şirketin ne yaptığı ve son on iki ayın temel metrikleri; gelir tablosu, bilanço ve nakit akışı ayrı sekmelerde.',
+        'Şirket profilinde fiyat, değişim, piyasa değeri ve beta bilgisinin yanında şirketin ne yaptığı ve son on iki ayın temel metrikleri yer alıyor. Gelir tablosu, bilanço ve nakit akışı ayrı sekmelerde duruyor.',
       ),
     ).toBeInTheDocument()
   })

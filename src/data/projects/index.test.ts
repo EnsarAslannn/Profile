@@ -3,13 +3,13 @@ import { getProjectBySlug, PROJECTS } from './index'
 import { getProjectImages } from '../projectImages'
 
 const DOLFIN_SUMMARY =
-  'Kullanıcıların sanal bir cüzdanla hisse senedi alıp satabildiği, portföylerinin dağılımını ve performansını izleyebildiği, hisse sayfalarına yorum bırakabildiği kurumsal odaklı bir finansal yönetim platformu. Uygulama harici bir piyasa verisi servisine bağlı değil; TSLA, NVDA, AAPL, GOOGL ve MSFT için elle hazırlanmış yerel bir veri seti üzerinde çalışıyor.'
+  'Kullanıcıların sanal bir cüzdanla hisse senedi alıp satabildiği, portföylerinin dağılımını ve performansını izleyebildiği, hisse sayfalarına yorum bırakabildiği kurumsal odaklı bir finansal yönetim platformu. Uygulama harici bir piyasa verisi servisine bağlı değil. TSLA, NVDA, AAPL, GOOGL ve MSFT için elle hazırlanmış yerel bir veri seti üzerinde çalışıyor.'
 
 const TAKEAUCTION_SUMMARY =
-  'Satıcıların lot listelediği, alıcıların gizli tavan değerleriyle yarıştığı, yüksek trafikli ve eşzamanlı çalışan gerçek zamanlı bir açık artırma sistemi. Amaç yalnızca teklif butonu olan bir CRUD uygulaması değil; gerçek rekabet altında eşzamanlılığı, teslimat garantilerini ve kapanış mantığını doğru ele alan uçtan uca bir sistem kurmaktı. Kod yatay katmanlar yerine Vertical Slice Architecture ile örgütlendi: her özellik kendi isteğini, işleyicisini ve doğrulamasını uçtan uca kendisi taşıyor.'
+  'Satıcıların lot listelediği, alıcıların gizli tavan değerleriyle yarıştığı, yüksek trafikli ve eşzamanlı çalışan gerçek zamanlı bir açık artırma sistemi. Amaç yalnızca teklif butonu olan bir CRUD uygulaması değil, gerçek rekabet altında eşzamanlılığı, teslimat garantilerini ve kapanış mantığını doğru ele alan uçtan uca bir sistem kurmaktı. Kod yatay katmanlar yerine Vertical Slice Architecture ile örgütlendi. Her özellik kendi isteğini, işleyicisini ve doğrulamasını uçtan uca kendisi taşıyor.'
 
 const ALTITUDELOG_SUMMARY =
-  'Pilotların rütbeleriyle sisteme kayıt olduğu, uçuş kaydı oluşturduğu, her uçuşa mürettebat üyelerini görev rolleriyle atadığı ve isteğe bağlı olarak anonim CRM (Crew Resource Management) güvenlik raporu doldurabildiği bir uçuş ve mürettebat yönetim platformu. Hedef basit bir kayıt ekranı değil; rol tabanlı yetkilendirmeyi, arka plan işlerini, önbellek katmanını ve gerçek bir dağıtım sürecini bir araya getiren uçtan uca bir uygulamaydı.'
+  'Pilotların rütbeleriyle sisteme kayıt olduğu, uçuş kaydı oluşturduğu, her uçuşa mürettebat üyelerini görev rolleriyle atadığı ve isteğe bağlı olarak anonim CRM (Crew Resource Management) güvenlik raporu doldurabildiği bir uçuş ve mürettebat yönetim platformu. Hedef basit bir kayıt ekranı değil, rol tabanlı yetkilendirmeyi, arka plan işlerini, önbellek katmanını ve gerçek bir dağıtım sürecini bir araya getiren uçtan uca bir uygulamaydı.'
 
 describe('PROJECTS', () => {
   it('has three entries in the owner-specified mosaic order: dolfin, takeauction, altitudelog', () => {
@@ -45,6 +45,27 @@ describe('PROJECTS', () => {
         expect(paragraph.trim()).toBe(paragraph)
         expect(paragraph.length).toBeGreaterThan(80)
       }
+    }
+  })
+
+  // The owner asked for semicolons and colons to be taken out of the project
+  // copy. Rewriting the paragraphs once would have been a change a later edit
+  // could quietly undo, so the rule is pinned here instead - it covers the
+  // captions as well, because both fields render as prose on the same page and
+  // a reader does not know which field a sentence came from. Turkish joins
+  // clauses perfectly well with a full stop or a comma, so nothing is lost:
+  // every ';' became a sentence break and every ':' either a sentence break or
+  // a rephrase into a single clause.
+  it('uses no semicolon or colon anywhere in the rendered project prose', () => {
+    for (const project of PROJECTS) {
+      for (const paragraph of project.description) {
+        expect(paragraph, `${project.slug} description`).not.toMatch(/[;:]/)
+      }
+      for (const screen of project.screens) {
+        expect(screen.caption, `${project.slug}/${screen.name} caption`).not.toMatch(/[;:]/)
+      }
+      expect(project.title).not.toMatch(/[;:]/)
+      expect(project.subtitle).not.toMatch(/[;:]/)
     }
   })
 
@@ -224,21 +245,21 @@ describe('screens', () => {
       (s) => s.name === 'auction',
     )
     expect(takeauctionAuction?.caption).toBe(
-      'Parça detayında açıklama, güncel teklif ve kalan süre bulunuyor. Kullanıcı görünmeyen bir üst limit belirleyerek teklif veriyor; sistem yalnızca önde kalmaya yetecek kadar artırıyor.',
+      'Parça detayında açıklama, güncel teklif ve kalan süre bulunuyor. Kullanıcı görünmeyen bir üst limit belirleyerek teklif veriyor. Sistem yalnızca önde kalmaya yetecek kadar artırıyor.',
     )
 
     const altitudelogNewFlight = PROJECTS.find((p) => p.slug === 'altitudelog')?.screens.find(
       (s) => s.name === 'newFlight',
     )
     expect(altitudelogNewFlight?.caption).toBe(
-      'Yeni uçuş oluşturma formu; kalkış ve varış ICAO kodu, tarih, uçuş süresi ve uçak tipi giriliyor. METAR bilgisi uçuş kaydedildikten sonra sistem tarafından otomatik olarak alınıyor.',
+      'Yeni uçuş oluşturma formunda kalkış ve varış ICAO kodu, tarih, uçuş süresi ve uçak tipi giriliyor. METAR bilgisi uçuş kaydedildikten sonra sistem tarafından otomatik olarak alınıyor.',
     )
 
     const dolfinCompanyProfile = PROJECTS.find((p) => p.slug === 'dolfin')?.screens.find(
       (s) => s.name === 'companyProfile',
     )
     expect(dolfinCompanyProfile?.caption).toBe(
-      'Şirket profili; fiyat, değişim, piyasa değeri ve beta bilgisinin yanında şirketin ne yaptığı ve son on iki ayın temel metrikleri; gelir tablosu, bilanço ve nakit akışı ayrı sekmelerde.',
+      'Şirket profilinde fiyat, değişim, piyasa değeri ve beta bilgisinin yanında şirketin ne yaptığı ve son on iki ayın temel metrikleri yer alıyor. Gelir tablosu, bilanço ve nakit akışı ayrı sekmelerde duruyor.',
     )
   })
 })

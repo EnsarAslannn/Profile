@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import GlowButton from './ui/GlowButton'
 import ArrowUpRightIcon from './icons/ArrowUpRightIcon'
 import DownloadIcon from './icons/DownloadIcon'
 import HeroGallery from './HeroGallery'
@@ -39,13 +40,10 @@ export default function Hero() {
             data-reveal
             className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4 [--reveal-delay:240ms]"
           >
-            <Link
-              to={{ pathname: '/', hash: '#iletisim' }}
-              className="inline-flex items-center gap-3 rounded-full bg-accent-base px-7 py-4 text-sm font-semibold tracking-widest text-white uppercase transition-colors duration-200 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:bg-accent-active"
-            >
+            <GlowButton to={{ pathname: '/', hash: '#iletisim' }}>
               İletişime geç
               <ArrowUpRightIcon className="h-4 w-4 shrink-0" />
-            </Link>
+            </GlowButton>
             <Link
               to={{ pathname: '/', hash: '#projeler' }}
               className="inline-flex items-center gap-3 rounded-full px-4 py-4 text-sm font-semibold tracking-widest text-ink-body uppercase underline-offset-4 transition-colors duration-200 hover:text-accent-hover hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:text-accent-active"
@@ -57,14 +55,10 @@ export default function Hero() {
                 makes the browser save it instead of navigating the tab to a
                 PDF viewer. src/data/hero.test.ts asserts the file is actually
                 there, so this link cannot quietly become a 404. */}
-            <a
-              href={CV_FILE}
-              download
-              className="inline-flex items-center gap-3 rounded-full border border-line-strong px-6 py-4 text-sm font-semibold tracking-widest text-ink-strong uppercase transition-colors duration-200 hover:border-accent-base hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:text-accent-active"
-            >
+            <GlowButton href={CV_FILE} download variant="outline">
               CV indir
               <DownloadIcon className="h-4 w-4 shrink-0" />
-            </a>
+            </GlowButton>
           </div>
         </div>
 
