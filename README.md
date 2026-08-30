@@ -2,7 +2,7 @@
 
 Ensar Aslan'ın kişisel portfolyo sitesi. Hakkımda, Projeler, Özgeçmiş, Stacks ve İletişim bölümlerini tek sayfada sunar; her projenin ayrıca kendi detay sayfası vardır.
 
-**Canlı:** https://ensar-aslan-portfolio.vercel.app
+**Canlı:** https://ensaraslan.vercel.app
 
 ---
 
