@@ -25,11 +25,11 @@ describe('About', () => {
 
   it('teases one paragraph and no more', () => {
     renderWithRouter(<About />)
-    expect(screen.getByText(ABOUT_TEASER.text)).toBeInTheDocument()
+    expect(screen.getByText(ABOUT_TEASER.tr.text)).toBeInTheDocument()
     // The other three belong to /hakkimda. Showing them here would make
     // "Tam metni oku" lead to a page the visitor has already read.
-    for (const paragraph of ABOUT_PARAGRAPHS) {
-      if (paragraph.id === ABOUT_TEASER.id) continue
+    for (const paragraph of ABOUT_PARAGRAPHS.tr) {
+      if (paragraph.id === ABOUT_TEASER.tr.id) continue
       expect(screen.queryByText(paragraph.text)).not.toBeInTheDocument()
     }
   })

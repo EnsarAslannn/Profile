@@ -6,11 +6,11 @@ import { NAV_LINKS } from '../data/navigation'
 import { SITE_NAME } from '../lib/siteMeta'
 
 describe('Navbar', () => {
-  it('renders one link per NAV_LINKS entry, in order', () => {
+  it('renders one link per NAV_LINKS.tr entry, in order', () => {
     renderWithRouter(<Navbar />)
     const nav = screen.getByRole('navigation', { name: 'Bölüm gezinmesi' })
     const links = Array.from(nav.querySelectorAll('a'))
-    expect(links.map((link) => link.textContent)).toEqual(NAV_LINKS.map((link) => link.label))
+    expect(links.map((link) => link.textContent)).toEqual(NAV_LINKS.tr.map((link) => link.label))
   })
 
   // Not `href="#projeler"`. Clicked from /projects/dolfin, a bare hash would
@@ -21,7 +21,7 @@ describe('Navbar', () => {
     renderWithRouter(<Navbar />, '/projects/dolfin')
     const nav = screen.getByRole('navigation', { name: 'Bölüm gezinmesi' })
     for (const [index, link] of Array.from(nav.querySelectorAll('a')).entries()) {
-      expect(link.getAttribute('href')).toBe(`/#${NAV_LINKS[index].anchor}`)
+      expect(link.getAttribute('href')).toBe(`/#${NAV_LINKS.tr[index].anchor}`)
     }
   })
 
@@ -33,9 +33,15 @@ describe('Navbar', () => {
   // The reference design carries a language switcher and a theme toggle. This
   // site has neither i18n nor a dark theme, and a control that does nothing
   // is worse than no control - so the navbar must stay links-only.
-  it('adds no control that does not do anything', () => {
+  // The reference design carries a language switcher and a theme toggle.
+  // This used to assert zero buttons, because neither did anything here and a
+  // control that does nothing is worse than no control. The language switcher
+  // is now real, so the rule is not "no buttons" - it is "no button that does
+  // nothing": exactly the two language controls, and no theme toggle.
+  it('carries the language controls and no other, non-functional control', () => {
     const { container } = renderWithRouter(<Navbar />)
-    expect(container.querySelectorAll('button')).toHaveLength(0)
+    const buttons = [...container.querySelectorAll('button')]
+    expect(buttons.map((b) => b.textContent)).toEqual(['TRTürkçe', 'ENEnglish'])
     expect(container.querySelectorAll('select')).toHaveLength(0)
   })
 

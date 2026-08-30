@@ -11,14 +11,14 @@ describe('App', () => {
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1)
   })
 
-  // The two-edit rule, made self-enforcing. NAV_LINKS is the single source of
+  // The two-edit rule, made self-enforcing. NAV_LINKS.tr is the single source of
   // truth for section navigation; a section added to only one of the two
   // places that render sections (HomePage for the five body sections, App
   // itself for `iletisim`) fails here instead of shipping a dead nav link.
-  it('renders exactly one section per NAV_LINKS anchor, in order', () => {
+  it('renders exactly one section per NAV_LINKS.tr anchor, in order', () => {
     const { container } = renderWithRouter(<App />)
     const ids = Array.from(container.querySelectorAll('section[id]')).map((section) => section.id)
-    expect(ids).toEqual(NAV_LINKS.map((link) => link.anchor))
+    expect(ids).toEqual(NAV_LINKS.tr.map((link) => link.anchor))
   })
 
   it('links every navbar anchor to a section that exists', () => {
@@ -26,7 +26,7 @@ describe('App', () => {
     // (`/#hakkimda`), so this reads the fragment after `/#`.
     const { container } = renderWithRouter(<App />)
     const anchors = Array.from(container.querySelectorAll('nav a[href^="/#"]'))
-    expect(anchors.length).toBe(NAV_LINKS.length)
+    expect(anchors.length).toBe(NAV_LINKS.tr.length)
     for (const anchor of anchors) {
       const id = anchor.getAttribute('href')?.slice(2)
       expect(container.querySelector(`section#${id}`)).not.toBeNull()

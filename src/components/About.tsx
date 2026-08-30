@@ -4,14 +4,19 @@ import ArrowUpRightIcon from './icons/ArrowUpRightIcon'
 import SectionHeading from './SectionHeading'
 import SegmentedText from './SegmentedText'
 import { ABOUT_STATEMENT, ABOUT_TEASER } from '../data/about'
+import { useLanguage } from '../i18n/LanguageContext'
+import { UI } from '../i18n/ui'
 import { SITE_NAME, SITE_ROLE } from '../lib/siteMeta'
 
 export default function About() {
+  const { language } = useLanguage()
+  const ui = UI[language]
+
   return (
     <section id="hakkimda" className="scroll-mt-24 border-t border-line-subtle py-20 sm:py-24">
       <div className="grid gap-12 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-16 xl:gap-24">
         <div>
-          <SectionHeading title="Hakkımda" />
+          <SectionHeading title={ui.sectionAbout} />
 
           {/* The reference drops a hairline from the heading into a small
               identity card. The line is drawn with a border on a fixed-height
@@ -48,14 +53,14 @@ export default function About() {
             data-reveal
             className="text-3xl leading-tight font-normal tracking-tight text-ink-strong sm:text-4xl lg:text-5xl"
           >
-            <SegmentedText segments={ABOUT_STATEMENT} />
+            <SegmentedText segments={ABOUT_STATEMENT[language]} />
           </p>
 
           <p
             data-reveal
             className="mt-10 max-w-2xl text-base leading-relaxed text-ink-body [--reveal-delay:120ms] sm:text-lg sm:leading-loose"
           >
-            {ABOUT_TEASER.text}
+            {ABOUT_TEASER[language].text}
           </p>
 
           <Link
@@ -63,7 +68,7 @@ export default function About() {
             data-reveal
             className="mt-10 inline-flex items-center gap-3 rounded border-b border-ink-strong pb-1 text-lg font-semibold text-ink-strong [--reveal-delay:240ms] transition-colors duration-200 hover:border-accent-hover hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:text-accent-active sm:text-xl"
           >
-            Tam metni oku
+            {ui.aboutReadFull}
             <ArrowUpRightIcon className="h-5 w-5 shrink-0" />
           </Link>
         </div>

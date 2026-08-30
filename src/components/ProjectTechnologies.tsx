@@ -1,6 +1,9 @@
 import { Fragment } from 'react'
 import type { TechGroup } from '../data/projects'
 
+import { useLanguage } from '../i18n/LanguageContext'
+import { UI } from '../i18n/ui'
+
 type Props = {
   groups: readonly TechGroup[]
 }
@@ -15,10 +18,12 @@ type Props = {
 // ink-muted drops to ~3.90:1 against the PageBackdrop gradient's bluest
 // point - see CLAUDE.md's contrast rule.
 export default function ProjectTechnologies({ groups }: Props) {
+  const { language } = useLanguage()
+
   return (
     <dl
       data-reveal
-      aria-label="Kullanılan teknolojiler"
+      aria-label={UI[language].technologiesUsed}
       className="mt-10 space-y-5 sm:grid sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-x-8 sm:gap-y-4 sm:space-y-0"
     >
       {groups.map((group) => (

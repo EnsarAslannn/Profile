@@ -1,3 +1,6 @@
+import { DEFAULT_LANGUAGE, type Language } from '../i18n/language'
+import { UI } from '../i18n/ui'
+
 // Project screenshots are collected with a single import.meta.glob call
 // instead of one import per file, so dropping a new WebP into
 // src/assets/<slug>/ never requires a code change here.
@@ -72,6 +75,10 @@ export function getProjectImages(folder: string, preferredOrder: readonly string
 // until the owner supplies real per-screenshot Turkish alt text. Project
 // covers do not use this - they are decorative (alt="") because the card
 // link carries the accessible name.
-export function getProjectImageAlt(projectTitle: string, index: number): string {
-  return `${projectTitle} ekran görüntüsü ${index + 1}`
+export function getProjectImageAlt(
+  projectTitle: string,
+  index: number,
+  language: Language = DEFAULT_LANGUAGE,
+): string {
+  return UI[language].projectScreenshot(projectTitle, index + 1)
 }

@@ -3,12 +3,12 @@ import { RESUME_GROUPS, toMachineDate } from './resume'
 
 describe('resume data', () => {
   it('exposes the two groups in owner order', () => {
-    expect(RESUME_GROUPS.map((g) => g.id)).toEqual(['education', 'experience'])
-    expect(RESUME_GROUPS.map((g) => g.heading)).toEqual(['Eğitim', 'Deneyim'])
+    expect(RESUME_GROUPS.tr.map((g) => g.id)).toEqual(['education', 'experience'])
+    expect(RESUME_GROUPS.tr.map((g) => g.heading)).toEqual(['Eğitim', 'Deneyim'])
   })
 
   it('lists education entries verbatim in owner order', () => {
-    const education = RESUME_GROUPS.find((g) => g.id === 'education')!
+    const education = RESUME_GROUPS.tr.find((g) => g.id === 'education')!
     expect(education.entries).toEqual([
       {
         id: 'karabuk-bm',
@@ -28,7 +28,7 @@ describe('resume data', () => {
   })
 
   it('lists experience entries verbatim in owner order', () => {
-    const experience = RESUME_GROUPS.find((g) => g.id === 'experience')!
+    const experience = RESUME_GROUPS.tr.find((g) => g.id === 'experience')!
     expect(experience.entries).toEqual([
       {
         id: 'brisa-staj',
@@ -48,7 +48,7 @@ describe('resume data', () => {
   })
 
   it('uses stable non-numeric ids that are unique across all groups', () => {
-    const ids = RESUME_GROUPS.flatMap((g) => g.entries.map((e) => e.id))
+    const ids = RESUME_GROUPS.tr.flatMap((g) => g.entries.map((e) => e.id))
     expect(new Set(ids).size).toBe(ids.length)
     for (const id of ids) {
       expect(id).not.toMatch(/^\d+$/)

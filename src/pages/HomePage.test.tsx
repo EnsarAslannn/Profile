@@ -9,7 +9,7 @@ describe('HomePage', () => {
     const ids = Array.from(container.querySelectorAll('section[id]')).map((section) => section.id)
     // `iletisim` is deliberately absent: it is site chrome, rendered by
     // App.tsx outside <Routes> so every route ends the same way. App.test.tsx
-    // is what proves the full NAV_LINKS set resolves.
+    // is what proves the full NAV_LINKS.tr set resolves.
     expect(ids).toEqual(['anasayfa', 'hakkimda', 'projeler', 'ozgecmis', 'yetenekler'])
   })
 

@@ -14,7 +14,7 @@ describe('firstSentence', () => {
   })
 
   it('returns the first sentence of every project description', () => {
-    for (const project of PROJECTS) {
+    for (const project of PROJECTS.tr) {
       const sentence = firstSentence(project.description[0])
       expect(project.description[0].startsWith(sentence)).toBe(true)
       expect(sentence.endsWith('.')).toBe(true)

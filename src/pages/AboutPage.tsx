@@ -4,6 +4,9 @@ import ArrowLeftIcon from '../components/icons/ArrowLeftIcon'
 import ProfileCard from '../components/ProfileCard'
 import RouteMeta from '../components/RouteMeta'
 import { ABOUT_PARAGRAPHS } from '../data/about'
+import { useLanguage } from '../i18n/LanguageContext'
+import type { Localized } from '../i18n/language'
+import { UI } from '../i18n/ui'
 import { CONTENT_CONTAINER } from '../lib/layout'
 import { SITE_NAME, truncateForDescription } from '../lib/siteMeta'
 import { useReveal } from '../lib/useReveal'
@@ -13,16 +16,23 @@ import { useReveal } from '../lib/useReveal'
 // example.mp4 redesign moved the landing screen to a hero. Nothing new is
 // written here - it renders ABOUT_PARAGRAPHS whole, which is exactly what
 // "full version" means.
-const PAGE_DESCRIPTION = truncateForDescription(ABOUT_PARAGRAPHS[0].text)
+// Derived, never hand-written - one description per language, each trimmed
+// from that language's own opening paragraph.
+const PAGE_DESCRIPTION: Localized<string> = {
+  tr: truncateForDescription(ABOUT_PARAGRAPHS.tr[0].text),
+  en: truncateForDescription(ABOUT_PARAGRAPHS.en[0].text),
+}
 
 export default function AboutPage() {
   const revealRoot = useReveal<HTMLElement>()
+  const { language } = useLanguage()
+  const ui = UI[language]
 
   return (
     <>
       <RouteMeta
-        title={`Hakkımda | ${SITE_NAME}`}
-        description={PAGE_DESCRIPTION}
+        title={`${ui.aboutPageTitle} | ${SITE_NAME}`}
+        description={PAGE_DESCRIPTION[language]}
         image={profilePhoto}
         type="website"
       />
@@ -33,7 +43,7 @@ export default function AboutPage() {
             className="mb-8 inline-flex items-center gap-2 rounded px-3 py-3 text-sm font-medium text-accent-base transition-colors duration-200 hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:text-accent-active"
           >
             <ArrowLeftIcon className="h-4 w-4 shrink-0" />
-            Geri
+            {ui.back}
           </Link>
 
           {/* The same two-track grid the old home hero used: a fixed card
@@ -49,10 +59,10 @@ export default function AboutPage() {
                 data-reveal
                 className="text-4xl font-bold tracking-tight text-ink-strong sm:text-5xl"
               >
-                Hakkımda
+                {ui.aboutPageTitle}
               </h1>
               <div className="mt-10 space-y-5">
-                {ABOUT_PARAGRAPHS.map((paragraph) => (
+                {ABOUT_PARAGRAPHS[language].map((paragraph) => (
                   <p
                     key={paragraph.id}
                     data-about-paragraph

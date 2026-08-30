@@ -11,6 +11,7 @@
 // crossed the ~120-line threshold that a single projects.ts file allowed -
 // see CLAUDE.md's "Adding a project" step 10. Importers still write
 // `from '../data/projects'`, which resolves to this index.ts unchanged.
+import { DEFAULT_LANGUAGE, type Language, type Localized } from '../../i18n/language'
 import { getProjectImages } from '../projectImages'
 import { getProjectCover, type ProjectCover } from '../projectCovers'
 import { takeauction } from './takeauction'
@@ -22,7 +23,7 @@ import { dolfin } from './dolfin'
 // IS the walkthrough order on the detail page.
 export type ProjectScreenInput = {
   name: string
-  caption: string
+  caption: Localized<string>
 }
 
 export type ProjectScreen = {
@@ -57,12 +58,23 @@ export type Project = {
   screens: ProjectScreen[]
 }
 
+// What translates and what does not, in one place:
+//
+//  - `title` does not. DOLFIN, TakeAuction and AltitudELog are product names.
+//  - `slug` and `liveUrl` do not. They are addresses.
+//  - `technologies` does not. Every entry is a proper noun taken from the
+//    project's own repo, and translating "Entity Framework Core" would be
+//    inventing a product that does not exist. The four group labels
+//    (Backend / Frontend / Test / Deployment) are already English and read
+//    the same to a Turkish developer.
+//  - `subtitle`, `description` and each screen's `caption` do. They are the
+//    prose.
 export type ProjectInput = {
   slug: string
   title: string
-  subtitle: string
+  subtitle: Localized<string>
   liveUrl?: string
-  description: readonly string[]
+  description: Localized<readonly string[]>
   technologies: readonly TechGroup[]
   screens: readonly ProjectScreenInput[]
 }
@@ -90,8 +102,12 @@ const PROJECT_INPUTS: ProjectInput[] = [dolfin, takeauction, altitudelog]
  * set-equality assertion is what turns either mismatch into a loud,
  * build-time failure instead of a silent content gap.
  */
-function buildScreens(slug: string, inputs: readonly ProjectScreenInput[]): ProjectScreen[] {
-  const captionsByName = new Map(inputs.map((input) => [input.name, input.caption]))
+function buildScreens(
+  slug: string,
+  inputs: readonly ProjectScreenInput[],
+  language: Language,
+): ProjectScreen[] {
+  const captionsByName = new Map(inputs.map((input) => [input.name, input.caption[language]]))
   const images = getProjectImages(
     slug,
     inputs.map((input) => input.name),
@@ -103,18 +119,34 @@ function buildScreens(slug: string, inputs: readonly ProjectScreenInput[]): Proj
   }))
 }
 
-export const PROJECTS: Project[] = PROJECT_INPUTS.map((input) => ({
-  slug: input.slug,
-  title: input.title,
-  subtitle: input.subtitle,
-  liveUrl: input.liveUrl,
-  description: input.description,
-  technologies: input.technologies,
-  cover: getProjectCover(input.slug),
-  screens: buildScreens(input.slug, input.screens),
-}))
+// Both languages are resolved once, at module load, rather than on each
+// render: the work is a handful of array maps over static data, and a
+// component that reads PROJECTS[language] then needs no memo of its own.
+const resolve = (language: Language): Project[] =>
+  PROJECT_INPUTS.map((input) => ({
+    slug: input.slug,
+    title: input.title,
+    subtitle: input.subtitle[language],
+    liveUrl: input.liveUrl,
+    description: input.description[language],
+    technologies: input.technologies,
+    cover: getProjectCover(input.slug),
+    screens: buildScreens(input.slug, input.screens, language),
+  }))
 
-export function getProjectBySlug(slug: string | undefined): Project | undefined {
+export const PROJECTS: Localized<Project[]> = {
+  tr: resolve('tr'),
+  en: resolve('en'),
+}
+
+// The language defaults rather than being required, so a caller that has no
+// business knowing about languages - a test asserting a slug, say - does not
+// have to pass one. Route lookup is by slug in both languages: the URLs are
+// identical, and only the copy inside changes.
+export function getProjectBySlug(
+  slug: string | undefined,
+  language: Language = DEFAULT_LANGUAGE,
+): Project | undefined {
   if (!slug) return undefined
-  return PROJECTS.find((project) => project.slug === slug)
+  return PROJECTS[language].find((project) => project.slug === slug)
 }

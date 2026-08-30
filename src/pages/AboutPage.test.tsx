@@ -10,7 +10,7 @@ describe('AboutPage', () => {
     const rendered = Array.from(container.querySelectorAll('p[data-about-paragraph]')).map(
       (p) => p.textContent,
     )
-    expect(rendered).toEqual(ABOUT_PARAGRAPHS.map((paragraph) => paragraph.text))
+    expect(rendered).toEqual(ABOUT_PARAGRAPHS.tr.map((paragraph) => paragraph.text))
   })
 
   it('titles itself Hakkımda as the route h1', () => {

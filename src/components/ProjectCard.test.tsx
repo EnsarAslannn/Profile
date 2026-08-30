@@ -4,7 +4,7 @@ import ProjectCard from './ProjectCard'
 import { renderWithRouter } from '../test/renderWithRouter'
 import { getProjectBySlug } from '../data/projects'
 
-// Looked up by slug, not by index: the PROJECTS array order is the home-page
+// Looked up by slug, not by index: the PROJECTS.tr array order is the home-page
 // grid display order and is expected to change without breaking this test.
 const dolfin = getProjectBySlug('dolfin')!
 

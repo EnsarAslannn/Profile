@@ -11,16 +11,16 @@ const TAKEAUCTION_SUMMARY =
 const ALTITUDELOG_SUMMARY =
   'Pilotların rütbeleriyle sisteme kayıt olduğu, uçuş kaydı oluşturduğu, her uçuşa mürettebat üyelerini görev rolleriyle atadığı ve isteğe bağlı olarak anonim CRM (Crew Resource Management) güvenlik raporu doldurabildiği bir uçuş ve mürettebat yönetim platformu. Hedef basit bir kayıt ekranı değil, rol tabanlı yetkilendirmeyi, arka plan işlerini, önbellek katmanını ve gerçek bir dağıtım sürecini bir araya getiren uçtan uca bir uygulamaydı.'
 
-describe('PROJECTS', () => {
+describe('PROJECTS.tr', () => {
   it('has three entries in the owner-specified mosaic order: dolfin, takeauction, altitudelog', () => {
-    expect(PROJECTS).toHaveLength(3)
-    expect(PROJECTS.map((p) => p.slug)).toEqual(['dolfin', 'takeauction', 'altitudelog'])
+    expect(PROJECTS.tr).toHaveLength(3)
+    expect(PROJECTS.tr.map((p) => p.slug)).toEqual(['dolfin', 'takeauction', 'altitudelog'])
   })
 
   it('has the exact title and subtitle for each project', () => {
-    const dolfin = PROJECTS.find((p) => p.slug === 'dolfin')
-    const takeauction = PROJECTS.find((p) => p.slug === 'takeauction')
-    const altitudelog = PROJECTS.find((p) => p.slug === 'altitudelog')
+    const dolfin = PROJECTS.tr.find((p) => p.slug === 'dolfin')
+    const takeauction = PROJECTS.tr.find((p) => p.slug === 'takeauction')
+    const altitudelog = PROJECTS.tr.find((p) => p.slug === 'altitudelog')
     expect(dolfin?.title).toBe('DOLFIN')
     expect(dolfin?.subtitle).toBe('Finansal Portföy Yönetim Platformu')
     expect(takeauction?.title).toBe('TakeAuction')
@@ -30,16 +30,16 @@ describe('PROJECTS', () => {
   })
 
   it('opens each description with the verbatim summary paragraph', () => {
-    expect(PROJECTS.find((p) => p.slug === 'dolfin')?.description[0]).toBe(DOLFIN_SUMMARY)
-    expect(PROJECTS.find((p) => p.slug === 'takeauction')?.description[0]).toBe(TAKEAUCTION_SUMMARY)
-    expect(PROJECTS.find((p) => p.slug === 'altitudelog')?.description[0]).toBe(ALTITUDELOG_SUMMARY)
+    expect(PROJECTS.tr.find((p) => p.slug === 'dolfin')?.description[0]).toBe(DOLFIN_SUMMARY)
+    expect(PROJECTS.tr.find((p) => p.slug === 'takeauction')?.description[0]).toBe(TAKEAUCTION_SUMMARY)
+    expect(PROJECTS.tr.find((p) => p.slug === 'altitudelog')?.description[0]).toBe(ALTITUDELOG_SUMMARY)
   })
 
   // description[0] is what RouteMeta trims into the route's meta description,
   // so it has to read as a standalone summary of the whole project rather
   // than as the first instalment of a story the later paragraphs finish.
   it('gives every project a multi-paragraph description whose first paragraph can stand alone', () => {
-    for (const project of PROJECTS) {
+    for (const project of PROJECTS.tr) {
       expect(project.description.length).toBeGreaterThan(1)
       for (const paragraph of project.description) {
         expect(paragraph.trim()).toBe(paragraph)
@@ -57,7 +57,7 @@ describe('PROJECTS', () => {
   // every ';' became a sentence break and every ':' either a sentence break or
   // a rephrase into a single clause.
   it('uses no semicolon or colon anywhere in the rendered project prose', () => {
-    for (const project of PROJECTS) {
+    for (const project of PROJECTS.tr) {
       for (const paragraph of project.description) {
         expect(paragraph, `${project.slug} description`).not.toMatch(/[;:]/)
       }
@@ -70,7 +70,7 @@ describe('PROJECTS', () => {
   })
 
   it('no description paragraph contains a digit-only year or an http substring', () => {
-    for (const project of PROJECTS) {
+    for (const project of PROJECTS.tr) {
       for (const paragraph of project.description) {
         expect(paragraph).not.toMatch(/\b(19|20)\d{2}\b/)
         // URLs belong in liveUrl, never inline in prose - a bare URL in a
@@ -87,7 +87,7 @@ describe('PROJECTS', () => {
 
 describe('liveUrl', () => {
   it('gives every project an https demo link, with no trailing slash', () => {
-    for (const project of PROJECTS) {
+    for (const project of PROJECTS.tr) {
       expect(project.liveUrl).toBeDefined()
       expect(project.liveUrl).toMatch(/^https:\/\//)
       expect(project.liveUrl).not.toMatch(/\/$/)
@@ -95,7 +95,7 @@ describe('liveUrl', () => {
   })
 
   it('points each project at its own demo', () => {
-    const urls = Object.fromEntries(PROJECTS.map((p) => [p.slug, p.liveUrl]))
+    const urls = Object.fromEntries(PROJECTS.tr.map((p) => [p.slug, p.liveUrl]))
     expect(urls).toEqual({
       dolfin: 'https://dol-fin.com',
       takeauction: 'https://take-auction.vercel.app',
@@ -111,7 +111,7 @@ describe('technologies', () => {
   // These assertions instead pin the shape, and spot-check the entries that
   // distinguish one project's repo from another's.
   it('groups every project as Backend / Frontend / Test / Deployment, in that order', () => {
-    for (const project of PROJECTS) {
+    for (const project of PROJECTS.tr) {
       expect(project.technologies.map((group) => group.label)).toEqual([
         'Backend',
         'Frontend',
@@ -122,7 +122,7 @@ describe('technologies', () => {
   })
 
   it('has no empty group and no repeated entry within a project', () => {
-    for (const project of PROJECTS) {
+    for (const project of PROJECTS.tr) {
       const all: string[] = []
       for (const group of project.technologies) {
         expect(group.items.length).toBeGreaterThan(0)
@@ -136,7 +136,7 @@ describe('technologies', () => {
   // shows up as a failure instead of quietly attributing one stack to another.
   it('carries the stack that is actually specific to each repo', () => {
     const items = (slug: string) =>
-      PROJECTS.find((p) => p.slug === slug)!.technologies.flatMap((group) => group.items)
+      PROJECTS.tr.find((p) => p.slug === slug)!.technologies.flatMap((group) => group.items)
 
     // github.com/EnsarAslannn/TakeAuction - outbox over RabbitMQ and live
     // bid push over SignalR.
@@ -177,7 +177,7 @@ describe('technologies', () => {
       'CodeQL',
       'Respawn',
     ]
-    for (const project of PROJECTS) {
+    for (const project of PROJECTS.tr) {
       const text = [
         ...project.description,
         ...project.technologies.flatMap((group) => group.items),
@@ -193,18 +193,18 @@ describe('technologies', () => {
 
 describe('screens', () => {
   it('has the expected screen counts: 4 takeauction, 6 altitudelog, 5 dolfin', () => {
-    const counts = Object.fromEntries(PROJECTS.map((p) => [p.slug, p.screens.length]))
+    const counts = Object.fromEntries(PROJECTS.tr.map((p) => [p.slug, p.screens.length]))
     expect(counts).toEqual({ takeauction: 4, altitudelog: 6, dolfin: 5 })
   })
 
   it('narrates in the exact owner-specified order per project', () => {
-    expect(PROJECTS.find((p) => p.slug === 'takeauction')?.screens.map((s) => s.name)).toEqual([
+    expect(PROJECTS.tr.find((p) => p.slug === 'takeauction')?.screens.map((s) => s.name)).toEqual([
       'homePage',
       'homePage2',
       'auctions',
       'auction',
     ])
-    expect(PROJECTS.find((p) => p.slug === 'altitudelog')?.screens.map((s) => s.name)).toEqual([
+    expect(PROJECTS.tr.find((p) => p.slug === 'altitudelog')?.screens.map((s) => s.name)).toEqual([
       'homePage',
       'homePage2',
       'newFlight',
@@ -212,7 +212,7 @@ describe('screens', () => {
       'profile',
       'statistics',
     ])
-    expect(PROJECTS.find((p) => p.slug === 'dolfin')?.screens.map((s) => s.name)).toEqual([
+    expect(PROJECTS.tr.find((p) => p.slug === 'dolfin')?.screens.map((s) => s.name)).toEqual([
       'homePage',
       'homePage2',
       'searchPage',
@@ -222,7 +222,7 @@ describe('screens', () => {
   })
 
   it('the set of screen names exactly matches the set of image names on disk, per project', () => {
-    for (const project of PROJECTS) {
+    for (const project of PROJECTS.tr) {
       const screenNames = [...project.screens.map((s) => s.name)].sort()
       const imageNames = getProjectImages(project.slug, [])
         .map((i) => i.name)
@@ -232,7 +232,7 @@ describe('screens', () => {
   })
 
   it('every screen has a non-empty caption and a non-empty src', () => {
-    for (const project of PROJECTS) {
+    for (const project of PROJECTS.tr) {
       for (const screen of project.screens) {
         expect(screen.caption?.length).toBeGreaterThan(0)
         expect(screen.src.length).toBeGreaterThan(0)
@@ -241,21 +241,21 @@ describe('screens', () => {
   })
 
   it('spot-checks three captions verbatim, one per project', () => {
-    const takeauctionAuction = PROJECTS.find((p) => p.slug === 'takeauction')?.screens.find(
+    const takeauctionAuction = PROJECTS.tr.find((p) => p.slug === 'takeauction')?.screens.find(
       (s) => s.name === 'auction',
     )
     expect(takeauctionAuction?.caption).toBe(
       'Parça detayında açıklama, güncel teklif ve kalan süre bulunuyor. Kullanıcı görünmeyen bir üst limit belirleyerek teklif veriyor. Sistem yalnızca önde kalmaya yetecek kadar artırıyor.',
     )
 
-    const altitudelogNewFlight = PROJECTS.find((p) => p.slug === 'altitudelog')?.screens.find(
+    const altitudelogNewFlight = PROJECTS.tr.find((p) => p.slug === 'altitudelog')?.screens.find(
       (s) => s.name === 'newFlight',
     )
     expect(altitudelogNewFlight?.caption).toBe(
       'Yeni uçuş oluşturma formunda kalkış ve varış ICAO kodu, tarih, uçuş süresi ve uçak tipi giriliyor. METAR bilgisi uçuş kaydedildikten sonra sistem tarafından otomatik olarak alınıyor.',
     )
 
-    const dolfinCompanyProfile = PROJECTS.find((p) => p.slug === 'dolfin')?.screens.find(
+    const dolfinCompanyProfile = PROJECTS.tr.find((p) => p.slug === 'dolfin')?.screens.find(
       (s) => s.name === 'companyProfile',
     )
     expect(dolfinCompanyProfile?.caption).toBe(
@@ -266,7 +266,7 @@ describe('screens', () => {
 
 describe('cover', () => {
   it('is defined for all three projects and is a genuinely different asset from screen 0', () => {
-    for (const project of PROJECTS) {
+    for (const project of PROJECTS.tr) {
       expect(project.cover).toBeDefined()
       expect(project.cover?.src).not.toBe(project.screens[0]?.src)
     }

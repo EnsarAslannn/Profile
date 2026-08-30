@@ -76,7 +76,7 @@ describe('ProjectDetailPage', () => {
     const list = container.querySelector('dl[aria-label="Kullanılan teknolojiler"]')
     expect(list).not.toBeNull()
 
-    const dolfin = PROJECTS.find((project) => project.slug === 'dolfin')!
+    const dolfin = PROJECTS.tr.find((project) => project.slug === 'dolfin')!
     expect([...list!.querySelectorAll('dt')].map((dt) => dt.textContent)).toEqual(
       dolfin.technologies.map((group) => group.label),
     )

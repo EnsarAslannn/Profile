@@ -14,66 +14,66 @@ const TOOLING_TEXT =
 const GOALS_TEXT =
   'Gelişimime olan inancım ve yüksek öğrenme motivasyonumla, dahil olacağım yazılım ekiplerinin projelerine ve iş süreçlerine maksimum katkıyı sağlamayı hedefliyorum. Aşağıda üzerinde çalıştığım projelere göz atabilir, ya da doğrudan benimle iletişime geçebilirsiniz.'
 
-describe('ABOUT_PARAGRAPHS', () => {
+describe('ABOUT_PARAGRAPHS.tr', () => {
   it('has exactly four paragraphs in the owner-supplied order', () => {
-    expect(ABOUT_PARAGRAPHS).toHaveLength(4)
-    expect(ABOUT_PARAGRAPHS.map((p) => p.id)).toEqual(['intro', 'stack', 'tooling', 'goals'])
+    expect(ABOUT_PARAGRAPHS.tr).toHaveLength(4)
+    expect(ABOUT_PARAGRAPHS.tr.map((p) => p.id)).toEqual(['intro', 'stack', 'tooling', 'goals'])
   })
 
   it('keeps the intro paragraph verbatim', () => {
-    expect(ABOUT_PARAGRAPHS[0].text).toBe(INTRO_TEXT)
+    expect(ABOUT_PARAGRAPHS.tr[0].text).toBe(INTRO_TEXT)
   })
 
   it('keeps the stack paragraph verbatim', () => {
-    expect(ABOUT_PARAGRAPHS[1].text).toBe(STACK_TEXT)
+    expect(ABOUT_PARAGRAPHS.tr[1].text).toBe(STACK_TEXT)
   })
 
   it('keeps the tooling paragraph verbatim', () => {
-    expect(ABOUT_PARAGRAPHS[2].text).toBe(TOOLING_TEXT)
+    expect(ABOUT_PARAGRAPHS.tr[2].text).toBe(TOOLING_TEXT)
   })
 
   it('keeps the goals paragraph verbatim', () => {
-    expect(ABOUT_PARAGRAPHS[3].text).toBe(GOALS_TEXT)
+    expect(ABOUT_PARAGRAPHS.tr[3].text).toBe(GOALS_TEXT)
   })
 
   it('no longer contains the superseded copy', () => {
-    const allText = ABOUT_PARAGRAPHS.map((p) => p.text).join(' ')
+    const allText = ABOUT_PARAGRAPHS.tr.map((p) => p.text).join(' ')
     expect(allText).not.toContain('Erasmus+')
     expect(allText).not.toContain('Futbol')
     expect(allText).not.toContain('zamanla iyi bir Full Stack geliştirici olmayı')
   })
 })
 
-describe('ABOUT_STATEMENT', () => {
+describe('ABOUT_STATEMENT.tr', () => {
   // The single sentence on this site that is not lifted verbatim from the
   // owner. It is allowed to exist only because it states no new fact: the
   // title is the one already shown in ProfileCard, and the adjectives are
   // the owner's own. Both halves are pinned, so a rewrite that smuggles in a
   // fresh claim ("5 yıllık deneyim", a framework nobody named) fails here.
   it('reads as one sentence and claims nothing new', () => {
-    const joined = ABOUT_STATEMENT.map((segment) => segment.text).join('')
+    const joined = ABOUT_STATEMENT.tr.map((segment) => segment.text).join('')
     expect(joined).toBe(
       'Full Stack .NET Developer olarak ölçeklenebilir, performanslı ve sürdürülebilir sistemler kuruyorum.',
     )
     expect(joined).toContain(SITE_ROLE)
-    expect(ABOUT_PARAGRAPHS[0].text).toContain(
+    expect(ABOUT_PARAGRAPHS.tr[0].text).toContain(
       'ölçeklenebilir, performanslı ve sürdürülebilir',
     )
   })
 
   it('emphasises only the title and the owner-supplied adjectives', () => {
     expect(
-      ABOUT_STATEMENT.filter((segment) => segment.emphasis).map((segment) => segment.text),
+      ABOUT_STATEMENT.tr.filter((segment) => segment.emphasis).map((segment) => segment.text),
     ).toEqual([SITE_ROLE, 'ölçeklenebilir, performanslı ve sürdürülebilir'])
   })
 })
 
-describe('ABOUT_TEASER', () => {
+describe('ABOUT_TEASER.tr', () => {
   // The section shows one paragraph before "Tam metni oku". Index 0 is the
   // hero's and index 1 is what Yetenekler covers, so this is the first that
   // repeats nothing already on the screen.
   it('is the tooling paragraph, so the home page never says the same thing twice', () => {
-    expect(ABOUT_TEASER.id).toBe('tooling')
-    expect(ABOUT_TEASER).toBe(ABOUT_PARAGRAPHS[2])
+    expect(ABOUT_TEASER.tr.id).toBe('tooling')
+    expect(ABOUT_TEASER.tr).toBe(ABOUT_PARAGRAPHS.tr[2])
   })
 })

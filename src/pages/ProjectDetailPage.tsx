@@ -6,6 +6,8 @@ import ProjectScreens from '../components/ProjectScreens'
 import ProjectTechnologies from '../components/ProjectTechnologies'
 import RouteMeta from '../components/RouteMeta'
 import { getProjectBySlug } from '../data/projects'
+import { useLanguage } from '../i18n/LanguageContext'
+import { UI } from '../i18n/ui'
 import { CONTENT_CONTAINER } from '../lib/layout'
 import { SITE_NAME, firstSentence, truncateForDescription } from '../lib/siteMeta'
 import { useReveal } from '../lib/useReveal'
@@ -13,7 +15,9 @@ import { useReveal } from '../lib/useReveal'
 export default function ProjectDetailPage() {
   const revealRoot = useReveal<HTMLElement>()
   const { slug } = useParams<{ slug: string }>()
-  const project = getProjectBySlug(slug)
+  const { language } = useLanguage()
+  const ui = UI[language]
+  const project = getProjectBySlug(slug, language)
 
   if (!project) {
     return <Navigate to="/" replace />
@@ -41,7 +45,7 @@ export default function ProjectDetailPage() {
           className="mb-6 inline-flex items-center gap-2 rounded px-3 py-3 text-sm font-medium text-accent-base transition-colors duration-200 hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:text-accent-active sm:mb-8"
         >
           <ArrowLeftIcon className="h-4 w-4 shrink-0" />
-          Geri
+          {ui.back}
         </Link>
 
         {cover && (
@@ -69,7 +73,7 @@ export default function ProjectDetailPage() {
         {project.liveUrl && (
           <div className="mt-6">
             <GlowButton href={project.liveUrl} external>
-              Projeyi aç
+              {ui.openProject}
               <ArrowUpRightIcon className="h-4 w-4 shrink-0" />
             </GlowButton>
           </div>
@@ -97,7 +101,7 @@ export default function ProjectDetailPage() {
           className="mt-12 inline-flex items-center gap-2 rounded px-3 py-3 text-sm font-medium text-accent-base transition-colors hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           <ArrowLeftIcon className="h-4 w-4 shrink-0" />
-          Projelere dön
+          {ui.backToProjects}
         </Link>
       </div>
     </main>

@@ -8,6 +8,8 @@
 // src/App.tsx for `iletisim`, which lives in the site chrome so that every
 // route ends the same way. See CLAUDE.md's two-edit rule; src/App.test.tsx
 // enforces set-equality between these anchors and the rendered sections.
+import type { Localized } from '../i18n/language'
+
 export type NavLink = {
   anchor: string
   label: string
@@ -18,14 +20,32 @@ export type NavLink = {
   lang?: string
 }
 
-export const NAV_LINKS: NavLink[] = [
-  { anchor: 'anasayfa', label: 'Anasayfa' },
-  { anchor: 'hakkimda', label: 'Hakkımda' },
-  { anchor: 'projeler', label: 'Projeler' },
-  { anchor: 'ozgecmis', label: 'Özgeçmiş' },
-  // The anchor stays Turkish (the section-contract slug rule, and it keeps
-  // any shared /#yetenekler link alive); only the visible label follows the
-  // heading the owner renamed to Stacks.
-  { anchor: 'yetenekler', label: 'Stacks', lang: 'en' },
-  { anchor: 'iletisim', label: 'İletişim' },
-]
+// The ANCHORS never translate, in either language. They are the section
+// contract's Turkish slugs (CLAUDE.md), they are what App.test.tsx compares
+// the rendered section ids against, and they are what any already-shared
+// /#projeler link points at. Only the labels follow the language.
+export const NAV_LINKS: Localized<NavLink[]> = {
+  tr: [
+    { anchor: 'anasayfa', label: 'Anasayfa' },
+    { anchor: 'hakkimda', label: 'Hakkımda' },
+    { anchor: 'projeler', label: 'Projeler' },
+    { anchor: 'ozgecmis', label: 'Özgeçmiş' },
+    // The anchor stays Turkish (the section-contract slug rule, and it keeps
+    // any shared /#yetenekler link alive); only the visible label follows the
+    // heading the owner renamed to Stacks.
+    { anchor: 'yetenekler', label: 'Stacks', lang: 'en' },
+    { anchor: 'iletisim', label: 'İletişim' },
+  ],
+  // No lang tags here: the document is lang="en" in this branch, so every
+  // label is already in the document's own language and a redundant
+  // attribute would be noise. englishLabels.test.tsx checks the Turkish
+  // branch, which is the one where the casing trap exists.
+  en: [
+    { anchor: 'anasayfa', label: 'Home' },
+    { anchor: 'hakkimda', label: 'About' },
+    { anchor: 'projeler', label: 'Projects' },
+    { anchor: 'ozgecmis', label: 'Resume' },
+    { anchor: 'yetenekler', label: 'Stacks' },
+    { anchor: 'iletisim', label: 'Contact' },
+  ],
+}

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import CheckIcon from './icons/CheckIcon'
 import CopyIcon from './icons/CopyIcon'
+import { useLanguage } from '../i18n/LanguageContext'
+import { UI } from '../i18n/ui'
 
 type Props = {
   value: string
@@ -13,6 +15,8 @@ type State = 'idle' | 'copied' | 'failed'
 const FEEDBACK_MS = 2000
 
 export default function CopyButton({ value, label }: Props) {
+  const { language } = useLanguage()
+  const ui = UI[language]
   const [state, setState] = useState<State>('idle')
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -45,7 +49,7 @@ export default function CopyButton({ value, label }: Props) {
       <button
         type="button"
         onClick={copy}
-        aria-label={copied ? `${label} kopyalandı` : `${label} kopyala`}
+        aria-label={copied ? ui.copiedAriaLabel(label) : ui.copyAriaLabel(label)}
         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line-subtle bg-surface-raised text-ink-body transition-colors duration-200 hover:border-accent-base hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:text-accent-active"
       >
         {copied ? (
@@ -58,8 +62,8 @@ export default function CopyButton({ value, label }: Props) {
           changes after the click is announced unreliably. A polite live region
           is what actually reports the outcome. */}
       <span aria-live="polite" className="sr-only">
-        {state === 'copied' ? `${label} panoya kopyalandı` : ''}
-        {state === 'failed' ? `${label} kopyalanamadı` : ''}
+        {state === 'copied' ? ui.copyAnnouncement(label) : ''}
+        {state === 'failed' ? ui.copyFailedAnnouncement(label) : ''}
       </span>
     </>
   )

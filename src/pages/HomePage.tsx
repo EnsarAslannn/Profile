@@ -7,24 +7,32 @@ import Resume from '../components/Resume'
 import RouteMeta from '../components/RouteMeta'
 import Skills from '../components/Skills'
 import { ABOUT_PARAGRAPHS } from '../data/about'
+import { useLanguage } from '../i18n/LanguageContext'
+import type { Localized } from '../i18n/language'
 import { CONTENT_CONTAINER } from '../lib/layout'
 import { DEFAULT_TITLE, truncateForDescription } from '../lib/siteMeta'
 import { useReveal } from '../lib/useReveal'
 
 // Derived from the owner's own Hakkımda copy rather than written separately,
 // so the snippet can never drift from what the page actually says.
-const HOME_DESCRIPTION = truncateForDescription(ABOUT_PARAGRAPHS[0].text)
+// Derived, never hand-written - one description per language, each trimmed
+// from that language's own opening paragraph.
+const HOME_DESCRIPTION: Localized<string> = {
+  tr: truncateForDescription(ABOUT_PARAGRAPHS.tr[0].text),
+  en: truncateForDescription(ABOUT_PARAGRAPHS.en[0].text),
+}
 
 export default function HomePage() {
   // One observer for the whole route: every [data-reveal] below is found by
   // this ref, so no section has to wire up an observer of its own.
   const revealRoot = useReveal<HTMLElement>()
+  const { language } = useLanguage()
 
   return (
     <>
       <RouteMeta
         title={DEFAULT_TITLE}
-        description={HOME_DESCRIPTION}
+        description={HOME_DESCRIPTION[language]}
         image={profilePhoto}
         type="website"
       />

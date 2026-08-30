@@ -2,6 +2,8 @@ import ArrowUpRightIcon from './icons/ArrowUpRightIcon'
 import CopyButton from './CopyButton'
 import SectionHeading from './SectionHeading'
 import { CONTACT_ROWS } from '../data/contactRows'
+import { useLanguage } from '../i18n/LanguageContext'
+import { UI } from '../i18n/ui'
 import { CONTENT_CONTAINER } from '../lib/layout'
 import { SITE_NAME } from '../lib/siteMeta'
 import { revealDelayClass, useReveal } from '../lib/useReveal'
@@ -18,19 +20,21 @@ const VALUE_CLASS = 'text-xl font-semibold sm:text-2xl lg:text-3xl'
 
 export default function Contact() {
   const revealRoot = useReveal<HTMLElement>()
+  const { language } = useLanguage()
+  const ui = UI[language]
 
   return (
     <footer ref={revealRoot}>
       <div className={CONTENT_CONTAINER}>
         <section id="iletisim" className="scroll-mt-24 border-t border-line-subtle py-20 sm:py-24">
           <SectionHeading
-            title="İletişim"
-            subtitle="Yeni bir proje ya da ekip fırsatı için doğrudan yazabilirsiniz."
+            title={ui.sectionContact}
+            subtitle={ui.contactSubtitle}
             align="center"
           />
 
           <dl className="mt-16 sm:mt-20">
-            {CONTACT_ROWS.map((row, index) => {
+            {CONTACT_ROWS[language].map((row, index) => {
               const Icon = row.icon
               return (
                 <div
@@ -84,10 +88,10 @@ export default function Contact() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-status-open opacity-60 motion-reduce:hidden" />
               <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-status-open" />
             </span>
-            Yeni fırsatlara açık
+            {ui.availability}
           </p>
           <p className="text-sm text-ink-muted">
-            &copy; {new Date().getFullYear()} {SITE_NAME}. Tüm hakları saklıdır.
+            &copy; {new Date().getFullYear()} {SITE_NAME}. {ui.rightsReserved}
           </p>
         </div>
       </div>

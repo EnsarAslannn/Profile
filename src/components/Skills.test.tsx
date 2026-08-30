@@ -161,9 +161,9 @@ describe('skills data', () => {
   // and nowhere else fails this.
   it('lists nothing that the About copy or a project stack does not already vouch for', () => {
     const vouched = [
-      ...ABOUT_PARAGRAPHS.map((paragraph) => paragraph.text),
-      ...PROJECTS.flatMap((project) => project.technologies.flatMap((group) => group.items)),
-      ...PROJECTS.flatMap((project) => project.description),
+      ...ABOUT_PARAGRAPHS.tr.map((paragraph) => paragraph.text),
+      ...PROJECTS.tr.flatMap((project) => project.technologies.flatMap((group) => group.items)),
+      ...PROJECTS.tr.flatMap((project) => project.description),
     ]
       .join(' ')
       .toLowerCase()

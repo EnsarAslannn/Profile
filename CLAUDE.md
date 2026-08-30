@@ -28,7 +28,7 @@ The home route `/` is a scroll-navigated single page: a landing **hero**, then H
 
 The reference prints a `[001]`-style index above every heading. It was reproduced and then **removed at the owner's request** - `SectionHeading` no longer takes an index at all, and three tests assert no `[NNN]` string survives anywhere. Do not reinstate it from the recording. `/hakkimda` is the full Hakkımda copy behind the section's "Tam metni oku" link; `/projects/<slug>` are the project detail pages.
 
-All user-facing copy is **Turkish**; identifiers, types, props and comments are **English**. The two sanctioned exceptions are the Yetenekler group labels and the LinkedIn/GitHub pills - see "English text in a Turkish document" below, which is a correctness rule, not a style note.
+The site ships in **two languages**, Turkish and English, switched by a TR|EN control at the far left of the navbar. Turkish is the default and the original; English is a full translation of the same content. See "Two languages" below. Identifiers, types, props and comments stay **English** regardless.
 
 Visual direction: a light gradient ground (a soft blue wash fading into near-white, `PageBackdrop.tsx`) with a blue accent (`text-accent-base`), defined as semantic `@theme` tokens in `src/index.css` (`surface-*`, `line-*`, `ink-*`, `accent-*`, `focus`, `backdrop-*`).
 
@@ -77,7 +77,7 @@ Routes: `/` → `src/pages/HomePage.tsx`; `/hakkimda` → `src/pages/AboutPage.t
 
 `Navbar.tsx` was **reinstated** for this redesign after having been removed in five-owner-changes Task 4; the owner asked for it back because the reference design has one. It is `sticky top-0`, links only, and deliberately **translucent**: `bg-surface-base/55` over `backdrop-blur-xl`, so the page ground reads through and the bar takes on whatever is behind it - the blue backdrop wash at the top, plain surface once that fades, a warm tint as a photo scrolls past. Measured at the bar: rgb(233,243,253) at the top, rgb(245,237,232) over the Brisa photo.
 
-**That is also why the links are `ink-strong` and not `ink-body`.** With a translucent bar the text ground is whatever is passing underneath, and a full-page scan found a dark project card dropping `ink-body` to 3.91:1 - a real failure, invisible to the ordinary contrast sweep, which cannot see through a `backdrop-filter`. Scanning every scroll position with the bar text hidden puts the worst ground at rgb(151,151,157) and `ink-strong` at 6.15:1. Lowering the tint or lightening the links means re-running that scan. The reference's language switcher and theme toggle are deliberately **not** reproduced: this site has neither i18n nor a dark theme, and a control that does nothing is worse than no control - `Navbar.test.tsx` asserts the navbar contains zero buttons so neither creeps back as a placeholder. Its links are router `<Link to={{ pathname: '/', hash: '#projeler' }}>`, never bare `<a href="#projeler">`: clicked from `/projects/dolfin` a bare hash would produce the dead URL `/projects/dolfin#projeler`.
+**That is also why the links are `ink-strong` and not `ink-body`.** With a translucent bar the text ground is whatever is passing underneath, and a full-page scan found a dark project card dropping `ink-body` to 3.91:1 - a real failure, invisible to the ordinary contrast sweep, which cannot see through a `backdrop-filter`. Scanning every scroll position with the bar text hidden puts the worst ground at rgb(151,151,157) and `ink-strong` at 6.15:1. Lowering the tint or lightening the links means re-running that scan. The reference's language switcher is now **real** and sits at the far left, where the owner asked for it. The theme toggle is still deliberately **not** reproduced: this site has no dark theme, and a control that does nothing is worse than no control. `Navbar.test.tsx` used to assert zero buttons for exactly that reason; it now asserts *these two buttons and no others*, which is the same rule stated for a navbar that has one working control. Its links are router `<Link to={{ pathname: '/', hash: '#projeler' }}>`, never bare `<a href="#projeler">`: clicked from `/projects/dolfin` a bare hash would produce the dead URL `/projects/dolfin#projeler`.
 
 Because the navbar is sticky, **every section carries `scroll-mt-24`** (96px > the 65px bar). `scroll-mt-8` was correct only while there was no navbar; `App.test.tsx` pins the new value, because an anchor landing under the bar is invisible in unit tests and easy to miss by eye.
 
@@ -139,9 +139,11 @@ Both the group labels and the technology names carry `lang="en"` - the labels be
 
 ## The CV download
 
-`public/EnsarAslanCV.pdf`, linked from the hero's third call to action as a plain `<a href download>` - not a router `<Link>`, and not a Vite import. It is a static file, and bundling it through the asset pipeline would hash the filename, which is the one thing a CV must not have: people expect it to land in their downloads folder called something recognisable.
+**Two files, one per language**: `public/EnsarAslanCV.pdf` (Turkish) and `public/EnsarAslanCV-EN.pdf` (English), linked from the hero's third call to action as a plain `<a href download>` - not a router `<Link>`, and not a Vite import. It is a static file, and bundling it through the asset pipeline would hash the filename, which is the one thing a CV must not have: people expect it to land in their downloads folder called something recognisable.
 
-The path is a literal string in `src/data/hero.ts`, so **neither TypeScript nor Vite can tell you when it breaks**. `src/data/hero.test.ts` reads the file off disk and checks the `%PDF-` magic bytes instead, which is what stops the button quietly becoming a 404.
+The paths are literal strings in `src/data/hero.ts` (a `Localized<string>`), so **neither TypeScript nor Vite can tell you when one breaks**. `src/data/hero.test.ts` reads both off disk and checks the `%PDF-` magic bytes instead, which is what stops a button quietly becoming a 404.
+
+**These are two genuinely different documents, not one file linked twice**, and the second test in that file is what enforces it. Both are titled "ENSAR ASLAN", both are a single page, and a copy-paste that pointed the English button at the Turkish PDF would pass every check based on filename or size. So the test reads each PDF's own `/Lang` entry - `(tr)` against `(en)` - which means inflating the object streams, because the Turkish file compresses its catalogue and the English one does not. The section outlines differ the same way: Deneyim / Projeler / Yetenekler against Summary / Education / Experience / Projects / Skills. **Verify a replacement CV by reading it, not by trusting its filename** - an earlier round nearly shipped an outdated CV that had the right name.
 
 **Replacing it is a content change, not a file copy.** The version that ships must be the one the owner supplied; an older CV on a portfolio is worse than none, and the two differ in ways that are easy to miss (title, which projects are listed, which technologies). Render page 1 and read it before overwriting.
 
@@ -205,6 +207,28 @@ Raising it means re-measuring the **rendered pixels**. The site-wide contrast sw
 
 Applied to the pill CTAs only. Deliberately **not** applied to the text links ("Projeleri keşfet", "Tam metni oku", "Geri"), the navbar (`Navbar.test.tsx` asserts zero buttons), `CopyButton`, or `SocialLinks` - a permanently rotating glow around a 40px icon affordance is noise, and a ring around a bare inline link has no pill to ring.
 
+## Two languages
+
+Turkish and English, switched by `LanguageToggle` at the far left of the navbar. `src/i18n/` holds the whole mechanism: `language.ts` (the `Language` type and `Localized<T>`), `LanguageContext.ts` (context + `useLanguage()`), `LanguageProvider.tsx` (resolution and side effects) and `ui.ts` (every interface string that is not owner content).
+
+**Owner content is stored as `Localized<T>` - one record with both languages side by side**, never two parallel module trees. `Record<Language, T>` makes a missing translation a type error rather than a silent fallback to Turkish. Components read `X[language]`, which is one line each.
+
+**Resolution order, highest first**: `?lang=en` in the URL, then the reader's remembered choice in `localStorage`, then Turkish. The URL wins over storage deliberately - a link someone was *sent* has to open in the language it was sent in. The param is also the only thing that makes the English version shareable or crawlable at all; without it the translation would be invisible to anyone the owner sends a link to.
+
+**`document.documentElement.lang` follows the language**, and that is not cosmetic: CSS `text-transform: uppercase` is locale-aware, so every uppercased label on the site depends on this one line being right.
+
+**What does NOT translate, ever**, and `src/i18n/language.test.tsx` pins each one:
+
+- **Section anchors.** `#projeler` stays `#projeler` in English. They are the section contract's Turkish slugs, `App.test.tsx` compares the rendered section ids against them, and any already-shared link points at them. Only `NAV_LINKS`' labels move.
+- **Routes.** `/hakkimda` and `/projects/<slug>` are identical in both languages. One URL per page, two languages inside it.
+- **Project titles, slugs and `liveUrl`.** Product names and addresses.
+- **`technologies`.** Every entry is a proper noun taken from that project's own repo - translating "Entity Framework Core" would invent a product that does not exist. The four group labels are already English.
+- **Dates**, and **the contact values and hrefs** (the handles are cut from the URLs, so they cannot drift per language).
+
+**Organisation names follow a narrower rule than "translate" or "do not":** each uses the name that organisation uses for *itself* in that language. Karabük Üniversitesi publishes in English as Karabük University, so the English entry says that. The two internship employers have no English trading name, so they keep their registered Turkish ones. **Never invent an English name for an employer that does not publish one** - a test pins those two by id.
+
+**Adding a string**: interface chrome goes in `src/i18n/ui.ts` (one flat record, both languages); owner content goes in its own `src/data/` module as a `Localized<T>`. A test asserts the English branch is not a copy of the Turkish, which is how a half-finished translation usually ships.
+
 ## Reveal on load and on scroll
 
 The page fades, lifts and un-blurs its content in as you arrive at it - on first paint for anything above the fold, and on scroll for everything below. Two pieces, and no library:
@@ -242,7 +266,7 @@ The **left column's order is the owner's own**, written by image id rather than 
 
 ## English text in a Turkish document
 
-`index.html` sets `lang="tr"`. CSS `text-transform: uppercase` is **locale-aware**, and Turkish maps `i` → `İ`. So any English string rendered through an `uppercase` utility comes out wrong unless the element declares `lang="en"`:
+`index.html` sets `lang="tr"` and `LanguageProvider` moves it to `en` when the reader switches. CSS `text-transform: uppercase` is **locale-aware**, and Turkish maps `i` → `İ`. So any English string rendered through an `uppercase` utility comes out wrong **while the document is Turkish** unless the element declares `lang="en"`:
 
 ```
 Architecture -> ARCHİTECTURE      LinkedIn -> LİNKEDIN
@@ -252,6 +276,8 @@ Testing      -> TESTİNG           GitHub   -> GİTHUB
 This has shipped twice already (the Yetenekler group labels, then the contact pills) because it is **invisible in jsdom** - there is no layout and no text-transform - and easy to miss in a screenshot. `src/components/englishLabels.test.tsx` now guards it structurally: every English label the UI renders must sit inside a `lang="en"` scope, and every Turkish `h2` must **not**, because "İletişim" → "İLETİŞİM" is correct precisely when the locale is Turkish. `TextSegment` carries an optional `lang` for the same reason.
 
 Add a new English label ⇒ add `lang="en"` **and** add it to `ENGLISH_LABELS` in that test.
+
+In the English document the attribute is redundant rather than wrong, and the components pass it unconditionally - one code path beats two, and `lang="en"` inside a `lang="en"` document changes nothing. A rendered scan of every uppercased element on all four routes confirms nothing English sits in a Turkish scope in either language.
 
 ## Tailwind usage
 

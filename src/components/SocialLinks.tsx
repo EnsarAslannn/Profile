@@ -1,9 +1,12 @@
 import { SOCIAL_LINKS } from '../data/social'
+import { useLanguage } from '../i18n/LanguageContext'
 
 export default function SocialLinks() {
+  const { language } = useLanguage()
+
   return (
     <ul className="mt-6 flex items-center gap-3">
-      {SOCIAL_LINKS.map((link) => {
+      {SOCIAL_LINKS[language].map((link) => {
         const Icon = link.icon
         return (
           <li key={link.id}>

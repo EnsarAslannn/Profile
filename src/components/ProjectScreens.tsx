@@ -1,5 +1,6 @@
 import { PROJECT_IMAGE_HEIGHT, PROJECT_IMAGE_WIDTH, getProjectImageAlt } from '../data/projectImages'
 import type { ProjectScreen } from '../data/projects'
+import { useLanguage } from '../i18n/LanguageContext'
 
 type Props = {
   screens: ProjectScreen[]
@@ -7,6 +8,8 @@ type Props = {
 }
 
 export default function ProjectScreens({ screens, projectTitle }: Props) {
+  const { language } = useLanguage()
+
   return (
     <ul className="mt-8 space-y-8 sm:space-y-12">
       {screens.map((screen, index) => (
@@ -15,7 +18,7 @@ export default function ProjectScreens({ screens, projectTitle }: Props) {
             <div className="overflow-hidden rounded-2xl bg-surface-sunken">
               <img
                 src={screen.src}
-                alt={getProjectImageAlt(projectTitle, index)}
+                alt={getProjectImageAlt(projectTitle, index, language)}
                 width={PROJECT_IMAGE_WIDTH}
                 height={PROJECT_IMAGE_HEIGHT}
                 decoding="async"

@@ -3,6 +3,8 @@ import SectionHeading from './SectionHeading'
 import { SKILL_GROUPS } from '../data/skills'
 import { TECH_LOGOS, logosFirst } from '../data/techLogos'
 import { revealDelayClass } from '../lib/useReveal'
+import { useLanguage } from '../i18n/LanguageContext'
+import { UI } from '../i18n/ui'
 
 // The stack section. The group label sits to the LEFT of its technologies
 // rather than above them (owner's request), which is what a <dl> means: a
@@ -12,9 +14,14 @@ import { revealDelayClass } from '../lib/useReveal'
 // Below sm: the pair stacks anyway - two 170px columns would break
 // "Vertical Slice Architecture" across four lines.
 export default function Skills() {
+  const { language } = useLanguage()
+
   return (
     <section id="yetenekler" className="scroll-mt-24 border-t border-line-subtle py-20 sm:py-24">
-      <SectionHeading title="Stacks" lang="en" />
+      {/* lang="en" only matters in the Turkish document - see the note in
+          src/data/skills.ts. In the English one it is redundant rather than
+          wrong, and passing it unconditionally keeps one code path. */}
+      <SectionHeading title={UI[language].sectionStacks} lang="en" />
 
       <dl className="mt-14 sm:mt-16">
         {SKILL_GROUPS.map((group, index) => (

@@ -26,9 +26,9 @@ describe('Contact', () => {
     // A dd holds more than the value now (a copy button's live region, the
     // location note), so this asserts containment rather than equality.
     const values = Array.from(container.querySelectorAll('dd'))
-    expect(values).toHaveLength(CONTACT_ROWS.length)
+    expect(values).toHaveLength(CONTACT_ROWS.tr.length)
     for (const [i, dd] of values.entries()) {
-      expect(dd.textContent).toContain(CONTACT_ROWS[i].value)
+      expect(dd.textContent).toContain(CONTACT_ROWS.tr[i].value)
     }
   })
 
@@ -36,7 +36,7 @@ describe('Contact', () => {
   // e-posta row nor konum may contain a link - only the two profile rows do.
   it('renders e-posta and konum as plain text, with no mailto', () => {
     const { container } = renderWithRouter(<Contact />)
-    const email = CONTACT_ITEMS.find((item) => item.id === 'email')!
+    const email = CONTACT_ITEMS.tr.find((item) => item.id === 'email')!
     expect(screen.getByText(email.value).closest('a')).toBeNull()
     expect(container.querySelector('a[href^="mailto:"]')).toBeNull()
 
@@ -50,8 +50,8 @@ describe('Contact', () => {
 
   it('opens the two profile rows in a new tab, safely', () => {
     const { container } = renderWithRouter(<Contact />)
-    for (const social of SOCIAL_LINKS) {
-      const row = CONTACT_ROWS.find((r) => r.id === social.id)!
+    for (const social of SOCIAL_LINKS.tr) {
+      const row = CONTACT_ROWS.tr.find((r) => r.id === social.id)!
       const link = Array.from(container.querySelectorAll('dd a')).find(
         (a) => a.getAttribute('href') === social.href,
       )!
@@ -80,7 +80,7 @@ describe('Contact', () => {
   // /hakkimda. Adding rows must not quietly reinstate it.
   it('does not reinstate the phone number the owner removed from the footer', () => {
     const { container } = renderWithRouter(<Contact />)
-    const phone = CONTACT_ITEMS.find((item) => item.id === 'phone')!
+    const phone = CONTACT_ITEMS.tr.find((item) => item.id === 'phone')!
     expect(container.textContent).not.toContain(phone.value)
     expect(container.querySelector('a[href^="tel:"]')).toBeNull()
   })
@@ -88,7 +88,7 @@ describe('Contact', () => {
   it('gives every row its own icon, hidden from screen readers', () => {
     const { container } = renderWithRouter(<Contact />)
     const labels = Array.from(container.querySelectorAll('dt'))
-    expect(labels).toHaveLength(CONTACT_ROWS.length)
+    expect(labels).toHaveLength(CONTACT_ROWS.tr.length)
     for (const dt of labels) {
       const icon = dt.querySelector('svg')
       expect(icon).not.toBeNull()

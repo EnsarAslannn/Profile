@@ -21,9 +21,9 @@ describe('Resume', () => {
   it('paints each card with its own year photo, as decoration', () => {
     const { container } = render(<Resume />)
     const images = Array.from(container.querySelectorAll('img'))
-    expect(images).toHaveLength(ROADMAP_ENTRIES.length)
+    expect(images).toHaveLength(ROADMAP_ENTRIES.tr.length)
     for (const [index, image] of images.entries()) {
-      const entry = ROADMAP_ENTRIES[index]
+      const entry = ROADMAP_ENTRIES.tr[index]
       expect(image.getAttribute('src')).toBe(entry.background!.src)
       expect(image.getAttribute('alt')).toBe('')
       expect(image.getAttribute('aria-hidden')).toBe('true')
@@ -41,9 +41,9 @@ describe('Resume', () => {
   it('lists every entry once, oldest first, as an ordered list', () => {
     const { container } = render(<Resume />)
     expect(container.querySelector('ol')).not.toBeNull()
-    const totalEntries = RESUME_GROUPS.reduce((sum, group) => sum + group.entries.length, 0)
+    const totalEntries = RESUME_GROUPS.tr.reduce((sum, group) => sum + group.entries.length, 0)
     expect(container.querySelectorAll('li')).toHaveLength(totalEntries)
-    expect(ROADMAP_ENTRIES.map((entry) => entry.year)).toEqual(['2020', '2023', '2024', '2025'])
+    expect(ROADMAP_ENTRIES.tr.map((entry) => entry.year)).toEqual(['2020', '2023', '2024', '2025'])
   })
 
   it('renders every entry title and organization verbatim', () => {
