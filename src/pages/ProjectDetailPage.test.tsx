@@ -2,6 +2,7 @@ import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import App from '../App'
 import { PROJECTS, getProjectBySlug } from '../data/projects'
+import { getProjectCover } from '../data/projectCovers'
 import { renderWithRouter } from '../test/renderWithRouter'
 
 describe('ProjectDetailPage', () => {
@@ -53,8 +54,10 @@ describe('ProjectDetailPage', () => {
     expect(firstImage).toHaveAttribute('loading', 'eager')
     expect(firstImage).toHaveAttribute('fetchpriority', 'high')
     expect(firstImage).toHaveAttribute('alt', '')
-    expect(firstImage).toHaveAttribute('width', '1600')
-    expect(firstImage).toHaveAttribute('height', '2161')
+    // Derived, not repeated - see the note in ProjectCard.test.tsx.
+    const cover = getProjectCover('dolfin')!
+    expect(firstImage).toHaveAttribute('width', String(cover.width))
+    expect(firstImage).toHaveAttribute('height', String(cover.height))
   })
 
   it('links to the live demo of whichever project is on screen, opened safely', () => {

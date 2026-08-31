@@ -26,10 +26,13 @@ export type ProjectCover = {
   height: number
 }
 
+// Dimensions are read back off the written .webp, never computed from the
+// source and a target width - a resize rounds, and a height that is one pixel
+// out is a height that no longer describes the file.
 const PROJECT_COVERS: Record<string, ProjectCover> = {
-  dolfin: { src: profileDolfin, width: 1600, height: 2161 },
-  takeauction: { src: profileTakeauction, width: 1379, height: 909 },
-  altitudelog: { src: profileAltitudelog, width: 1600, height: 1613 },
+  dolfin: { src: profileDolfin, width: 1600, height: 2162 },
+  takeauction: { src: profileTakeauction, width: 1375, height: 905 },
+  altitudelog: { src: profileAltitudelog, width: 1600, height: 1614 },
 }
 
 export function getProjectCover(slug: string): ProjectCover | undefined {

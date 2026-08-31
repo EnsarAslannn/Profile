@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import ProjectCard from './ProjectCard'
 import { renderWithRouter } from '../test/renderWithRouter'
 import { getProjectBySlug } from '../data/projects'
+import { getProjectCover } from '../data/projectCovers'
 
 // Looked up by slug, not by index: the PROJECTS.tr array order is the home-page
 // grid display order and is expected to change without breaking this test.
@@ -38,7 +39,13 @@ describe('ProjectCard', () => {
     expect(screen.getByRole('link')).toHaveAccessibleName(/DOLFIN/)
   })
 
+  // The dimensions are DERIVED from the covers table rather than written out
+  // again here. src/data/projectCovers.test.ts is the one place that pins the
+  // literal numbers; this test is about the img carrying its intrinsics at
+  // all, so repeating them only meant that swapping a cover broke three files
+  // instead of one - which is exactly what happened.
   it('renders the cover image with the true intrinsic attributes', () => {
+    const cover = getProjectCover('dolfin')!
     const { container } = renderWithRouter(
       <ul>
         <ProjectCard project={dolfin} index={1} />
@@ -47,8 +54,8 @@ describe('ProjectCard', () => {
     const img = container.querySelector('img')!
     expect(img).toHaveAttribute('loading', 'lazy')
     expect(img).toHaveAttribute('decoding', 'async')
-    expect(img).toHaveAttribute('width', '1600')
-    expect(img).toHaveAttribute('height', '2161')
+    expect(img).toHaveAttribute('width', String(cover.width))
+    expect(img).toHaveAttribute('height', String(cover.height))
     expect(img).toHaveAttribute('alt', '')
     expect(img.getAttribute('fetchpriority')).toBeNull()
   })
