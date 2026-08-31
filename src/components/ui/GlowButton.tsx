@@ -67,7 +67,7 @@ export default function GlowButton({
     'group relative isolate inline-flex overflow-hidden rounded-full bg-accent-base/15 p-0.5 transition-transform duration-300 hover:scale-105 active:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus motion-reduce:transition-none motion-reduce:hover:scale-100'
 
   const face =
-    'inline-flex items-center gap-3 rounded-full bg-cta-base px-7 py-4 text-sm font-semibold tracking-widest text-cta-ink uppercase transition-colors duration-200 group-hover:bg-cta-hover group-active:bg-cta-active'
+    'inline-flex items-center gap-3 rounded-full bg-cta-base px-6 py-4 text-sm font-semibold tracking-widest whitespace-nowrap text-cta-ink uppercase transition-colors duration-200 group-hover:bg-cta-hover group-active:bg-cta-active'
 
   const inner = (
     <>

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import GlowButton from './ui/GlowButton'
 import ArrowUpRightIcon from './icons/ArrowUpRightIcon'
 import DownloadIcon from './icons/DownloadIcon'
@@ -20,7 +21,13 @@ export default function Hero() {
     // cover it exactly.
     <section id="anasayfa" className="scroll-mt-24 pt-10 pb-16 sm:pt-14 lg:pt-16">
       <div className={CONTENT_CONTAINER}>
-        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] xl:gap-20">
+        {/* The xl track used to be WIDER than the lg one (30rem sidebar plus a
+            5rem gutter against 26rem plus 3.5rem), which meant the content
+            column got NARROWER as the viewport grew - 624px at xl against
+            728px at lg, since max-w-7xl caps both at 1280px. That squeeze is
+            what pushed the hero's third button onto a second row. Measured, in
+            a browser, at 1280-2560px. */}
+        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] xl:gap-16">
           <div className="lg:min-w-0">
             <h1
               data-reveal
@@ -49,21 +56,27 @@ export default function Hero() {
 
             <div
               data-reveal
-              className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4 [--reveal-delay:240ms]"
+              // flex-wrap stays as the graceful fallback for narrow viewports
+              // and for machines whose default sans is wider than the one this
+              // was measured on: the failure mode is a second row, never a
+              // horizontal overflow.
+              className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4 [--reveal-delay:240ms]"
             >
-              {/* Three identical buttons, at the owner's request. The middle
-                  one was a bare underlined text link; all three now share the
-                  one deep-green face. GlowButton has a single style, so
-                  "identical" is structural here rather than three class
-                  strings someone has to keep in step. */}
               <GlowButton to={{ pathname: '/', hash: '#iletisim' }}>
                 {ui.heroContact}
                 <ArrowUpRightIcon className="h-4 w-4 shrink-0" />
               </GlowButton>
-              <GlowButton to={{ pathname: '/', hash: '#projeler' }}>
+              {/* The quiet one of the three, back to a bare underlined link at
+                  the owner's request after a round as a filled button. Two
+                  pill CTAs and one text link is also what keeps the row on a
+                  single line - as a button this was 56px wider, which is what
+                  pushed "CV indir" onto a second row in the first place. */}
+              <Link
+                to={{ pathname: '/', hash: '#projeler' }}
+                className="inline-flex items-center gap-3 rounded-full px-4 py-4 text-sm font-semibold tracking-widest whitespace-nowrap text-ink-body uppercase underline-offset-4 xl:px-3 transition-colors duration-200 hover:text-accent-hover hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:text-accent-active"
+              >
                 {ui.heroProjects}
-                <ArrowUpRightIcon className="h-4 w-4 shrink-0" />
-              </GlowButton>
+              </Link>
               {/* A plain <a download> to a file in public/, not a router Link:
                   the CV is a static asset, not a route, and `download` is what
                   makes the browser save it instead of navigating the tab to a
