@@ -6,11 +6,11 @@ Ensar Aslan's personal portfolio site. It presents the About, Projects, Resume, 
 
 **Live:** https://ensaraslan.vercel.app
 
-![Home page - hero section with the intro copy and call-to-action buttons](src/assets/anasayfa.webp)
+![Home page - hero section with the intro copy and call-to-action buttons](src/assets/homepage.webp)
 
-![Projects section - the mosaic layout of the project cards](src/assets/projeler.webp)
+![Projects section - the mosaic layout of the project cards](src/assets/projects.webp)
 
-![Resume section - the education and experience timeline](src/assets/deneyim.webp)
+![Resume section - the education and experience timeline](src/assets/resume.webp)
 
 ## Tech Stack
 

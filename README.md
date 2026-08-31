@@ -6,11 +6,11 @@ Ensar Aslan'ın kişisel portfolyo sitesidir. Hakkımda, Projeler, Özgeçmiş, 
 
 **Canlı:** https://ensaraslan.vercel.app
 
-![Ana sayfa - hero bölümü, tanıtım metni ve çağrı butonları](src/assets/anasayfa.webp)
+![Ana sayfa - hero bölümü, tanıtım metni ve çağrı butonları](src/assets/homepage.webp)
 
-![Projeler bölümü - proje kartlarının mozaik yerleşimi](src/assets/projeler.webp)
+![Projeler bölümü - proje kartlarının mozaik yerleşimi](src/assets/projects.webp)
 
-![Özgeçmiş bölümü - eğitim ve deneyim zaman çizelgesi](src/assets/deneyim.webp)
+![Özgeçmiş bölümü - eğitim ve deneyim zaman çizelgesi](src/assets/resume.webp)
 
 ## Kullanılan Teknolojiler
 
