@@ -68,26 +68,46 @@
   /* Accent - muted sage, replacing the blue outright. TWO steps, because one
      sage cannot do both jobs and the arithmetic is what says so:
 
-     accent-soft is the FILL - a button face, the active language pill, the
-     hover bar on a project card, the hero wordmark. It carries accent-ink
-     (near-black) on top at 4.91:1.
+     accent-soft is the sage FILL - the active language pill and the hover bar
+     on a project card. It carries accent-ink (near-black) on top at 5.11:1.
+     The buttons and the hero wordmark used to live here too and have since
+     moved to cta-* and ink-heading respectively, so this family now marks
+     only the quiet highlights.
      accent-base is the READABLE accent - link text, icons, the focus ring -
      at 5.33:1 on cream and 4.85:1 on the neutral band. hover and active go
      darker still, the light-theme direction (a lighter tint fades toward
      invisible on a pale ground).
 
-     accent-soft is the owner's #8fa58f taken one step deeper. That is not a
-     stylistic edit: #8fa58f measures 2.39:1 against cream, so as the hero's
-     "PORTFOLYO" wordmark - large text, 3:1 floor - it would have failed, and
-     no sage light enough to read as #8fa58f clears that floor on a #f7f3ea
-     ground. #748b74 measures 3.37:1 and is the same muted sage two shades in.
-     The owner's exact #8fa58f does survive, as the dark band's accent-active,
-     where the ground is deep green and it measures 5.03:1. */
-  --color-accent-soft: #748b74; /* sage fill - buttons, pills, the hero wordmark */
+     accent-soft is the owner's #8fa58f taken one step deeper, which began as
+     a contrast fix: #8fa58f measures 2.39:1 against cream, and as the hero's
+     "PORTFOLYO" wordmark - large text, 3:1 floor - it failed. The wordmark has
+     since moved to ink-heading at the owner's request, so that particular
+     pressure is off, but the deeper value stays: it is what keeps accent-ink
+     legible on the fills that remain. The owner's exact #8fa58f survives as
+     the dark band's accent-active, where the ground is deep green and it
+     measures 5.03:1. */
+  --color-accent-soft: #748b74; /* sage fill - the language pill, a card's hover bar */
   --color-accent-ink: #111111; /* the ink that sits ON an accent-soft fill */
   --color-accent-base: #4f6b52; /* deep sage - links, icons, resting state */
   --color-accent-hover: #3d5540;
   --color-accent-active: #2c3e2f;
+
+  /* The primary call to action - its own family, deliberately NOT the accent.
+     The owner asked for the deep green with a white label, and reusing
+     accent-soft for it would have dragged the two other things that fill with
+     accent-soft along: a project card's hover bar, which is meant to be a
+     subtle sage highlight rather than a strong block of colour, and the active
+     language pill. A button this emphatic is a different role from a quiet
+     highlight, so it gets different tokens.
+
+     hover goes LIGHTER here, inverted from the accent scale above. That is
+     forced rather than chosen: cta-base is already near the dark end of the
+     palette, so a darker hover reads as black rather than as a state change.
+     White measures 13.3:1 on base, 9.5:1 on hover and 15.9:1 on active. */
+  --color-cta-base: #17352d;
+  --color-cta-hover: #244d40;
+  --color-cta-active: #0f261f;
+  --color-cta-ink: #ffffff;
 
   /* Focus - kept decoupled from accent-base so the ring's contrast can be
      tuned without dragging every accent-coloured link along with it, even
@@ -265,6 +285,14 @@
      owner's exact #8fa58f, which finally has a ground dark enough to carry it.
      accent-soft/accent-ink is the owner's own prescription for a button on a
      dark section: a cream face with deep-green text, 12.0:1. */
+  /* On a deep-green band the CTA flips: a cream face with deep-green ink,
+     12.0:1. No GlowButton sits in a dark band today, but the scope is kept
+     complete so that putting one there is a non-event rather than a bug. */
+  --color-cta-base: #f7f3ea;
+  --color-cta-hover: #ffffff;
+  --color-cta-active: #e4dfd2;
+  --color-cta-ink: #17352d;
+
   --color-accent-soft: #f7f3ea;
   --color-accent-ink: #17352d;
   --color-accent-base: #a8b9a5;

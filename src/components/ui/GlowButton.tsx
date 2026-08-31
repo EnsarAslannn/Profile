@@ -11,8 +11,6 @@ type Props = {
   download?: boolean
   /** Open off-site, with the rel that has to accompany it. */
   external?: boolean
-  /** `solid` fills with the accent; `outline` keeps the page ground inside. */
-  variant?: 'solid' | 'outline'
 }
 
 // The pill CTA used across the site, with the rotating rim the owner supplied
@@ -28,16 +26,21 @@ type Props = {
 //     dark-on-pale, which is the same contrast relationship the original had
 //     the other way up.
 //
-// The solid face is the owner's CTA recipe: a muted sage fill carrying
-// near-black ink (accent-soft / accent-ink, 4.91:1), not a saturated block of
-// colour. Its hover is a colour INVERSION rather than a darker tint of the
-// same fill, and that is forced rather than chosen: accent-hover is a deep
-// sage meant to be read as text on cream, so painting it behind accent-ink
-// would measure 2.24:1. Flipping to a deep-sage face with a cream label
-// measures 5.33:1 and is the better hover anyway. Both halves resolve through
-// the tone scope, so on a deep-green band the same two classes give a cream
-// face with deep-green ink - which is exactly what the owner specified for a
-// button on a dark section.
+// There is ONE face, not two. It used to take a `variant` prop - a solid fill
+// and an outline that kept the page ground inside - but the owner asked for
+// the hero's three buttons to be identical, which left `outline` with no
+// caller at all. An unused variant with a test pinning it is worse than
+// either keeping or dropping it honestly, so it is gone; re-adding one is a
+// few lines if a second button style is ever wanted.
+//
+// The face is the deep green carrying a white label (cta-*, 13.3:1). That is
+// its own token family rather than the accent, because filling with
+// accent-soft would have dragged the project-card hover bar and the language
+// pill along with it - see the note in src/index.css. Hover goes LIGHTER,
+// inverted from every other hover on the site, because cta-base is already
+// near the dark end of the palette and a darker hover reads as black rather
+// than as a state change. All of it resolves through the tone scope, so on a
+// deep-green band the same classes give a cream face with deep-green ink.
 //  3. The `@keyframes` moved out of an inline <style> tag into an @theme token
 //     (`--animate-glow-spin`), because a <style> tag re-declares them once per
 //     instance and cannot carry a `motion-reduce:` variant.
@@ -55,7 +58,6 @@ export default function GlowButton({
   href,
   download,
   external,
-  variant = 'solid',
 }: Props) {
   // `isolate` is what makes the sweep's -z-10 stay inside this button: within
   // a stacking context the element's own background paints first and negative
@@ -65,9 +67,7 @@ export default function GlowButton({
     'group relative isolate inline-flex overflow-hidden rounded-full bg-accent-base/15 p-0.5 transition-transform duration-300 hover:scale-105 active:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus motion-reduce:transition-none motion-reduce:hover:scale-100'
 
   const face =
-    variant === 'solid'
-      ? 'inline-flex items-center gap-3 rounded-full bg-accent-soft px-7 py-4 text-sm font-semibold tracking-widest text-accent-ink uppercase transition-colors duration-200 group-hover:bg-accent-base group-hover:text-surface-base group-active:bg-accent-active group-active:text-surface-base'
-      : 'inline-flex items-center gap-3 rounded-full bg-surface-base px-6 py-4 text-sm font-semibold tracking-widest text-ink-strong uppercase transition-colors duration-200 group-hover:text-accent-hover group-active:text-accent-active'
+    'inline-flex items-center gap-3 rounded-full bg-cta-base px-7 py-4 text-sm font-semibold tracking-widest text-cta-ink uppercase transition-colors duration-200 group-hover:bg-cta-hover group-active:bg-cta-active'
 
   const inner = (
     <>

@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import GlowButton from './ui/GlowButton'
 import ArrowUpRightIcon from './icons/ArrowUpRightIcon'
 import DownloadIcon from './icons/DownloadIcon'
@@ -33,7 +32,7 @@ export default function Hero() {
                   className={
                     index === 0
                       ? 'block whitespace-nowrap'
-                      : 'block whitespace-nowrap text-accent-soft'
+                      : 'block whitespace-nowrap text-ink-heading'
                   }
                 >
                   {line}
@@ -52,22 +51,25 @@ export default function Hero() {
               data-reveal
               className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4 [--reveal-delay:240ms]"
             >
+              {/* Three identical buttons, at the owner's request. The middle
+                  one was a bare underlined text link; all three now share the
+                  one deep-green face. GlowButton has a single style, so
+                  "identical" is structural here rather than three class
+                  strings someone has to keep in step. */}
               <GlowButton to={{ pathname: '/', hash: '#iletisim' }}>
                 {ui.heroContact}
                 <ArrowUpRightIcon className="h-4 w-4 shrink-0" />
               </GlowButton>
-              <Link
-                to={{ pathname: '/', hash: '#projeler' }}
-                className="inline-flex items-center gap-3 rounded-full px-4 py-4 text-sm font-semibold tracking-widest text-ink-body uppercase underline-offset-4 transition-colors duration-200 hover:text-accent-hover hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:text-accent-active"
-              >
+              <GlowButton to={{ pathname: '/', hash: '#projeler' }}>
                 {ui.heroProjects}
-              </Link>
+                <ArrowUpRightIcon className="h-4 w-4 shrink-0" />
+              </GlowButton>
               {/* A plain <a download> to a file in public/, not a router Link:
                   the CV is a static asset, not a route, and `download` is what
                   makes the browser save it instead of navigating the tab to a
                   PDF viewer. src/data/hero.test.ts asserts the file is actually
                   there, so this link cannot quietly become a 404. */}
-              <GlowButton href={CV_FILE[language]} download variant="outline">
+              <GlowButton href={CV_FILE[language]} download>
                 {ui.heroCv}
                 <DownloadIcon className="h-4 w-4 shrink-0" />
               </GlowButton>

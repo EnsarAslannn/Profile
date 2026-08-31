@@ -69,22 +69,31 @@ describe('GlowButton', () => {
     expect(screen.getByRole('link').className).toContain('motion-reduce:hover:scale-100')
   })
 
-  // accent-soft is the FILL step of the sage scale and accent-ink is the only
-  // ink measured against it (4.91:1). The two travel together: a face painted
-  // accent-soft that kept a white or ink-strong label would drop to ~2.2:1, so
-  // this asserts the pairing rather than either half on its own.
-  it('fills with the accent by default and keeps the page ground when outlined', () => {
-    const { container: solid } = render(<GlowButton href="/x">Dolu</GlowButton>)
-    const face = solid.querySelector('.bg-accent-soft')
+  // cta-base is the fill and cta-ink is the label measured against it
+  // (13.3:1). The two travel together, so this asserts the pairing rather than
+  // either half on its own - and pins that the fill is NOT accent-soft, which
+  // is the sage the project-card hover bar and the language pill use. Reaching
+  // for the accent here would quietly restyle both of those.
+  it('fills with the CTA green and labels it with the ink measured against it', () => {
+    const { container } = render(<GlowButton href="/x">Dolu</GlowButton>)
+    const face = container.querySelector('.bg-cta-base')
     expect(face).not.toBeNull()
-    expect(face?.className).toContain('text-accent-ink')
-    expect(face?.className).not.toContain('text-white')
+    expect(face?.className).toContain('text-cta-ink')
+    expect(container.querySelector('.bg-accent-soft')).toBeNull()
+  })
 
-    const { container: outline } = render(
-      <GlowButton href="/x" variant="outline">
-        Çerçeve
-      </GlowButton>,
-    )
-    expect(outline.querySelector('.bg-surface-base')).not.toBeNull()
+  // One face, no variants. The button carried a `variant` prop until the
+  // owner asked for the hero's three buttons to be identical, which left the
+  // outline style with no caller; an unused variant with a test pinning it
+  // rots. Every rendered button is therefore the same, which is what makes
+  // "identical" structural rather than a thing to keep in step by hand.
+  it('renders the same face for every button', () => {
+    // Both branches: the plain <a> and the router <Link>, which needs a Router
+    // ancestor and so goes through renderWithRouter.
+    const a = render(<GlowButton href="/x">Bir</GlowButton>)
+    const b = renderWithRouter(<GlowButton to="/y">İki</GlowButton>)
+    const faceOf = (c: HTMLElement) => c.querySelector('a > span:last-of-type')!.className
+    expect(faceOf(a.container)).toBe(faceOf(b.container))
+    expect(faceOf(a.container)).toContain('bg-cta-base')
   })
 })
