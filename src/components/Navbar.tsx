@@ -26,14 +26,18 @@ export default function Navbar() {
   const ui = UI[language]
 
   return (
-    // Deliberately thin: at /55 the page ground reads THROUGH the bar, so the
-    // navbar takes on whatever is behind it - the blue backdrop wash at the
-    // top of the page, plain surface-base once that has faded, a card or a
-    // photo as one scrolls past. That is the whole effect, and it is why the
-    // tint cannot be raised much: the heavier the white, the more the bar goes
-    // back to being an opaque strip. The blur is what keeps text legible over
-    // whatever is passing underneath, so the two are one setting, not two.
-    <header className="sticky top-0 z-50 border-b border-line-subtle bg-surface-base/55 backdrop-blur-xl backdrop-saturate-150">
+    // Still translucent - the ground reads THROUGH the bar and the blur is
+    // what keeps text legible over whatever is passing underneath, so the two
+    // are one setting, not two. But the tint went 55% -> 80% when the page
+    // became a set of alternating light and DEEP GREEN bands. At 55% the bar
+    // blended to a mid sage-grey every time a dark band scrolled under it,
+    // which read as a separate coloured panel appearing and disappearing -
+    // exactly what the owner asked the navbar not to do. At 80% it stays in
+    // the cream family over every band while still taking a warm tint from a
+    // photo, and the ink-strong links improve rather than suffer: the worst
+    // ground the bar can now sit on is cream-over-deep-green at rgb(202,205,196),
+    // where #111 measures 11.4:1 (it was 6.15:1 against the old blue theme).
+    <header className="sticky top-0 z-50 border-b border-line-subtle bg-surface-base/80 backdrop-blur-xl backdrop-saturate-150">
       <div className={`flex items-center justify-between gap-4 py-3 ${CONTENT_CONTAINER}`}>
         <div className="flex shrink-0 items-center gap-3 sm:gap-4">
           <LanguageToggle />

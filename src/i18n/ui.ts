@@ -32,6 +32,7 @@ export type UiStrings = {
   backToProjects: string
   openProject: string
   technologiesUsed: string
+  screensLabel: string
   projectScreenshot: (title: string, index: number) => string
 
   copyAriaLabel: (label: string) => string
@@ -70,6 +71,7 @@ export const UI: Localized<UiStrings> = {
     backToProjects: 'Projelere dön',
     openProject: 'Projeyi aç',
     technologiesUsed: 'Kullanılan teknolojiler',
+    screensLabel: 'Ekran görüntüleri',
     projectScreenshot: (title, index) => `${title} ekran görüntüsü ${index}`,
 
     copyAriaLabel: (label) => `${label} kopyala`,
@@ -106,6 +108,7 @@ export const UI: Localized<UiStrings> = {
     backToProjects: 'Back to projects',
     openProject: 'Open the project',
     technologiesUsed: 'Technologies used',
+    screensLabel: 'Screenshots',
     projectScreenshot: (title, index) => `${title} screenshot ${index}`,
 
     copyAriaLabel: (label) => `Copy ${label}`,

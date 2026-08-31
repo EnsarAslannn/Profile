@@ -92,9 +92,15 @@ export default function ProjectDetailPage() {
           ))}
         </div>
 
-        <h2 data-reveal className="mt-12 text-3xl font-bold text-ink-strong sm:mt-16 sm:text-4xl">Ekranlar</h2>
-
-        <ProjectScreens screens={project.screens} projectTitle={project.title} />
+        {/* The "Ekranlar" heading above this list was removed at the owner's
+            request. ProjectScreens carries a localized aria-label in its
+            place, so the walkthrough is still announced as a named list -
+            dropping the heading must not mean dropping the name. It also
+            means this route now contributes no h2 of its own, which is why
+            ProjectDetailPage.test.tsx asserts İletişim is the only one left. */}
+        <div className="mt-12 sm:mt-16">
+          <ProjectScreens screens={project.screens} projectTitle={project.title} />
+        </div>
 
         <Link
           to={{ pathname: '/', hash: '#projeler' }}

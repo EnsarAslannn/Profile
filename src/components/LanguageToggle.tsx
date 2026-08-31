@@ -41,7 +41,7 @@ export default function LanguageToggle() {
             aria-pressed={active}
             className={`rounded-full px-2.5 py-1.5 text-[0.6875rem] font-semibold tracking-widest uppercase transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
               active
-                ? 'bg-accent-base text-white'
+                ? 'bg-accent-soft text-accent-ink'
                 : 'text-ink-body hover:text-accent-hover active:text-accent-active'
             }`}
           >

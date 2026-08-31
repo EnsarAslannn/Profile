@@ -36,16 +36,28 @@ describe('App', () => {
   // Every content column on every route is the same constant, so there is
   // nothing to drift - this asserts the constant is actually what reaches the
   // DOM, on the home route and on a detail route alike.
+  //
+  // The footer is checked by SEARCHING it rather than by reaching for
+  // `footer > div`: it is now two full-bleed bands (a cream İletişim section
+  // and the deep-green closing bar), each carrying the column inside itself,
+  // so its direct children are the bands and not the columns. Asserting that
+  // every column found is the constant, and that there is more than one,
+  // survives that restructure and still catches a band that forgot the column
+  // or invented its own width.
   it('lays the navbar, the body and the contact block on one content column', () => {
     for (const route of ['/', '/projects/dolfin', '/hakkimda']) {
       const { container, unmount } = renderWithRouter(<App />, route)
-      const columns = [
-        container.querySelector('header > div'),
-        container.querySelector('footer > div'),
-      ]
-      for (const column of columns) {
-        expect(column?.className).toContain(CONTENT_CONTAINER)
+
+      expect(container.querySelector('header > div')?.className).toContain(CONTENT_CONTAINER)
+
+      const footerColumns = Array.from(
+        container.querySelectorAll('footer div[class*="max-w-"]'),
+      )
+      expect(footerColumns.length).toBeGreaterThan(1)
+      for (const column of footerColumns) {
+        expect(column.className).toBe(CONTENT_CONTAINER)
       }
+
       expect(CONTENT_CONTAINER).toContain('max-w-7xl')
       unmount()
     }

@@ -2,91 +2,119 @@
    names inside .agents/skills/ data files never leak into the bundle. */
 @import "tailwindcss" source(".");
 
-/* Semantic light-theme tokens - replaces the navy/gold dark palette for the
-   full light-theme conversion (planner: docs/.../plan3.md Task 4-5; see the
-   ui-agent handoff for the contrast measurements behind every value below).
-   Tokens are named by ROLE, not by literal color, on purpose: it is what
-   makes a future prefers-color-scheme variant a one-file edit instead of a
-   second full migration across every component. CLAUDE.md's palette section
-   already documents this semantic set (surface-, line-, ink-, accent- families) -
-   the earlier note claiming it still described neutral-950/amber-400 was
-   itself stale and has been removed (ui-agent, six-owner-changes handoff). */
+/* Semantic tokens for the cream / deep-green editorial palette (owner's
+   brief, this round). It replaces the blue-accent light theme wholesale - no
+   blue survives anywhere in the token layer, which is what makes the swap a
+   one-file edit rather than a sweep across every component.
+
+   Tokens are named by ROLE, not by literal colour, and that is now doing real
+   work rather than being a promise: the site alternates cream, deep-green and
+   light-neutral BANDS, and the dark band is expressed as a scoped
+   redefinition of these same variables (see the [data-tone='dark'] block
+   below the @theme). A component writes text-ink-strong once and gets
+   near-black on cream and warm cream on deep green, with no variant classes
+   and no second component tree. Introducing a literal-colour token here
+   (sage-500, green-800) would break exactly that, which is why the rule
+   against them stands. */
 @theme {
-  /* Surfaces. surface-base is the page's flat ground once the top gradient
-     band (see backdrop-from/to below) has faded out. surface-raised is kept
-     a touch lighter than surface-base (pure white vs. slate-50) so cards
-     read as "lifted" by tone + a hairline border, not by a heavy shadow -
-     a dark-card shadow recipe reads as dirt on a light ground. surface-sunken
-     is for the image-letterbox guard behind screenshots whose aspect ratio
-     doesn't exactly match the reserved box. */
-  --color-surface-base: #f8fafc; /* slate-50 - page ground */
-  --color-surface-raised: #ffffff; /* card / elevated surface */
-  --color-surface-sunken: #e2e8f0; /* slate-200 - image letterbox guard */
+  /* Surfaces - the three light bands, in order of recession.
+     surface-base is the warm cream the page rides on and the colour of the
+     hero, Projeler and Iletisim bands. surface-raised is the soft white cards
+     sit on: only a few points off cream on purpose, so a card is separated by
+     its hairline border rather than by a tonal jump (the owner asked for
+     borders over shadows). surface-sunken is the light neutral one step
+     BELOW the page ground - it is the Stacks band, the Marquee strip, and the
+     letterbox guard behind an image whose ratio does not exactly fill its
+     reserved box; those are the same role, a recessed neutral. */
+  --color-surface-base: #f7f3ea; /* warm cream - page ground, hero/projects/contact band */
+  --color-surface-raised: #fcfcf9; /* soft white - cards */
+  --color-surface-sunken: #e9e9e5; /* light neutral - stacks band, marquee, letterbox guard */
 
-  /* Lines. line-subtle is purely decorative (section border-t, card
-     hairlines) and is not held to a contrast floor - WCAG 1.4.11 exempts
-     decorative separators. line-strong is a real UI boundary (card outline,
-     icon-link ring) and clears 3:1 against every surface it appears on:
-     4.76:1 on surface-raised, 4.55:1 on surface-base, 3.90:1 against
-     backdrop-from (the gradient's bluest point) - all above the 3:1 floor. */
-  --color-line-subtle: #e2e8f0; /* slate-200 */
-  --color-line-strong: #64748b; /* slate-500 */
+  /* Lines. line-subtle is the owner's border colour and is purely decorative
+     (card hairlines, dividers, the navbar's underline); WCAG 1.4.11 exempts
+     it. line-strong is a real UI boundary (icon-link ring, the chip outline
+     on a roadmap card) and clears 3:1 on every surface it appears on: 4.87:1
+     on surface-base, 5.00:1 on surface-raised, 4.43:1 on surface-sunken. */
+  --color-line-subtle: #d9dcd7;
+  --color-line-strong: #686b68;
 
-  /* Ink. ink-strong is near-black for headings (17.9:1 on surface-raised,
-     17.1:1 on surface-base, 14.6:1 on backdrop-from). ink-body is a dark
-     slate for paragraph copy, deliberately darker than the minimum so it
-     keeps >6:1 even over the gradient's lightest-blue point (7.58:1 on
-     surface-raised, 7.24:1 on surface-base, 6.21:1 on backdrop-from).
-     ink-muted is for de-emphasized text (Footer) and card body copy
-     (ProjectCard's description) - it clears 4.5:1 on both surfaces
-     (4.76:1 raised, 4.55:1 base) but FAILS at 3.90:1 against backdrop-from,
-     so ink-muted must only be used inside an opaque surface-raised
-     container, or below the gradient band - never as text sitting directly
-     on the bare page ground within the first viewport height. */
-  --color-ink-strong: #0f172a; /* slate-900 */
-  --color-ink-body: #475569; /* slate-600 */
-  --color-ink-muted: #64748b; /* slate-500 */
+  /* Ink. ink-strong is the owner's main black for headings and navigation
+     (15.4:1 on surface-base, 15.8:1 on surface-raised, 15.0:1 on
+     surface-sunken). ink-body is the owner's secondary gray taken a few steps
+     darker for running copy - 7.65:1 on cream, 6.96:1 on the neutral band -
+     because body text is the one role with no margin to spare. ink-muted IS
+     the owner's #686b68 exactly, for de-emphasised labels and captions:
+     4.87:1 on cream, 5.00:1 on soft white. It measures 4.43:1 on
+     surface-sunken, which is under the 4.5:1 floor - so ink-muted must not be
+     used for text sitting on the light-neutral band (Skills.tsx's ordinal
+     numbers use ink-body for exactly this reason). */
+  --color-ink-strong: #111111;
+  --color-ink-body: #4a4e4a;
+  --color-ink-muted: #686b68;
 
-  /* Accent - blue, replacing the warm brass that dark-theme token relied on
-     (brass drops to roughly 1.6:1 on white and is unusable here). Matches
-     the ui-ux-pro-max "Portfolio/Personal" palette precedent (monochrome +
-     blue accent, data/colors.csv row 11). hover/active go DARKER than base -
-     inverted from the dark theme, where hover lightened - because a lighter
-     tint fades toward invisible on a light ground. Measured: accent-base
-     4.94:1 on surface-base, 5.17:1 on surface-raised, 4.24:1 on
-     backdrop-from (below 4.5:1 - fine for the 3:1 heading-rule/UI use, but
-     do not use accent-base as running link text directly on the bare
-     gradient; use accent-hover there, which holds 5.49:1 even at the
-     gradient's bluest point). accent-hover: 6.41:1 base / 6.70:1 raised /
-     5.49:1 backdrop-from. accent-active is darker again; contrast only
-     increases from accent-hover's figures. */
-  --color-accent-base: #2563eb; /* blue-600 - links, icons (the heading rule div was removed - five-owner-changes Task 1) */
-  --color-accent-hover: #1d4ed8; /* blue-700 - hover, and gradient-safe link color */
-  --color-accent-active: #1e40af; /* blue-800 - active / pressed */
+  /* Section headings, and the only ink role that is NOT a neutral. The owner
+     asked for PROJELER / STACKS / ILETISIM in the deep green rather than the
+     main black, which turns the h2 scale into the palette's second voice -
+     the page's biggest type carries the brand colour, and near-black is left
+     to do the reading. 12.0:1 on cream, 10.9:1 on the neutral band.
 
-  /* Focus - decoupled from accent-base per the token-layer rationale, even
-     though accent-base itself already clears 3:1 everywhere measured. One
-     step darker for margin against the palest surface. 6.70:1 on
-     surface-raised, 6.41:1 on surface-base, 5.49:1 on backdrop-from - all
-     comfortably above the 3:1 non-text floor. */
-  --color-focus: #1d4ed8; /* blue-700 */
+     It is one token rather than three per-section classes because the dark
+     bands have to answer it: HAKKIMDA and OZGECMIS cannot be deep green on
+     deep green, so the tone scope maps this to warm cream and those two
+     headings keep the colour they already had. SectionHeading writes
+     text-ink-heading once and every band is correct. */
+  --color-ink-heading: #17352d;
 
-  /* Gradient stops for PageBackdrop (src/components/PageBackdrop.tsx).
-     backdrop-to is set to the EXACT hex of surface-base, not merely "a
-     similar light color" - that identity is what makes the fade disappear
-     seamlessly into the flat page ground instead of leaving a visible edge
-     where the backdrop element ends. */
-  --color-backdrop-from: #dbeafe; /* blue-100 - soft top-of-page wash */
-  --color-backdrop-to: #f8fafc; /* = surface-base, by design */
+  /* Accent - muted sage, replacing the blue outright. TWO steps, because one
+     sage cannot do both jobs and the arithmetic is what says so:
 
-  /* Availability status. A role name, not a colour name, per the palette rule
-     - it marks 'open to work', and would follow if that state ever needed a
-     different hue. Used only as a small dot beside text that says the same
-     thing, so it carries no information on its own and is not held to a text
-     contrast floor; it clears the 3:1 non-text floor on surface-base
-     (3.35:1) so the dot itself stays visible. */
-  --color-status-open: #15803d; /* green-700 */
+     accent-soft is the FILL - a button face, the active language pill, the
+     hover bar on a project card, the hero wordmark. It carries accent-ink
+     (near-black) on top at 4.91:1.
+     accent-base is the READABLE accent - link text, icons, the focus ring -
+     at 5.33:1 on cream and 4.85:1 on the neutral band. hover and active go
+     darker still, the light-theme direction (a lighter tint fades toward
+     invisible on a pale ground).
 
+     accent-soft is the owner's #8fa58f taken one step deeper. That is not a
+     stylistic edit: #8fa58f measures 2.39:1 against cream, so as the hero's
+     "PORTFOLYO" wordmark - large text, 3:1 floor - it would have failed, and
+     no sage light enough to read as #8fa58f clears that floor on a #f7f3ea
+     ground. #748b74 measures 3.37:1 and is the same muted sage two shades in.
+     The owner's exact #8fa58f does survive, as the dark band's accent-active,
+     where the ground is deep green and it measures 5.03:1. */
+  --color-accent-soft: #748b74; /* sage fill - buttons, pills, the hero wordmark */
+  --color-accent-ink: #111111; /* the ink that sits ON an accent-soft fill */
+  --color-accent-base: #4f6b52; /* deep sage - links, icons, resting state */
+  --color-accent-hover: #3d5540;
+  --color-accent-active: #2c3e2f;
+
+  /* Focus - kept decoupled from accent-base so the ring's contrast can be
+     tuned without dragging every accent-coloured link along with it, even
+     though the two currently share a value. 5.33:1 on cream, 4.85:1 on the
+     neutral band, 5.18:1 on the backdrop wash - all above the 3:1 floor. */
+  --color-focus: #4f6b52;
+
+  /* Gradient stops for PageBackdrop (src/components/PageBackdrop.tsx). The
+     old blue-100 wash is gone; what is left is a barely-there cool-sage
+     breath over the cream, which is what the owner asked a gradient to be.
+     backdrop-to is the EXACT hex of surface-base, not merely a similar light
+     colour - that identity is what makes the fade disappear into the flat
+     page ground instead of leaving an edge where the element ends.
+
+     Because the wash is now this close to cream, the old caveat that
+     ink-muted fails against backdrop-from no longer holds: ink-muted measures
+     4.73:1 at the gradient's strongest point, ink-body 7.43:1 and accent-base
+     5.18:1. Nothing on this site is unsafe on the bare page ground any more. */
+  --color-backdrop-from: #eff1ea;
+  --color-backdrop-to: #f7f3ea; /* = surface-base, by design */
+
+  /* Availability status. A role name, not a colour name - it marks 'open to
+     work'. Pulled into the sage family so it stops reading as a stray
+     saturated green beside a muted palette; it is only ever a small dot next
+     to a sentence that says the same thing, so it is not held to a text
+     contrast floor, and it clears the 3:1 non-text floor on cream (3.87:1). */
+  --color-status-open: #5b8460;
 
   /* Project screenshot ratio - nominal 1600x879 (see src/data/projectImages.ts),
      simplified to 253/139 (~1.82:1). Used only by ProjectScreens (the narrated
@@ -182,6 +210,72 @@
       transform: translateY(0);
     }
   }
+}
+
+/* The deep-green band, expressed as a SCOPED REDEFINITION of the same role
+   tokens rather than as a second set of names. A section opts in with a bare
+   `data-tone="dark"`; from that element down, --color-ink-strong resolves to
+   warm cream instead of near-black, --color-surface-raised to a lifted green
+   instead of soft white, and so on. Every component inside keeps writing
+   text-ink-strong / bg-surface-raised / border-line-subtle exactly as it does
+   on cream - no dark: variants, no per-section colour props, no parallel
+   component tree. This is the payoff the role-based naming was always for.
+   (Hakkimda and Ozgecmis are the two dark bands; see HomePage.tsx.)
+
+   Unlayered on purpose. Tailwind v4 emits @theme variables inside
+   `@layer theme`, and an unlayered rule beats a layered one whatever the
+   specificity, so this block wins without needing !important or a doubled
+   selector.
+
+   `color` is re-declared here and that line is load-bearing, not tidiness.
+   `text-ink-body` on App.tsx's root computes to the literal #4a4e4a at the
+   root and children inherit that COMPUTED value, not the variable - so
+   redefining --color-ink-body alone would leave every unstyled run of text in
+   a dark section still painted dark grey on dark green. Re-declaring color
+   from the variable inside the scope is what makes it re-resolve.
+   background-color is set for the same reason it is convenient: a section
+   only has to carry the attribute, not the attribute plus a bg- utility that
+   could drift away from it. */
+[data-tone='dark'] {
+  /* Surfaces. surface-raised is a lifted green rather than a lighter neutral:
+     a card on this ground reads as raised by tone plus its hairline, the same
+     way a soft-white card does on cream. */
+  --color-surface-base: #17352d; /* the owner's deep green - the band itself */
+  --color-surface-raised: #1e4238; /* lifted green - cards */
+  --color-surface-sunken: #10261f; /* recessed green - letterbox guard */
+
+  /* Lines. line-strong still clears the 3:1 non-text floor on the band
+     (3.61:1); line-subtle stays decorative. */
+  --color-line-subtle: #2e5247;
+  --color-line-strong: #6e8c7f;
+
+  /* Ink. Warm cream rather than pure white for the headings, which is what
+     keeps the band editorial instead of corporate - and it measures 12.0:1.
+     ink-body 9.07:1, ink-muted 5.95:1, all on the band itself. */
+  --color-ink-strong: #f7f3ea;
+  --color-ink-body: #cfd8cb;
+  --color-ink-muted: #a3b2a0;
+  /* Deep green on deep green would be invisible; on a dark band the heading
+     is the warm cream it always was. 12.0:1. */
+  --color-ink-heading: #f7f3ea;
+
+  /* Accent. Inverted direction from the light theme: hover goes LIGHTER here,
+     because a darker sage disappears into deep green. accent-base 6.36:1,
+     accent-hover 8.35:1, accent-active 5.03:1 - and accent-active is the
+     owner's exact #8fa58f, which finally has a ground dark enough to carry it.
+     accent-soft/accent-ink is the owner's own prescription for a button on a
+     dark section: a cream face with deep-green text, 12.0:1. */
+  --color-accent-soft: #f7f3ea;
+  --color-accent-ink: #17352d;
+  --color-accent-base: #a8b9a5;
+  --color-accent-hover: #c3d0bf;
+  --color-accent-active: #8fa58f;
+  --color-focus: #c3d0bf;
+
+  --color-status-open: #a8b9a5;
+
+  color: var(--color-ink-body);
+  background-color: var(--color-surface-base);
 }
 
 /* Custom-property registrations for FooterWordmark's cursor-tracking mask

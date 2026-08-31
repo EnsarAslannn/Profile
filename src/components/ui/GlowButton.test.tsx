@@ -69,9 +69,16 @@ describe('GlowButton', () => {
     expect(screen.getByRole('link').className).toContain('motion-reduce:hover:scale-100')
   })
 
+  // accent-soft is the FILL step of the sage scale and accent-ink is the only
+  // ink measured against it (4.91:1). The two travel together: a face painted
+  // accent-soft that kept a white or ink-strong label would drop to ~2.2:1, so
+  // this asserts the pairing rather than either half on its own.
   it('fills with the accent by default and keeps the page ground when outlined', () => {
     const { container: solid } = render(<GlowButton href="/x">Dolu</GlowButton>)
-    expect(solid.querySelector('.bg-accent-base')).not.toBeNull()
+    const face = solid.querySelector('.bg-accent-soft')
+    expect(face).not.toBeNull()
+    expect(face?.className).toContain('text-accent-ink')
+    expect(face?.className).not.toContain('text-white')
 
     const { container: outline } = render(
       <GlowButton href="/x" variant="outline">

@@ -137,17 +137,22 @@ export function toMachineDate(value: string): string {
 export type RoadmapEntry = ResumeEntry & {
   kind: string
   year: string
-  // Owner-supplied photo behind the card, keyed by year below. A year with no
-  // photo simply renders a plain card - the background is decoration, and the
-  // component must not assume one exists. Dimensions are the true measured
-  // WebP sizes, per CLAUDE.md's images rule.
-  background?: { src: string; width: number; height: number }
+  // Owner-supplied photo for that year, keyed by year below. A year with no
+  // photo simply renders a text-only card, so the component must not assume
+  // one exists. Dimensions are the true measured WebP sizes, per CLAUDE.md's
+  // images rule.
+  //
+  // It was called `background` while it really was one - a washed-out image
+  // behind the card's text. The owner asked for the photographs at full
+  // strength with the text beside them instead, so it is now an ordinary
+  // photo in its own column and the name says so.
+  photo?: { src: string; width: number; height: number }
 }
 
 // Keyed by year rather than by entry id or array position, so reordering the
 // groups or renaming an entry cannot silently pair 2024's card with 2025's
 // photograph.
-const BACKGROUNDS: Record<string, { src: string; width: number; height: number }> = {
+const PHOTOS: Record<string, { src: string; width: number; height: number }> = {
   '2020': { src: photo2020, width: 1040, height: 778 },
   '2023': { src: photo2023, width: 614, height: 767 },
   '2024': { src: photo2024, width: 574, height: 767 },
@@ -163,7 +168,7 @@ const toRoadmap = (groups: ResumeGroup[]): RoadmapEntry[] =>
         ...entry,
         kind: group.heading,
         year: entry.start.split('/')[1],
-        background: BACKGROUNDS[entry.start.split('/')[1]],
+        photo: PHOTOS[entry.start.split('/')[1]],
       })),
     )
     .sort((a, b) => toMachineDate(a.start).localeCompare(toMachineDate(b.start)))

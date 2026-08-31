@@ -16,6 +16,12 @@ type Props = {
 // cannot drift apart the way five hand-written class strings would. It is
 // also the only place the h2 size lives - see CLAUDE.md's type scale.
 //
+// It is also the only consumer of `ink-heading`, the deep-green heading ink
+// the owner asked for. That is a token and not three per-section classes
+// because the two dark bands have to answer it: the tone scope maps it to
+// warm cream, so HAKKIMDA and OZGECMIS keep the colour they already had while
+// PROJELER, STACKS and ILETISIM come out deep green, from one class.
+//
 // The reference design prints a [001]-style index above each heading. It was
 // reproduced and then removed at the owner's request; do not reinstate it
 // without asking, and note that removing it is why nothing here needs to know
@@ -28,7 +34,7 @@ export default function SectionHeading({ title, subtitle, align = 'left', lang }
       <h2
         data-reveal
         {...(lang ? { lang } : {})}
-        className="text-4xl font-bold tracking-tight text-ink-strong uppercase sm:text-5xl lg:text-6xl"
+        className="text-4xl font-bold tracking-tight text-ink-heading uppercase sm:text-5xl lg:text-6xl"
       >
         {title}
       </h2>

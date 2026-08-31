@@ -1,6 +1,7 @@
 import { PROJECT_IMAGE_HEIGHT, PROJECT_IMAGE_WIDTH, getProjectImageAlt } from '../data/projectImages'
 import type { ProjectScreen } from '../data/projects'
 import { useLanguage } from '../i18n/LanguageContext'
+import { UI } from '../i18n/ui'
 
 type Props = {
   screens: ProjectScreen[]
@@ -11,7 +12,13 @@ export default function ProjectScreens({ screens, projectTitle }: Props) {
   const { language } = useLanguage()
 
   return (
-    <ul className="mt-8 space-y-8 sm:space-y-12">
+    // aria-label because the visible "Ekranlar" heading that used to name this
+    // list was removed at the owner's request. The list still needs to be
+    // identifiable to a screen reader moving through the page, and the label
+    // is localized - the heading it replaces never was, so this also quietly
+    // fixes a Turkish string that was hard-coded into an English-optional
+    // route.
+    <ul aria-label={UI[language].screensLabel} className="mt-8 space-y-8 sm:space-y-12">
       {screens.map((screen, index) => (
         <li key={screen.name} data-reveal>
           <figure>

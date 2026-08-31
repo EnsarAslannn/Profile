@@ -65,7 +65,7 @@ export default function HeroGallery() {
                   // ratio before the image decodes, so nothing shifts.
                   <div
                     key={`${copy}-${image.id}`}
-                    className="overflow-hidden rounded-2xl border border-line-subtle bg-surface-raised shadow-sm shadow-slate-950/5"
+                    className="overflow-hidden rounded-2xl border border-line-subtle bg-surface-raised shadow-sm shadow-black/5"
                   >
                     <img
                       src={image.src}

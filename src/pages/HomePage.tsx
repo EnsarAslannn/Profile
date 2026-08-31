@@ -9,7 +9,6 @@ import Skills from '../components/Skills'
 import { ABOUT_PARAGRAPHS } from '../data/about'
 import { useLanguage } from '../i18n/LanguageContext'
 import type { Localized } from '../i18n/language'
-import { CONTENT_CONTAINER } from '../lib/layout'
 import { DEFAULT_TITLE, truncateForDescription } from '../lib/siteMeta'
 import { useReveal } from '../lib/useReveal'
 
@@ -37,32 +36,35 @@ export default function HomePage() {
         type="website"
       />
       {/* Section order follows the reference design: hero, then the five
-          numbered sections. The Marquee strips are the reference's scrolling
-          dividers - decoration between sections, never inside one, so a
-          section's own boundaries stay exactly where the section contract in
-          CLAUDE.md puts them. They sit outside <main>'s padded column
-          deliberately: the strip is full-bleed in the reference, and a
-          padded one would look like a boxed-in banner. */}
+          numbered sections. Each section is now a full-bleed BAND that paints
+          its own ground - cream, deep green or light neutral - and carries the
+          shared content column INSIDE itself. That is why <main> no longer
+          wraps groups of sections in padded divs: a padded wrapper cannot
+          produce an edge-to-edge colour, and grouping Hero with About in one
+          box would have forced the two to share a ground.
+
+          The rhythm, top to bottom, is deliberate and alternating:
+          cream (hero) -> deep green (Hakkimda) -> neutral strip -> cream
+          (Projeler) -> deep green (Ozgecmis) -> neutral strip -> neutral
+          (Stacks) -> cream (Iletisim, rendered by App.tsx).
+
+          The Marquee strips are the reference's scrolling dividers and are
+          both the recessed neutral, so a strip reads as the seam between two
+          bands. The second one shares its ground with Stacks on purpose - the
+          strip runs the Stacks technologies, so the two are one band and the
+          strip leads into the section it is drawn from. */}
       <main ref={revealRoot} id="main">
-        <div className={CONTENT_CONTAINER}>
-          <Hero />
-          <About />
-        </div>
+        <Hero />
+        <About />
 
         <Marquee />
 
-        <div className={CONTENT_CONTAINER}>
-          <Projects />
-          <Resume />
-        </div>
+        <Projects />
+        <Resume />
 
-        {/* The strip runs the Yetenekler technologies, so putting it directly
-            above that section reads as a lead-in rather than as filler. */}
         <Marquee />
 
-        <div className={CONTENT_CONTAINER}>
-          <Skills />
-        </div>
+        <Skills />
       </main>
     </>
   )

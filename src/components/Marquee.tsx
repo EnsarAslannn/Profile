@@ -15,12 +15,19 @@ import { MARQUEE_WORDS } from '../data/marquee'
 //
 // The very low contrast is deliberate and matches the reference: decorative
 // texture, not content. WCAG 1.4.3's decorative-text exemption applies.
+//
+// The strip is the recessed light neutral, which makes it the SEAM between
+// two bands: it separates the deep-green Hakkimda from cream Projeler, and
+// then shares its ground with Stacks, which it leads into. The old
+// `border-y border-line-subtle` came off with it - a hairline drawn exactly
+// where deep green meets neutral reads as a mistake, and the colour change is
+// already the boundary.
 export default function Marquee() {
   return (
     <div
       aria-hidden="true"
       lang="en"
-      className="relative overflow-hidden border-y border-line-subtle py-8 sm:py-10"
+      className="relative overflow-hidden bg-surface-sunken py-8 sm:py-10"
     >
       <div className="flex w-max animate-marquee-x motion-reduce:animate-none">
         {[0, 1].map((copy) => (
@@ -31,7 +38,7 @@ export default function Marquee() {
                 className="flex shrink-0 items-center text-2xl font-bold tracking-tight text-ink-muted/30 uppercase sm:text-3xl lg:text-4xl"
               >
                 {word}
-                <span className="mx-6 text-accent-base/25 sm:mx-8">&bull;</span>
+                <span className="mx-6 text-accent-soft/50 sm:mx-8">&bull;</span>
               </li>
             ))}
           </ul>

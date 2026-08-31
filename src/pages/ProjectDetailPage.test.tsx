@@ -103,13 +103,23 @@ describe('ProjectDetailPage', () => {
     }
   })
 
-  // Two h2s on a detail route now, not one: the İletişim section is site
-  // chrome (App.tsx renders it outside <Routes>), so it lands on every page.
-  // Ekranlar stays the only h2 the ROUTE itself contributes.
-  it('contributes exactly one h2 of its own, named Ekranlar', () => {
+  // The route's own "Ekranlar" h2 was removed at the owner's request, so the
+  // only h2 left is İletişim - site chrome, rendered by App.tsx outside
+  // <Routes>, which lands on every page. The heading levels still have to run
+  // h1 -> h2 with nothing skipped, which is what makes this worth pinning
+  // rather than simply deleting.
+  it('contributes no h2 of its own now that Ekranlar is gone', () => {
     renderWithRouter(<App />, '/projects/dolfin')
     const names = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
-    expect(names).toEqual(['Ekranlar', 'İletişim'])
+    expect(names).toEqual(['İletişim'])
+    expect(screen.queryByText('Ekranlar')).toBeNull()
+  })
+
+  // Removing the heading must not leave the walkthrough anonymous: the list
+  // keeps a localized accessible name in its place.
+  it('still names the screenshot list for a screen reader', () => {
+    renderWithRouter(<App />, '/projects/dolfin')
+    expect(screen.getByRole('list', { name: 'Ekran görüntüleri' })).toBeInTheDocument()
   })
 
   it('renders five figcaptions for dolfin, with the companyProfile caption verbatim', () => {

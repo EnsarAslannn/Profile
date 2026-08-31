@@ -27,6 +27,17 @@ type Props = {
 //     so the rim is `accent-base` at 15% and the sweep is `accent-base` solid -
 //     dark-on-pale, which is the same contrast relationship the original had
 //     the other way up.
+//
+// The solid face is the owner's CTA recipe: a muted sage fill carrying
+// near-black ink (accent-soft / accent-ink, 4.91:1), not a saturated block of
+// colour. Its hover is a colour INVERSION rather than a darker tint of the
+// same fill, and that is forced rather than chosen: accent-hover is a deep
+// sage meant to be read as text on cream, so painting it behind accent-ink
+// would measure 2.24:1. Flipping to a deep-sage face with a cream label
+// measures 5.33:1 and is the better hover anyway. Both halves resolve through
+// the tone scope, so on a deep-green band the same two classes give a cream
+// face with deep-green ink - which is exactly what the owner specified for a
+// button on a dark section.
 //  3. The `@keyframes` moved out of an inline <style> tag into an @theme token
 //     (`--animate-glow-spin`), because a <style> tag re-declares them once per
 //     instance and cannot carry a `motion-reduce:` variant.
@@ -55,7 +66,7 @@ export default function GlowButton({
 
   const face =
     variant === 'solid'
-      ? 'inline-flex items-center gap-3 rounded-full bg-accent-base px-7 py-4 text-sm font-semibold tracking-widest text-white uppercase transition-colors duration-200 group-hover:bg-accent-hover group-active:bg-accent-active'
+      ? 'inline-flex items-center gap-3 rounded-full bg-accent-soft px-7 py-4 text-sm font-semibold tracking-widest text-accent-ink uppercase transition-colors duration-200 group-hover:bg-accent-base group-hover:text-surface-base group-active:bg-accent-active group-active:text-surface-base'
       : 'inline-flex items-center gap-3 rounded-full bg-surface-base px-6 py-4 text-sm font-semibold tracking-widest text-ink-strong uppercase transition-colors duration-200 group-hover:text-accent-hover group-active:text-accent-active'
 
   const inner = (
