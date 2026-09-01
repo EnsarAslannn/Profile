@@ -53,7 +53,14 @@ export default function HomePage() {
           bands. The second one shares its ground with Stacks on purpose - the
           strip runs the Stacks technologies, so the two are one band and the
           strip leads into the section it is drawn from. */}
-      <main ref={revealRoot} id="main">
+      {/* tabIndex={-1} makes this a focus target for SkipLink: a fragment
+          link moves focus into its target only if the target can hold focus.
+          The outline is suppressed because this is not an interactive element
+          - it is a whole page region receiving programmatic focus, and a ring
+          drawn around the entire content area reads as a rendering fault. The
+          feedback a reader gets is the page jumping past the navbar and the
+          skip link disappearing. */}
+      <main ref={revealRoot} id="main" tabIndex={-1} className="focus:outline-none">
         <Hero />
         <About />
 

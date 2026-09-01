@@ -5,12 +5,14 @@ import SectionHeading from './SectionHeading'
 import SegmentedText from './SegmentedText'
 import { ABOUT_STATEMENT, ABOUT_TEASER } from '../data/about'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useLocalizedTo } from '../i18n/useLocalizedTo'
 import { UI } from '../i18n/ui'
 import { CONTENT_CONTAINER } from '../lib/layout'
 import { SITE_NAME, SITE_ROLE } from '../lib/siteMeta'
 
 export default function About() {
   const { language } = useLanguage()
+  const localizedTo = useLocalizedTo()
   const ui = UI[language]
 
   return (
@@ -75,7 +77,7 @@ export default function About() {
             </p>
 
             <Link
-              to="/hakkimda"
+              to={localizedTo('/hakkimda')}
               data-reveal
               className="mt-10 inline-flex items-center gap-3 rounded border-b border-ink-strong pb-1 text-lg font-semibold text-ink-strong [--reveal-delay:240ms] transition-colors duration-200 hover:border-accent-hover hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:text-accent-active sm:text-xl"
             >

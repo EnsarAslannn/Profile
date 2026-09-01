@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import ArrowUpRightIcon from './icons/ArrowUpRightIcon'
 import type { Project } from '../data/projects'
+import { useLocalizedTo } from '../i18n/useLocalizedTo'
 import { revealDelayClass } from '../lib/useReveal'
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
 }
 
 export default function ProjectCard({ project, index }: Props) {
+  const localizedTo = useLocalizedTo()
   const cover = project.cover
   const placement =
     index === 0 ? 'md:col-start-1 md:row-start-1 md:row-span-2' : 'md:col-start-2'
@@ -19,7 +21,7 @@ export default function ProjectCard({ project, index }: Props) {
   return (
     <li data-reveal className={`h-full ${placement} ${revealDelayClass(index)}`}>
       <Link
-        to={`/projects/${project.slug}`}
+        to={localizedTo(`/projects/${project.slug}`)}
         aria-label={`${project.title} - ${project.subtitle}`}
         // Soft white on the cream band, separated by its hairline rather than
         // by a tonal jump. The hover is the owner's four small moves and

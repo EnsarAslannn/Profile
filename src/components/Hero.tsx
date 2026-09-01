@@ -7,10 +7,12 @@ import SegmentedText from './SegmentedText'
 import { CV_FILE, HERO_DESCRIPTION, HERO_TITLE_LINES } from '../data/hero'
 import { CONTENT_CONTAINER } from '../lib/layout'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useLocalizedTo } from '../i18n/useLocalizedTo'
 import { UI } from '../i18n/ui'
 
 export default function Hero() {
   const { language } = useLanguage()
+  const localizedTo = useLocalizedTo()
   const ui = UI[language]
 
   return (
@@ -62,7 +64,7 @@ export default function Hero() {
               // horizontal overflow.
               className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4 [--reveal-delay:240ms]"
             >
-              <GlowButton to={{ pathname: '/', hash: '#iletisim' }}>
+              <GlowButton to={localizedTo({ pathname: '/', hash: '#iletisim' })}>
                 {ui.heroContact}
                 <ArrowUpRightIcon className="h-4 w-4 shrink-0" />
               </GlowButton>
@@ -72,7 +74,7 @@ export default function Hero() {
                   single line - as a button this was 56px wider, which is what
                   pushed "CV indir" onto a second row in the first place. */}
               <Link
-                to={{ pathname: '/', hash: '#projeler' }}
+                to={localizedTo({ pathname: '/', hash: '#projeler' })}
                 className="inline-flex items-center gap-3 rounded-full px-4 py-4 text-sm font-semibold tracking-widest whitespace-nowrap text-ink-body uppercase underline-offset-4 xl:px-3 transition-colors duration-200 hover:text-accent-hover hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:text-accent-active"
               >
                 {ui.heroProjects}

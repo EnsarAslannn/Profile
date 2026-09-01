@@ -82,4 +82,63 @@ describe('App', () => {
     renderWithRouter(<App />, '/hakkimda')
     expect(screen.getByRole('heading', { level: 1, name: 'Hakkımda' })).toBeInTheDocument()
   })
+
+  // The sticky navbar puts nine tab stops (two language buttons, the wordmark
+  // and six section links) in front of the content on EVERY route, which is
+  // exactly the situation a skip link exists for. Asserting it is FIRST is
+  // the part worth pinning: a skip link that is not the first focusable
+  // element is decoration.
+  describe('skip link', () => {
+    for (const route of ['/', '/hakkimda', '/projects/dolfin']) {
+      it(`is the first focusable element on ${route} and targets its main`, () => {
+        const { container } = renderWithRouter(<App />, route)
+
+        const focusable = Array.from(
+          container.querySelectorAll<HTMLElement>('a[href], button, [tabindex]'),
+        )
+        const first = focusable[0]
+        expect(first.tagName).toBe('A')
+        expect(first.getAttribute('href')).toBe('#main')
+        expect(first.textContent).toBe('İçeriğe geç')
+
+        // A fragment link moves focus into its target only if the target can
+        // hold focus, so the <main> it points at has to be tabbable
+        // programmatically.
+        const main = container.querySelector('main#main')
+        expect(main).not.toBeNull()
+        expect(main?.getAttribute('tabindex')).toBe('-1')
+      })
+    }
+
+    // Hidden but reachable. display:none and visibility:hidden both remove an
+    // element from the focus order entirely, which would make the link
+    // unusable by the only people who can use it.
+    it('is visually hidden until focused, without leaving the focus order', () => {
+      const { container } = renderWithRouter(<App />)
+      const link = container.querySelector<HTMLElement>('a[href="#main"]')
+      expect(link?.className).toMatch(/\bsr-only\b/)
+      expect(link?.className).toMatch(/\bfocus:not-sr-only\b/)
+      expect(link?.className).not.toMatch(/\bhidden\b/)
+    })
+
+    // A cascade trap that jsdom cannot see, because jsdom has no cascade.
+    //
+    // Tailwind's `not-sr-only` resets `padding: 0` as part of undoing
+    // `sr-only`, and it arrives through a `focus:` variant - so it lands
+    // LATER in the stylesheet than an unscoped `px-5 py-3` and wins. Written
+    // that way the pill rendered 20px tall with its label against the edges;
+    // focus-scoping the padding puts it back to 44px, measured in a browser.
+    // Only the class names are visible from here, so the class names are what
+    // this pins.
+    it('scopes its padding to :focus, so not-sr-only cannot flatten the pill', () => {
+      const { container } = renderWithRouter(<App />)
+      const classes = container.querySelector('a[href="#main"]')?.className.split(/\s+/) ?? []
+
+      const padding = classes.filter((name) => /(^|:)p[xytrbl]?-/.test(name))
+      expect(padding.length).toBeGreaterThan(0)
+      for (const name of padding) {
+        expect(name, `${name} is reset to 0 by focus:not-sr-only`).toMatch(/^focus:/)
+      }
+    })
+  })
 })

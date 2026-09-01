@@ -7,6 +7,7 @@ import ProjectTechnologies from '../components/ProjectTechnologies'
 import RouteMeta from '../components/RouteMeta'
 import { getProjectBySlug } from '../data/projects'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useLocalizedTo } from '../i18n/useLocalizedTo'
 import { UI } from '../i18n/ui'
 import { CONTENT_CONTAINER } from '../lib/layout'
 import { SITE_NAME, firstSentence, truncateForDescription } from '../lib/siteMeta'
@@ -16,6 +17,7 @@ export default function ProjectDetailPage() {
   const revealRoot = useReveal<HTMLElement>()
   const { slug } = useParams<{ slug: string }>()
   const { language } = useLanguage()
+  const localizedTo = useLocalizedTo()
   const ui = UI[language]
   const project = getProjectBySlug(slug, language)
 
@@ -34,14 +36,22 @@ export default function ProjectDetailPage() {
         image={ogImage}
         type="article"
       />
+    {/* tabIndex={-1} makes this a focus target for SkipLink: a fragment
+        link moves focus into its target only if the target can hold focus.
+        The outline is suppressed because this is not an interactive element
+        - it is a whole page region receiving programmatic focus, and a ring
+        drawn around the entire content area reads as a rendering fault. The
+        feedback a reader gets is the page jumping past the navbar and the
+        skip link disappearing. */}
     <main
       ref={revealRoot}
       id="main"
-      className={`py-16 ${CONTENT_CONTAINER}`}
+      tabIndex={-1}
+      className={`py-16 focus:outline-none ${CONTENT_CONTAINER}`}
     >
       <div className="mx-auto max-w-3xl">
         <Link
-          to="/"
+          to={localizedTo('/')}
           className="mb-6 inline-flex items-center gap-2 rounded px-3 py-3 text-sm font-medium text-accent-base transition-colors duration-200 hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:text-accent-active sm:mb-8"
         >
           <ArrowLeftIcon className="h-4 w-4 shrink-0" />
@@ -103,7 +113,7 @@ export default function ProjectDetailPage() {
         </div>
 
         <Link
-          to={{ pathname: '/', hash: '#projeler' }}
+          to={localizedTo({ pathname: '/', hash: '#projeler' })}
           className="mt-12 inline-flex items-center gap-2 rounded px-3 py-3 text-sm font-medium text-accent-base transition-colors hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           <ArrowLeftIcon className="h-4 w-4 shrink-0" />

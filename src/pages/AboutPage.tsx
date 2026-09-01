@@ -5,6 +5,7 @@ import ProfileCard from '../components/ProfileCard'
 import RouteMeta from '../components/RouteMeta'
 import { ABOUT_PARAGRAPHS } from '../data/about'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useLocalizedTo } from '../i18n/useLocalizedTo'
 import type { Localized } from '../i18n/language'
 import { UI } from '../i18n/ui'
 import { CONTENT_CONTAINER } from '../lib/layout'
@@ -26,6 +27,7 @@ const PAGE_DESCRIPTION: Localized<string> = {
 export default function AboutPage() {
   const revealRoot = useReveal<HTMLElement>()
   const { language } = useLanguage()
+  const localizedTo = useLocalizedTo()
   const ui = UI[language]
 
   return (
@@ -36,10 +38,17 @@ export default function AboutPage() {
         image={profilePhoto}
         type="website"
       />
-      <main ref={revealRoot} id="main" className={CONTENT_CONTAINER}>
+      {/* tabIndex={-1} makes this a focus target for SkipLink: a fragment
+          link moves focus into its target only if the target can hold focus.
+          The outline is suppressed because this is not an interactive element
+          - it is a whole page region receiving programmatic focus, and a ring
+          drawn around the entire content area reads as a rendering fault. The
+          feedback a reader gets is the page jumping past the navbar and the
+          skip link disappearing. */}
+      <main ref={revealRoot} id="main" tabIndex={-1} className={`focus:outline-none ${CONTENT_CONTAINER}`}>
         <div className="py-16">
           <Link
-            to="/"
+            to={localizedTo('/')}
             className="mb-8 inline-flex items-center gap-2 rounded px-3 py-3 text-sm font-medium text-accent-base transition-colors duration-200 hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:text-accent-active"
           >
             <ArrowLeftIcon className="h-4 w-4 shrink-0" />

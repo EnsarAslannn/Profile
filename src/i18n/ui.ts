@@ -8,6 +8,7 @@ import type { Localized } from './language'
 // component wants one or two, and a flat key is what makes a missing
 // translation a compile error the moment the type is filled in.
 export type UiStrings = {
+  skipToContent: string
   navAriaLabel: string
   languageGroupAriaLabel: string
   languageSwitchTo: string
@@ -46,6 +47,7 @@ export type UiStrings = {
 
 export const UI: Localized<UiStrings> = {
   tr: {
+    skipToContent: 'İçeriğe geç',
     navAriaLabel: 'Bölüm gezinmesi',
     languageGroupAriaLabel: 'Dil seçimi',
     languageSwitchTo: 'Türkçe',
@@ -83,6 +85,7 @@ export const UI: Localized<UiStrings> = {
     rightsReserved: 'Tüm hakları saklıdır.',
   },
   en: {
+    skipToContent: 'Skip to content',
     navAriaLabel: 'Section navigation',
     languageGroupAriaLabel: 'Language selection',
     languageSwitchTo: 'English',
