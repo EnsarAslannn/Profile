@@ -51,4 +51,45 @@ describe('Navbar', () => {
     expect(header.className).toMatch(/\bsticky\b/)
     expect(header.className).toMatch(/\btop-0\b/)
   })
+
+  // The active-section underline. jsdom reports every rect as zero, so which
+  // link is current cannot be exercised here - useActiveSection.test.ts covers
+  // the choice and a browser covers the measuring. What IS checkable from
+  // here is the part that would silently regress: the reserved space, and the
+  // rule that nothing is marked current off the home route.
+  describe('active section underline', () => {
+    it('reserves the underline on every link, so switching cannot shift the row', () => {
+      const { container } = renderWithRouter(<Navbar />)
+      const links = Array.from(container.querySelectorAll('nav a'))
+
+      expect(links.length).toBeGreaterThan(0)
+      for (const link of links) {
+        // Painted or not, the 2px has to occupy space - otherwise the whole
+        // navbar jumps two pixels each time the reader scrolls into the next
+        // section.
+        expect(link.className).toMatch(/\bborder-b-2\b/)
+        expect(link.className).toMatch(/\bborder-transparent\b/)
+      }
+    })
+
+    it('marks no section current away from the home route', () => {
+      for (const route of ['/hakkimda', '/projects/dolfin']) {
+        const { container, unmount } = renderWithRouter(<Navbar />, route)
+        // Off the home route these six links navigate AWAY rather than
+        // describing where the reader is, so none of them is "current" -
+        // including İletişim, whose section the chrome renders on every route.
+        expect(container.querySelectorAll('nav a[aria-current]')).toHaveLength(0)
+        unmount()
+      }
+    })
+
+    // "page" would tell a screen reader the six links are six different
+    // pages. They are one page and six positions in it.
+    it('uses aria-current="location" and never "page" on a section link', () => {
+      const { container } = renderWithRouter(<Navbar />)
+      for (const link of Array.from(container.querySelectorAll('nav a'))) {
+        expect(link.getAttribute('aria-current')).not.toBe('page')
+      }
+    })
+  })
 })

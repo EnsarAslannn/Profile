@@ -1,10 +1,12 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import LanguageToggle from './LanguageToggle'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useLocalizedTo } from '../i18n/useLocalizedTo'
 import { UI } from '../i18n/ui'
-import { NAV_LINKS } from '../data/navigation'
+import { NAV_LINKS, NO_ANCHORS, SECTION_ANCHORS } from '../data/navigation'
 import { CONTENT_CONTAINER } from '../lib/layout'
 import { SITE_NAME } from '../lib/siteMeta'
+import { useActiveSection } from '../lib/useActiveSection'
 
 // Reinstated for the example.mp4 redesign (it had been removed in
 // five-owner-changes Task 4; the reference design has one and the owner asked
@@ -18,12 +20,31 @@ import { SITE_NAME } from '../lib/siteMeta'
 // <a href="#projeler">: clicked from /projects/dolfin, a bare hash would
 // produce the dead URL /projects/dolfin#projeler. Same reasoning the old
 // FooterNav carried.
+// `border-b-2` is on EVERY link, not just the active one: the underline has
+// to occupy its 2px whether or not it is painted, or the row would shift by
+// two pixels each time the reader scrolls from one section into the next.
+// Only the COLOUR changes, and that colour is written by the caller as
+// exactly one of two classes rather than as an override on a transparent
+// default - `border-transparent` and `border-accent-base` are both single
+// class selectors, so which one wins would come down to the order Tailwind
+// happened to emit them in. It emitted the transparent one last, and the
+// underline never painted at all. Measured in a browser; this is the same
+// cascade trap SkipLink's padding hit.
 const LINK_CLASS =
-  'inline-flex shrink-0 items-center rounded px-3 py-3 text-xs font-medium tracking-widest text-ink-strong uppercase transition-colors duration-200 hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:text-accent-active'
+  'inline-flex shrink-0 items-center rounded border-b-2 px-3 py-3 text-xs font-medium tracking-widest text-ink-strong uppercase transition-colors duration-200 hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:text-accent-active'
 
 export default function Navbar() {
   const { language } = useLanguage()
+  const localizedTo = useLocalizedTo()
+  const isHome = useLocation().pathname === '/'
   const ui = UI[language]
+
+  // Tracked only on the home route. Off it the six links navigate AWAY rather
+  // than describing where the reader is - İletişim is rendered on every route
+  // by the chrome, but clicking its link from /hakkimda leaves the page, so
+  // calling it "current" there would be a lie. The anchors are identical in
+  // both languages by the section contract, so this does not change with it.
+  const activeAnchor = useActiveSection(isHome ? SECTION_ANCHORS : NO_ANCHORS)
 
   return (
     // Still translucent - the ground reads THROUGH the bar and the blur is
@@ -41,8 +62,13 @@ export default function Navbar() {
       <div className={`flex items-center justify-between gap-4 py-3 ${CONTENT_CONTAINER}`}>
         <div className="flex shrink-0 items-center gap-3 sm:gap-4">
           <LanguageToggle />
+          {/* "page" here and "location" on the section links below, because
+              the two answer different questions: this one points at a ROUTE
+              and the router knows which route is open, while those point at
+              positions within one page. */}
           <Link
-            to="/"
+            to={localizedTo('/')}
+            aria-current={isHome ? 'page' : undefined}
             className="shrink-0 rounded text-sm font-bold tracking-tight text-ink-strong transition-colors duration-200 hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus sm:text-base"
           >
             {SITE_NAME}
@@ -57,16 +83,24 @@ export default function Navbar() {
           aria-label={ui.navAriaLabel}
           className="-mx-2 flex min-w-0 items-center gap-1 overflow-x-auto px-2 [scrollbar-width:none] lg:mx-0 lg:gap-2 lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden"
         >
-          {NAV_LINKS[language].map((link) => (
-            <Link
-              key={link.anchor}
-              to={{ pathname: '/', hash: `#${link.anchor}` }}
-              {...(link.lang ? { lang: link.lang } : {})}
-              className={LINK_CLASS}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {NAV_LINKS[language].map((link) => {
+            const current = link.anchor === activeAnchor
+            return (
+              <Link
+                key={link.anchor}
+                to={localizedTo({ pathname: '/', hash: `#${link.anchor}` })}
+                {...(link.lang ? { lang: link.lang } : {})}
+                // "location" and not "page": the page has not changed, the
+                // reader has moved within it. aria-current="page" here would
+                // tell a screen reader six different links are six different
+                // pages.
+                aria-current={current ? 'location' : undefined}
+                className={`${LINK_CLASS} ${current ? 'border-accent-base' : 'border-transparent'}`}
+              >
+                {link.label}
+              </Link>
+            )
+          })}
         </nav>
       </div>
     </header>

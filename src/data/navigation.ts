@@ -49,3 +49,16 @@ export const NAV_LINKS: Localized<NavLink[]> = {
     { anchor: 'iletisim', label: 'Contact' },
   ],
 }
+
+// The anchors alone, in page order, for the navbar's scrollspy (useActiveSection).
+//
+// Derived from the Turkish branch rather than from whichever language is
+// active, because the two are identical by the rule above - and derived at
+// all, rather than written out a second time, so a section added to NAV_LINKS
+// is tracked without a second edit. Module-level, so it is one array for the
+// life of the page instead of a new one per render.
+export const SECTION_ANCHORS: readonly string[] = NAV_LINKS.tr.map((link) => link.anchor)
+
+// The "track nothing" argument, off the home route. A shared frozen constant
+// rather than a fresh [] each render.
+export const NO_ANCHORS: readonly string[] = []
