@@ -7,6 +7,15 @@ export const SITE_NAME = 'Ensar Aslan'
 export const SITE_ROLE = 'Full Stack .NET Developer'
 export const DEFAULT_TITLE = `${SITE_NAME} | ${SITE_ROLE}`
 
+// The deployed origin, no trailing slash.
+//
+// canonical, og:url and the hreflang alternates all have to be ABSOLUTE, and
+// two of the three consumers cannot ask the browser for it: index.html is a
+// static file and scripts/build-seo-files.mjs runs in Node. So the origin is
+// written down once here and imported by everything that is able to import
+// it, rather than each place deriving its own from window.location.
+export const SITE_URL = 'https://ensaraslan.vercel.app'
+
 // Search engines truncate around 160 characters; going much past that just
 // wastes the snippet.
 const MAX_DESCRIPTION_LENGTH = 160
