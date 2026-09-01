@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { MemoryRouter, useNavigate } from 'react-router-dom'
+import { MemoryRouter, useLocation, useNavigate } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import ScrollToHash from './ScrollToHash'
 
@@ -64,4 +64,62 @@ describe('ScrollToHash', () => {
     fireEvent.click(screen.getByRole('button', { name: 'git' }))
     expect(scrollIntoView).toHaveBeenCalledTimes(2)
   })
+
+  // A language switch is a `replace` navigation that changes only the query
+  // string, and React Router mints a fresh location.key for it - so without
+  // the search-only guard below this component fires scrollTo(0, 0) and throws
+  // a reader who had scrolled down to Projeler straight back to the top.
+  it('does not scroll when a navigation changes only the query string', () => {
+    const scrollTo = vi.spyOn(window, 'scrollTo')
+
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <SwitchLanguage />
+        <ScrollToHash />
+      </MemoryRouter>,
+    )
+
+    const before = scrollTo.mock.calls.length
+    fireEvent.click(screen.getByRole('button', { name: 'EN' }))
+    expect(scrollTo.mock.calls.length).toBe(before)
+  })
+
+  it('does not re-scroll to the hash when a query-only navigation keeps it', () => {
+    // The same switch, but from a URL that already carries an anchor.
+    // Re-running scrollIntoView is less violent than jumping to the top, but
+    // it is still a jump the reader did not ask for - they may well have
+    // scrolled on past the anchor before reaching for the language control.
+    const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView')
+
+    render(
+      <MemoryRouter initialEntries={['/#projeler']}>
+        <section id="projeler">Projeler</section>
+        <SwitchLanguage />
+        <ScrollToHash />
+      </MemoryRouter>,
+    )
+
+    expect(scrollIntoView).toHaveBeenCalledTimes(1)
+    fireEvent.click(screen.getByRole('button', { name: 'EN' }))
+    expect(scrollIntoView).toHaveBeenCalledTimes(1)
+  })
 })
+
+// Shaped exactly like LanguageProvider.setLanguage: a replace navigation that
+// carries pathname and hash through untouched and only rewrites the search.
+function SwitchLanguage() {
+  const navigate = useNavigate()
+  const location = useLocation()
+  return (
+    <button
+      onClick={() =>
+        navigate(
+          { pathname: location.pathname, search: '?lang=en', hash: location.hash },
+          { replace: true },
+        )
+      }
+    >
+      EN
+    </button>
+  )
+}
