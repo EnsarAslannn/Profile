@@ -2,20 +2,32 @@ import { render } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it } from 'vitest'
 import RouteMeta from './RouteMeta'
+import { LanguageContext } from '../i18n/LanguageContext'
+import type { Language } from '../i18n/language'
 
 function metaContent(selector: string) {
   return document.head.querySelector<HTMLMetaElement>(selector)?.content
 }
 
-function renderMeta(props: Partial<React.ComponentProps<typeof RouteMeta>> = {}, route = '/') {
+function linkHref(selector: string) {
+  return document.head.querySelector<HTMLLinkElement>(selector)?.getAttribute('href')
+}
+
+function renderMeta(
+  props: Partial<React.ComponentProps<typeof RouteMeta>> = {},
+  route = '/',
+  language: Language = 'tr',
+) {
   return render(
     <MemoryRouter initialEntries={[route]}>
-      <RouteMeta
-        title="TakeAuction | Ensar Aslan"
-        description="Gerçek zamanlı, yüksek trafikli bir online açık artırma sistemi."
-        image="/assets/homePage-abc123.webp"
-        {...props}
-      />
+      <LanguageContext.Provider value={{ language, setLanguage: () => {} }}>
+        <RouteMeta
+          title="TakeAuction | Ensar Aslan"
+          description="Gerçek zamanlı, yüksek trafikli bir online açık artırma sistemi."
+          image="/assets/homePage-abc123.webp"
+          {...props}
+        />
+      </LanguageContext.Provider>
     </MemoryRouter>,
   )
 }
@@ -23,6 +35,7 @@ function renderMeta(props: Partial<React.ComponentProps<typeof RouteMeta>> = {},
 describe('RouteMeta', () => {
   afterEach(() => {
     document.head.querySelectorAll('meta').forEach((tag) => tag.remove())
+    document.head.querySelectorAll('link').forEach((tag) => tag.remove())
     document.title = ''
   })
 
@@ -60,6 +73,55 @@ describe('RouteMeta', () => {
     expect(metaContent('meta[property="og:url"]')).toBe(
       `${window.location.origin}/projects/takeauction`,
     )
+  })
+
+  // Each language version is canonical to ITSELF, and the two are tied
+  // together by the hreflang pair. Pointing English at the Turkish URL would
+  // tell a crawler the English site is a duplicate and should not be indexed
+  // - which is the opposite of why ?lang=en exists.
+  describe('canonical and hreflang', () => {
+    it('makes the Turkish version canonical to its bare path', () => {
+      renderMeta({}, '/hakkimda')
+      const origin = window.location.origin
+      expect(linkHref('link[rel="canonical"]')).toBe(`${origin}/hakkimda`)
+      expect(metaContent('meta[property="og:url"]')).toBe(`${origin}/hakkimda`)
+      expect(metaContent('meta[property="og:locale"]')).toBe('tr_TR')
+    })
+
+    it('makes the English version canonical to its own ?lang=en address', () => {
+      renderMeta({}, '/hakkimda', 'en')
+      const origin = window.location.origin
+      expect(linkHref('link[rel="canonical"]')).toBe(`${origin}/hakkimda?lang=en`)
+      expect(metaContent('meta[property="og:url"]')).toBe(`${origin}/hakkimda?lang=en`)
+      expect(metaContent('meta[property="og:locale"]')).toBe('en_US')
+    })
+
+    it('publishes both alternates and an x-default, in either language', () => {
+      const origin = window.location.origin
+      for (const language of ['tr', 'en'] as const) {
+        const { unmount } = renderMeta({}, '/projects/dolfin', language)
+        expect(linkHref('link[rel="alternate"][hreflang="tr"]')).toBe(
+          `${origin}/projects/dolfin`,
+        )
+        expect(linkHref('link[rel="alternate"][hreflang="en"]')).toBe(
+          `${origin}/projects/dolfin?lang=en`,
+        )
+        // Turkish is the site's original, so it is where a reader whose
+        // language matches neither is sent.
+        expect(linkHref('link[rel="alternate"][hreflang="x-default"]')).toBe(
+          `${origin}/projects/dolfin`,
+        )
+        unmount()
+      }
+    })
+
+    // The alternates are told apart by hreflang alone - three links, one rel.
+    // A canonical selector that ignored it would keep overwriting the same tag.
+    it('keeps the canonical link separate from the three alternates', () => {
+      renderMeta({}, '/')
+      expect(document.head.querySelectorAll('link[rel="alternate"]')).toHaveLength(3)
+      expect(document.head.querySelectorAll('link[rel="canonical"]')).toHaveLength(1)
+    })
   })
 
   it('restores the previous title and tag values on unmount', () => {
