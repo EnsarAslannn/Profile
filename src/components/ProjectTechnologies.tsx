@@ -8,15 +8,6 @@ type Props = {
   groups: readonly TechGroup[]
 }
 
-// A <dl> rather than the flat <ul> this replaced: each row is genuinely a
-// name (Backend) paired with its values, which is what a description list
-// means. The group label is a real <dt>, so a screen reader announces which
-// part of the stack it is reading instead of one undifferentiated run of
-// forty names.
-//
-// ink-body, never ink-muted: this block sits in the first viewport, where
-// ink-muted drops to ~3.90:1 against the PageBackdrop gradient's bluest
-// point - see CLAUDE.md's contrast rule.
 export default function ProjectTechnologies({ groups }: Props) {
   const { language } = useLanguage()
 

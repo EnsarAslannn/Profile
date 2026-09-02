@@ -36,13 +36,6 @@ export default function ProjectDetailPage() {
         image={ogImage}
         type="article"
       />
-    {/* tabIndex={-1} makes this a focus target for SkipLink: a fragment
-        link moves focus into its target only if the target can hold focus.
-        The outline is suppressed because this is not an interactive element
-        - it is a whole page region receiving programmatic focus, and a ring
-        drawn around the entire content area reads as a rendering fault. The
-        feedback a reader gets is the page jumping past the navbar and the
-        skip link disappearing. */}
     <main
       ref={revealRoot}
       id="main"
@@ -102,12 +95,6 @@ export default function ProjectDetailPage() {
           ))}
         </div>
 
-        {/* The "Ekranlar" heading above this list was removed at the owner's
-            request. ProjectScreens carries a localized aria-label in its
-            place, so the walkthrough is still announced as a named list -
-            dropping the heading must not mean dropping the name. It also
-            means this route now contributes no h2 of its own, which is why
-            ProjectDetailPage.test.tsx asserts İletişim is the only one left. */}
         <div className="mt-12 sm:mt-16">
           <ProjectScreens screens={project.screens} projectTitle={project.title} />
         </div>

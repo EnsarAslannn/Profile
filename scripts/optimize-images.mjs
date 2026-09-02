@@ -1,17 +1,3 @@
-// Converts project screenshots to web-sized WebP.
-//
-// Source screenshots come off a 2560px-wide display at 1-3 MB each, but the
-// content column never exceeds ~1280 CSS px, so shipping the originals wastes
-// roughly an order of magnitude of bandwidth on the page's LCP image.
-//
-// Usage (from the repo root):
-//   node scripts/optimize-images.mjs            # convert, keep the PNGs
-//   node scripts/optimize-images.mjs --delete   # convert, then delete the PNGs
-//
-// Quality was chosen by measuring PSNR against the losslessly-downscaled
-// original: q=75 -> 42.3 dB, q=88 -> 45.4 dB, q=94 -> 46.7 dB. Anything above
-// ~40 dB is considered visually lossless; 90 keeps fine UI text crisp while
-// still cutting the largest file from 3354 KB to well under 100 KB.
 import { readdir, stat, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import sharp from 'sharp'
@@ -21,14 +7,9 @@ const TARGET_WIDTH = 1600
 const QUALITY = 90
 const DELETE_ORIGINALS = process.argv.includes('--delete')
 
-// The profile photo lives at the root of src/assets (not in a project folder)
-// and is portrait, rendered at most ~384 CSS px wide in the sticky card, so it
-// gets its own narrower target: 800px still covers a 2x display.
 const PROFILE_SOURCE = 'src/assets/ea.jpg'
 const PROFILE_TARGET = 'src/assets/ea.webp'
 const PROFILE_TARGET_WIDTH = 640
-// Photographs tolerate more compression than UI screenshots, and the card
-// never renders wider than ~320 CSS px, so 640px at q80 is 2x coverage.
 const PROFILE_QUALITY = 80
 
 async function psnrAgainstOriginal(sourcePath, webpBuffer) {
@@ -98,7 +79,6 @@ console.log(
 console.log(`worst PSNR across all images: ${worstPsnr.toFixed(1)} dB (>40 dB is visually lossless)`)
 if (DELETE_ORIGINALS) console.log('original PNGs deleted')
 
-// --- Profile photo -----------------------------------------------------------
 try {
   const before = (await stat(PROFILE_SOURCE)).size
   const buffer = await sharp(PROFILE_SOURCE)

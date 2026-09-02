@@ -3,15 +3,6 @@ import { readFileSync } from 'node:fs'
 import { inflateSync } from 'node:zlib'
 import { CV_FILE, HERO_DESCRIPTION, HERO_IMAGES, HERO_PARAGRAPH, HERO_TITLE_LINES } from './hero'
 
-/**
- * The language a PDF declares for itself, from its catalogue's /Lang entry.
- *
- * Deliberately not a PDF library: the repo ships no PDF dependency and this
- * needs one field. The entry can sit in the raw file or inside an object
- * stream, so both are searched - the Turkish CV compresses its catalogue and
- * the English one does not, which is exactly the case a raw-bytes search
- * would silently miss.
- */
 function pdfLanguage(file: Buffer): string | undefined {
   const raw = file.toString('latin1')
   let searchable = raw
@@ -24,7 +15,6 @@ function pdfLanguage(file: Buffer): string | undefined {
     try {
       searchable += inflateSync(file.subarray(start, end)).toString('latin1')
     } catch {
-      // Not a Flate stream (an embedded font, an image). Nothing to read.
     }
   }
   return /\/Lang\s*\(([^)]*)\)/.exec(searchable)?.[1]
@@ -35,11 +25,6 @@ describe('hero data', () => {
     expect([...HERO_TITLE_LINES.tr]).toEqual(['ENSAR ASLAN', 'PORTFOLYO'])
   })
 
-  // The guard that keeps the hero honest. The segments exist only so the
-  // design's mixed weights can be painted; they must still be the owner's
-  // paragraph, character for character. A reworded fragment, a dropped space
-  // at a seam, or a "small improvement" to the copy all fail here rather than
-  // quietly changing what the site claims.
   it('joins back into the owner-supplied paragraph, exactly', () => {
     const joined = HERO_DESCRIPTION.tr.map((segment) => segment.text).join('')
     expect(joined).toBe(HERO_PARAGRAPH.tr)
@@ -56,15 +41,11 @@ describe('hero data', () => {
     }
   })
 
-  // The one English fragment in an otherwise Turkish sentence.
   it('declares the job title English', () => {
     const title = HERO_DESCRIPTION.tr.find((segment) => segment.text === '.NET Developer')
     expect(title?.lang).toBe('en')
   })
 
-  // A download button pointing at a missing file is a broken button, and
-  // nothing else in the build would notice: the path is a literal string, so
-  // neither TypeScript nor Vite can check it. This does.
   it('points each CV button at a PDF that is actually in public/', () => {
     for (const [language, path] of Object.entries(CV_FILE)) {
       expect(path.startsWith('/'), language).toBe(true)
@@ -74,19 +55,11 @@ describe('hero data', () => {
     }
   })
 
-  // Two languages, two documents - not one file linked twice. The PDFs also
-  // declare their own language, and a mismatch there is the failure that would
-  // hand an English reader the Turkish CV while every other check passed.
   it('serves a genuinely different CV per language, each declaring its own', () => {
     const tr = readFileSync(`public${CV_FILE.tr}`)
     const en = readFileSync(`public${CV_FILE.en}`)
     expect(CV_FILE.tr).not.toBe(CV_FILE.en)
     expect(tr.equals(en)).toBe(false)
-    // The /Lang entry is the PDF's own declaration of what language it is in,
-    // and it is the one thing that distinguishes these two files by CONTENT
-    // rather than by filename. Both documents are titled "ENSAR ASLAN" and
-    // both are one page; a copy-paste that pointed the English button at the
-    // Turkish PDF would pass every other check here.
     expect(pdfLanguage(tr)).toBe('tr')
     expect(pdfLanguage(en)).toBe('en')
   })
@@ -113,9 +86,6 @@ describe('hero data', () => {
     }
   })
 
-  // The ratios run from 0.75 to 1.83. That spread is the whole reason
-  // HeroGallery letterboxes instead of cropping to a single box - a crop that
-  // suits the portrait cuts the sides off the screenshots and vice versa.
   it('mixes portrait and landscape, which is why the gallery cannot crop', () => {
     const ratios = HERO_IMAGES.map((image) => image.width / image.height)
     expect(Math.min(...ratios)).toBeLessThan(0.8)

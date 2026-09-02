@@ -1,16 +1,6 @@
 import { DEFAULT_LANGUAGE, type Language } from '../i18n/language'
 import { UI } from '../i18n/ui'
 
-// Project screenshots are collected with a single import.meta.glob call
-// instead of one import per file, so dropping a new WebP into
-// src/assets/<slug>/ never requires a code change here.
-//
-// The glob only yields hashed URL strings, not image dimensions, so the two
-// exported dimension constants below are NOMINAL (1600x879), not measured
-// per file. CLS is actually reserved by the fixed aspect-ratio wrapper
-// (--aspect-project-cover in src/index.css), which does not depend on the
-// image at all - this is the sanctioned exception documented in CLAUDE.md's
-// Images section.
 export type ProjectImage = {
   name: string
   src: string
@@ -70,11 +60,6 @@ export function getProjectImages(folder: string, preferredOrder: readonly string
   return ordered
 }
 
-// Alt text for a screenshot. One call site: ProjectScreens (the detail-page
-// walkthrough). Index is zero-based; the rendered text is 1-based. Interim
-// until the owner supplies real per-screenshot Turkish alt text. Project
-// covers do not use this - they are decorative (alt="") because the card
-// link carries the accessible name.
 export function getProjectImageAlt(
   projectTitle: string,
   index: number,

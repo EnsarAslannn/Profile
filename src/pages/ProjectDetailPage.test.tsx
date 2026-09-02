@@ -11,15 +11,7 @@ describe('ProjectDetailPage', () => {
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1)
     expect(screen.getByRole('heading', { level: 1, name: 'DOLFIN' })).toBeInTheDocument()
     expect(screen.getByText('Finansal Portföy Yönetim Platformu')).toBeInTheDocument()
-    // 5 screenshots + 1 cover. getAllByRole('img') would miss the cover,
-    // whose alt="" removes it from the accessibility tree by design (the
-    // link/figure around it already carries the accessible name) - so the
-    // total is counted directly via querySelectorAll instead.
     expect(container.querySelectorAll('img')).toHaveLength(6)
-    // Sourced from the data, not re-typed: the wording is pinned once in
-    // src/data/projects/index.test.ts, and repeating it here would mean two
-    // places to update for one copy edit. What this asserts is the page's own
-    // job - that every paragraph reaches the DOM, as its own <p>, in order.
     const dolfin = getProjectBySlug('dolfin')!
     const paragraphs = [...container.querySelectorAll('main p')].map((p) => p.textContent)
     for (const paragraph of dolfin.description) {
@@ -48,13 +40,11 @@ describe('ProjectDetailPage', () => {
     const firstImage = images[0]
     const h1 = screen.getByRole('heading', { level: 1, name: 'DOLFIN' })
 
-    // DOM position: the cover node precedes the h1 node.
     expect(firstImage.compareDocumentPosition(h1) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
 
     expect(firstImage).toHaveAttribute('loading', 'eager')
     expect(firstImage).toHaveAttribute('fetchpriority', 'high')
     expect(firstImage).toHaveAttribute('alt', '')
-    // Derived, not repeated - see the note in ProjectCard.test.tsx.
     const cover = getProjectCover('dolfin')!
     expect(firstImage).toHaveAttribute('width', String(cover.width))
     expect(firstImage).toHaveAttribute('height', String(cover.height))
@@ -66,8 +56,6 @@ describe('ProjectDetailPage', () => {
       const link = screen.getByRole('link', { name: 'Projeyi aç' })
       expect(link).toHaveAttribute('href', getProjectBySlug(slug)!.liveUrl)
       expect(link).toHaveAttribute('target', '_blank')
-      // Without noopener the opened tab gets a handle on this one via
-      // window.opener; noreferrer keeps the referrer off the request.
       expect(link.getAttribute('rel')).toContain('noopener')
       expect(link.getAttribute('rel')).toContain('noreferrer')
       unmount()
@@ -84,9 +72,6 @@ describe('ProjectDetailPage', () => {
       dolfin.technologies.map((group) => group.label),
     )
 
-    // Each dd must carry that group's entries, separated by the aria-hidden
-    // dot. Stripping the dots is what proves the separator is decoration
-    // rather than part of a technology's name.
     const values = [...list!.querySelectorAll('dd')].map((dd) =>
       (dd.textContent ?? '')
         .split('·')
@@ -106,11 +91,6 @@ describe('ProjectDetailPage', () => {
     }
   })
 
-  // The route's own "Ekranlar" h2 was removed at the owner's request, so the
-  // only h2 left is İletişim - site chrome, rendered by App.tsx outside
-  // <Routes>, which lands on every page. The heading levels still have to run
-  // h1 -> h2 with nothing skipped, which is what makes this worth pinning
-  // rather than simply deleting.
   it('contributes no h2 of its own now that Ekranlar is gone', () => {
     renderWithRouter(<App />, '/projects/dolfin')
     const names = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
@@ -118,8 +98,6 @@ describe('ProjectDetailPage', () => {
     expect(screen.queryByText('Ekranlar')).toBeNull()
   })
 
-  // Removing the heading must not leave the walkthrough anonymous: the list
-  // keeps a localized accessible name in its place.
   it('still names the screenshot list for a screen reader', () => {
     renderWithRouter(<App />, '/projects/dolfin')
     expect(screen.getByRole('list', { name: 'Ekran görüntüleri' })).toBeInTheDocument()
@@ -148,7 +126,6 @@ describe('ProjectDetailPage', () => {
 
     const h1 = screen.getByRole('heading', { level: 1, name: 'DOLFIN' })
     expect(link.compareDocumentPosition(h1) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    // sanity: link is actually inside this page, not e.g. a stray global element
     expect(container.contains(link)).toBe(true)
   })
 
@@ -172,10 +149,6 @@ describe('ProjectDetailPage', () => {
   })
 
   it('points og:image at the project cover, not the first screenshot', () => {
-    // The cover became the LCP image and the social-preview art in this round.
-    // Without this assertion a regression back to screens[0] would be silent:
-    // the data test only proves cover.src differs from screens[0].src, not
-    // that the page actually wires the cover into RouteMeta.
     renderWithRouter(<App />, '/projects/dolfin')
 
     const ogImage = document.head.querySelector<HTMLMetaElement>('meta[property="og:image"]')?.content

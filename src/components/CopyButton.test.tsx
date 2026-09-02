@@ -36,16 +36,11 @@ describe('CopyButton', () => {
     fireEvent.click(screen.getByRole('button'))
 
     await waitFor(() => expect(writes).toEqual(['ensaraslannn@gmail.com']))
-    // The icon swap is invisible to a screen reader; the live region is what
-    // actually reports the outcome.
     await waitFor(() =>
       expect(screen.getByText('E-posta panoya kopyalandı')).toBeInTheDocument(),
     )
   })
 
-  // navigator.clipboard is undefined outside a secure context, and can reject
-  // if the user denies permission. Both are ordinary - the button must say so
-  // rather than showing a tick it did not earn.
   it('reports a failure instead of pretending it worked', async () => {
     setClipboard(null)
     render(<CopyButton value="a@b.com" label="E-posta" />)

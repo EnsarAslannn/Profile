@@ -3,10 +3,6 @@ import { PROJECTS } from '../data/projects'
 import { firstSentence, truncateForDescription } from './siteMeta'
 
 describe('firstSentence', () => {
-  // A literal, not a project description: the ".NET" lookahead is a property
-  // of firstSentence itself, and the descriptions no longer happen to contain
-  // ".NET" (the stack moved into the technologies list). Pinning the guard to
-  // whatever the copy currently says would let a copy edit quietly retire it.
   it('does not cut at the dot in ".NET"', () => {
     expect(firstSentence('.NET ve PostgreSQL ile geliştirildi. Sonra ikinci cümle gelir.')).toBe(
       '.NET ve PostgreSQL ile geliştirildi.',
@@ -18,7 +14,6 @@ describe('firstSentence', () => {
       const sentence = firstSentence(project.description[0])
       expect(project.description[0].startsWith(sentence)).toBe(true)
       expect(sentence.endsWith('.')).toBe(true)
-      // A cut at ".NET" would leave a fragment far shorter than a real sentence.
       expect(sentence.length).toBeGreaterThan(40)
     }
   })

@@ -1,8 +1,3 @@
-// Content here is owner-supplied. The Turkish is verbatim; the English is a
-// translation of that same copy, not a second draft of it - no claim appears
-// in one language that is absent from the other. Do not edit, embellish, or
-// add fields (tech-stack chips, dates, repo links) without the owner - see
-// CLAUDE.md's no-fabrication rule.
 import type { ProjectInput } from './index'
 
 export const dolfin: ProjectInput = {
@@ -13,10 +8,6 @@ export const dolfin: ProjectInput = {
     en: 'Financial Portfolio Management Platform',
   },
   liveUrl: 'https://dol-fin.com',
-  // Paragraphs, not one block: these descriptions run several hundred words
-  // now, and the detail page renders one <p> per entry. description[0] is
-  // also the source of the route's meta description, so it must stand alone
-  // as a summary of the whole project.
   description: {
     tr: [
       'Kullanıcıların sanal bir cüzdanla hisse senedi alıp satabildiği, portföylerinin dağılımını ve performansını izleyebildiği, hisse sayfalarına yorum bırakabildiği kurumsal odaklı bir finansal yönetim platformu. Uygulama harici bir piyasa verisi servisine bağlı değil. TSLA, NVDA, AAPL, GOOGL ve MSFT için elle hazırlanmış yerel bir veri seti üzerinde çalışıyor.',

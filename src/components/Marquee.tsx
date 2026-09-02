@@ -1,27 +1,5 @@
 import { MARQUEE_WORDS } from '../data/marquee'
 
-// The scrolling word strip that separates sections in the reference design.
-//
-// lang="en" is load-bearing: every entry is an English product or pattern
-// name, the strip is CSS-uppercased, and the document is lang="tr" where
-// casing maps i -> İ. Untagged, this renders ARCHİTECTURE and TESTCONTAİNERS.
-// See src/components/englishLabels.test.tsx.
-//
-// aria-hidden, and that is not laziness: the track renders its list TWICE
-// (see the --animate-marquee-x note in src/index.css - the duplicate is what
-// makes the wrap seamless), so a screen reader would read thirty technology
-// names through twice for no benefit. Nothing is lost: this is derived from
-// the Yetenekler section, which is on the page as real, readable content.
-//
-// The very low contrast is deliberate and matches the reference: decorative
-// texture, not content. WCAG 1.4.3's decorative-text exemption applies.
-//
-// The strip is the recessed light neutral, which makes it the SEAM between
-// two bands: it separates the deep-green Hakkimda from cream Projeler, and
-// then shares its ground with Stacks, which it leads into. The old
-// `border-y border-line-subtle` came off with it - a hairline drawn exactly
-// where deep green meets neutral reads as a mistake, and the colour change is
-// already the boundary.
 export default function Marquee() {
   return (
     <div

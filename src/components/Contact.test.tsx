@@ -23,8 +23,6 @@ describe('Contact', () => {
       'GitHub',
       'Konum',
     ])
-    // A dd holds more than the value now (a copy button's live region, the
-    // location note), so this asserts containment rather than equality.
     const values = Array.from(container.querySelectorAll('dd'))
     expect(values).toHaveLength(CONTACT_ROWS.tr.length)
     for (const [i, dd] of values.entries()) {
@@ -32,8 +30,6 @@ describe('Contact', () => {
     }
   })
 
-  // Owner's request: the address is copyable, not clickable. Neither the
-  // e-posta row nor konum may contain a link - only the two profile rows do.
   it('renders e-posta and konum as plain text, with no mailto', () => {
     const { container } = renderWithRouter(<Contact />)
     const email = CONTACT_ITEMS.tr.find((item) => item.id === 'email')!
@@ -62,8 +58,6 @@ describe('Contact', () => {
     }
   })
 
-  // The labels are CSS-uppercased and the page is lang="tr", where casing maps
-  // i -> İ: untagged, these render LİNKEDIN and GİTHUB.
   it('declares the English brand labels English, and the Turkish ones not', () => {
     const { container } = renderWithRouter(<Contact />)
     const byLabel = Object.fromEntries(
@@ -75,9 +69,6 @@ describe('Contact', () => {
     expect(byLabel['Konum'].getAttribute('lang')).toBeNull()
   })
 
-  // The phone number was dropped from the footer at the owner's request
-  // (five-owner-changes Task 5) and still lives in ProfileCard, now on
-  // /hakkimda. Adding rows must not quietly reinstate it.
   it('does not reinstate the phone number the owner removed from the footer', () => {
     const { container } = renderWithRouter(<Contact />)
     const phone = CONTACT_ITEMS.tr.find((item) => item.id === 'phone')!
@@ -92,15 +83,10 @@ describe('Contact', () => {
     for (const dt of labels) {
       const icon = dt.querySelector('svg')
       expect(icon).not.toBeNull()
-      // The label beside it already names the row; an announced icon would
-      // just be a second, worse name for the same thing.
       expect(icon!.getAttribute('aria-hidden')).toBe('true')
     }
   })
 
-  // The owner asked for the handle rather than the domain. Asserting the
-  // domain's absence is what stops a later "make it clearer" edit pasting the
-  // full URL back in.
   it('shows handles, not domains, for the profile rows', () => {
     const { container } = renderWithRouter(<Contact />)
     expect(container.textContent).toContain('/in/ensaraslannn')
@@ -122,9 +108,6 @@ describe('Contact', () => {
     expect(container.textContent).toContain('Remote çalışmaya açığım.')
   })
 
-  // The dot is decoration - the sentence beside it says the same thing - so
-  // it must not be announced, and its pulse must stop for a visitor who asked
-  // for less motion.
   it('shows the availability line with a decorative status dot', () => {
     const { container } = renderWithRouter(<Contact />)
     const line = screen.getByText(/Yeni fırsatlara açık/)
@@ -134,11 +117,8 @@ describe('Contact', () => {
     expect(container.innerHTML).toMatch(/motion-reduce:hidden/)
   })
 
-  // Removed at the owner's request: LinkedIn/GitHub/E-posta pills that
-  // duplicated three of the four rows directly above them.
   it('no longer repeats the profile links as footer pills', () => {
     const { container } = renderWithRouter(<Contact />)
-    // Every link left in the block is a row value.
     for (const link of Array.from(container.querySelectorAll('a'))) {
       expect(link.closest('dd')).not.toBeNull()
     }
@@ -150,15 +130,10 @@ describe('Contact', () => {
     expect(copyright.textContent).toBe(
       `© ${new Date().getFullYear()} ${SITE_NAME}. Tüm hakları saklıdır.`,
     )
-    // It used to be CSS-uppercased with a bullet separator; the owner asked
-    // for it softened.
     expect(copyright.className).not.toMatch(/\buppercase\b/)
     expect(container.textContent).not.toContain('•')
   })
 
-  // The old footer's oversized cursor-tracking wordmark was removed at the
-  // owner's request for this redesign. Asserting its absence keeps a later
-  // "bring back the nice bit" edit deliberate.
   it('renders no decorative wordmark', () => {
     const { container } = renderWithRouter(<Contact />)
     expect(container.querySelector('[data-wordmark]')).toBeNull()

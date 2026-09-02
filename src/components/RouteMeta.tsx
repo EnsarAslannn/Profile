@@ -5,25 +5,12 @@ import { LANGUAGE_PARAM } from '../i18n/language'
 import { DEFAULT_TITLE } from '../lib/siteMeta'
 
 type Props = {
-  /** Page title, already formatted (e.g. "TakeAuction | Ensar Aslan"). */
   title: string
-  /** Plain-text summary for <meta name="description"> and og:description. */
   description: string
-  /** Bundled asset URL for og:image / twitter:image. Resolved to absolute. */
   image: string
-  /** Open Graph type: "website" for the home page, "article" for a project. */
   type?: 'website' | 'article'
 }
 
-/**
- * Applies per-route metadata to the document head.
- *
- * IMPORTANT LIMITATION: this runs in the browser. Crawlers that execute
- * JavaScript (Google) will see these values, but social-preview scrapers
- * (LinkedIn, X, Slack, WhatsApp) read the raw HTML response and do not run
- * scripts - they will only ever see the static defaults in index.html.
- * Real per-route link previews need prerendering or SSG; see CLAUDE.md.
- */
 export default function RouteMeta({ title, description, image, type = 'website' }: Props) {
   const location = useLocation()
   const { language } = useLanguage()
@@ -35,11 +22,6 @@ export default function RouteMeta({ title, description, image, type = 'website' 
     const origin = window.location.origin
     const absoluteImage = image.startsWith('http') ? image : `${origin}${image}`
 
-    // The two language versions of this route. ?lang=en is the only address
-    // the English site has, so it is a distinct page rather than a duplicate:
-    // each version is canonical to ITSELF and the pair is tied together by
-    // the hreflang alternates below. Pointing English at the Turkish URL
-    // instead would be telling a crawler not to index it at all.
     const turkishUrl = `${origin}${location.pathname}`
     const englishUrl = `${turkishUrl}?${LANGUAGE_PARAM}=en`
     const canonical = language === 'en' ? englishUrl : turkishUrl
@@ -51,8 +33,6 @@ export default function RouteMeta({ title, description, image, type = 'website' 
       setMetaByProperty('og:image', absoluteImage),
       setMetaByProperty('og:type', type),
       setMetaByProperty('og:url', canonical),
-      // og:locale follows the language for the same reason <html lang> does:
-      // it tells a scraper which of the two versions it is looking at.
       setMetaByProperty('og:locale', language === 'en' ? 'en_US' : 'tr_TR'),
       setMetaByProperty('og:locale:alternate', language === 'en' ? 'tr_TR' : 'en_US'),
       setMetaByName('twitter:card', 'summary_large_image'),
@@ -62,8 +42,6 @@ export default function RouteMeta({ title, description, image, type = 'website' 
       setLink('canonical', null, canonical),
       setLink('alternate', 'tr', turkishUrl),
       setLink('alternate', 'en', englishUrl),
-      // x-default is where a crawler sends a reader whose language matches
-      // neither - Turkish, because it is this site's original.
       setLink('alternate', 'x-default', turkishUrl),
     ]
 
@@ -76,15 +54,6 @@ export default function RouteMeta({ title, description, image, type = 'website' 
   return null
 }
 
-/**
- * Sets a <link rel="..."> in the head, creating it if index.html does not
- * already ship one, and returns a function restoring the previous state -
- * the same contract upsertMeta keeps, and for the same reason: a route change
- * must not leave the previous route's canonical URL behind.
- *
- * `hreflang` is part of the key, not just an attribute: a page carries three
- * rel="alternate" links and they are told apart by nothing else.
- */
 function setLink(rel: string, hreflang: string | null, href: string) {
   const selector = hreflang
     ? `link[rel="${rel}"][hreflang="${hreflang}"]`
@@ -116,11 +85,6 @@ function setMetaByProperty(property: string, content: string) {
   return upsertMeta('property', property, content)
 }
 
-/**
- * Sets a meta tag, creating it if index.html does not already ship one, and
- * returns a function restoring the previous state so route changes cannot
- * leave a stale tag behind.
- */
 function upsertMeta(keyAttribute: 'name' | 'property', key: string, content: string) {
   const selector = `meta[${keyAttribute}="${key}"]`
   const existing = document.head.querySelector<HTMLMetaElement>(selector)

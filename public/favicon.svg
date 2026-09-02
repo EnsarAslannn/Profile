@@ -1,37 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="EA">
-  <!--
-    Ensar Aslan's monogram: cream EA on the palette's deep green.
-
-    The letterforms are PATHS, not <text>. A favicon drawn with <text> is
-    rendered in whatever font the viewing machine happens to have, so its
-    width and weight shift from browser to browser and the mark stops being
-    the same mark. Geometry renders identically everywhere.
-
-    Colours are the palette's own: #17352d is surface-base inside a dark tone
-    (the Hakkımda and Özgeçmiş bands), #f7f3ea is the cream page ground and
-    the ink-strong those bands carry. They measure 12.0:1 against each other,
-    which is what keeps the glyphs readable when a browser paints this into a
-    16px tab strip.
-
-    The letters fill ~53% of the tile's height rather than the ~40% a first
-    pass used. That was not a taste call: rendered at 16px the smaller mark
-    left so much dark padding that the glyphs closed up into a smudge. A
-    favicon is designed at the size it is actually painted, not at 512px.
-  -->
   <rect width="64" height="64" rx="14" fill="#17352d"/>
   <g fill="#f7f3ea">
-    <!-- E: stem plus three bars. The middle bar is shorter than the outer two,
-         the way a grotesque E is drawn, so the letter keeps its shape instead
-         of reading as a solid block once it is scaled down. -->
     <rect x="8" y="15" width="6.5" height="34"/>
     <rect x="8" y="15" width="20" height="6.5"/>
     <rect x="8" y="28.75" width="17" height="6.5"/>
     <rect x="8" y="42.5" width="20" height="6.5"/>
-    <!-- A: one evenodd path - the outer triangle, the counter above the
-         crossbar, and the gap between the legs below it. The stroke is heavy
-         relative to the letter's width, so the counter is small; at 16px it
-         closes up and the glyph reads as a solid A, which is still the right
-         shape. -->
     <path fill-rule="evenodd" d="M44 15 L56 49 L32 49 Z
                                  M44 35 L46.46 41.5 L41.54 41.5 Z
                                  M40.48 44.5 L47.52 44.5 L49.11 49 L38.89 49 Z"/>

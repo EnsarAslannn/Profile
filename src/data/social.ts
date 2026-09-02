@@ -11,10 +11,6 @@ export type SocialLink = {
   icon: ComponentType<{ className?: string }>
 }
 
-// The labels are the accessible names for icon-only links, so they are the
-// only text a screen-reader user gets here - they have to be in the reader's
-// language. The hrefs obviously do not translate, and contactRows.ts cuts the
-// visible handles straight out of them.
 export const SOCIAL_LINKS: Localized<SocialLink[]> = {
   tr: [
     {

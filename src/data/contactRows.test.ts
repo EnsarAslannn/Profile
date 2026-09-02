@@ -19,15 +19,9 @@ describe('CONTACT_ROWS.tr', () => {
     ])
   })
 
-  // Resolved from the existing data, never re-typed. A URL changed in
-  // src/data/social.ts has to move the visible text with it, or the row would
-  // display one address and link to another.
   it('derives every href and value from the existing contact and social data', () => {
     const email = CONTACT_ROWS.tr.find((row) => row.id === 'email')!
     expect(email.value).toBe(CONTACT_ITEMS.tr.find((item) => item.id === 'email')!.value)
-    // Copyable, not clickable (owner's request). CONTACT_ITEMS.tr still carries
-    // the mailto, which ProfileCard uses on /hakkimda - dropping it here must
-    // not drop it there.
     expect(email.href).toBeNull()
     expect(email.copyable).toBe(true)
     expect(CONTACT_ITEMS.tr.find((item) => item.id === 'email')!.href).toBe(
@@ -38,10 +32,6 @@ describe('CONTACT_ROWS.tr', () => {
     expect(location.value).toBe(CONTACT_ITEMS.tr.find((item) => item.id === 'location')!.value)
     expect(location.href).toBeNull()
 
-    // The owner asked for the handle on screen rather than the whole domain,
-    // and it is CUT FROM THE HREF - so a changed URL moves the visible text
-    // with it, and the row can never show one account while linking to
-    // another.
     for (const id of ['linkedin', 'github']) {
       const row = CONTACT_ROWS.tr.find((r) => r.id === id)!
       const social = SOCIAL_LINKS.tr.find((s) => s.id === id)!
@@ -67,8 +57,6 @@ describe('CONTACT_ROWS.tr', () => {
     ])
   })
 
-  // The labels are CSS-uppercased in a lang="tr" document, where casing maps
-  // i -> İ. Untagged, these two render LİNKEDIN and GİTHUB.
   it('tags the English brand labels, and only those', () => {
     expect(CONTACT_ROWS.tr.filter((row) => row.lang === 'en').map((row) => row.id)).toEqual([
       'linkedin',
@@ -76,8 +64,6 @@ describe('CONTACT_ROWS.tr', () => {
     ])
   })
 
-  // Dropped from the footer at the owner's request (five-owner-changes Task 5)
-  // and still on /hakkimda in ProfileCard. Adding rows must not smuggle it back.
   it('still leaves the phone number out', () => {
     expect(CONTACT_ROWS.tr.some((row) => row.id === 'phone')).toBe(false)
     expect(CONTACT_ROWS.tr.some((row) => row.href?.startsWith('tel:'))).toBe(false)

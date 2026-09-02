@@ -35,9 +35,6 @@ describe('PROJECTS.tr', () => {
     expect(PROJECTS.tr.find((p) => p.slug === 'altitudelog')?.description[0]).toBe(ALTITUDELOG_SUMMARY)
   })
 
-  // description[0] is what RouteMeta trims into the route's meta description,
-  // so it has to read as a standalone summary of the whole project rather
-  // than as the first instalment of a story the later paragraphs finish.
   it('gives every project a multi-paragraph description whose first paragraph can stand alone', () => {
     for (const project of PROJECTS.tr) {
       expect(project.description.length).toBeGreaterThan(1)
@@ -48,14 +45,6 @@ describe('PROJECTS.tr', () => {
     }
   })
 
-  // The owner asked for semicolons and colons to be taken out of the project
-  // copy. Rewriting the paragraphs once would have been a change a later edit
-  // could quietly undo, so the rule is pinned here instead - it covers the
-  // captions as well, because both fields render as prose on the same page and
-  // a reader does not know which field a sentence came from. Turkish joins
-  // clauses perfectly well with a full stop or a comma, so nothing is lost:
-  // every ';' became a sentence break and every ':' either a sentence break or
-  // a rephrase into a single clause.
   it('uses no semicolon or colon anywhere in the rendered project prose', () => {
     for (const project of PROJECTS.tr) {
       for (const paragraph of project.description) {
@@ -73,11 +62,6 @@ describe('PROJECTS.tr', () => {
     for (const project of PROJECTS.tr) {
       for (const paragraph of project.description) {
         expect(paragraph).not.toMatch(/\b(19|20)\d{2}\b/)
-        // URLs belong in liveUrl, never inline in prose - a bare URL in a
-        // paragraph would render as unclickable text and land in the meta
-        // description. Matches a real scheme, not the bare substring "http":
-        // "httpOnly cookie" is a correct technical term in the DOLFIN copy,
-        // and a substring match would reject it.
         expect(paragraph).not.toMatch(/https?:\/\//i)
         expect(paragraph).not.toMatch(/\bwww\./i)
       }
@@ -105,11 +89,6 @@ describe('liveUrl', () => {
 })
 
 describe('technologies', () => {
-  // Deliberately NOT a re-listing of all ~40 entries per project. That would
-  // be a copy of the data with no independent judgement in it: every real
-  // edit would fail it, so it would be updated reflexively rather than read.
-  // These assertions instead pin the shape, and spot-check the entries that
-  // distinguish one project's repo from another's.
   it('groups every project as Backend / Frontend / Test / Deployment, in that order', () => {
     for (const project of PROJECTS.tr) {
       expect(project.technologies.map((group) => group.label)).toEqual([
@@ -132,40 +111,24 @@ describe('technologies', () => {
     }
   })
 
-  // One distinctive entry per repo, so a copy-paste between project files
-  // shows up as a failure instead of quietly attributing one stack to another.
   it('carries the stack that is actually specific to each repo', () => {
     const items = (slug: string) =>
       PROJECTS.tr.find((p) => p.slug === slug)!.technologies.flatMap((group) => group.items)
 
-    // github.com/EnsarAslannn/TakeAuction - outbox over RabbitMQ and live
-    // bid push over SignalR.
     expect(items('takeauction')).toEqual(
       expect.arrayContaining(['RabbitMQ', 'MassTransit', 'SignalR']),
     )
-    // github.com/EnsarAslannn/AltitudELog - CQRS via MediatR, METAR enrichment
-    // on Hangfire, QuestPDF behind the logbook PDF export.
     expect(items('altitudelog')).toEqual(
       expect.arrayContaining(['MediatR', 'Hangfire', 'QuestPDF']),
     )
-    // github.com/EnsarAslannn/DOLFIN - Identity-backed auth and the L1+L2
-    // HybridCache tier.
     expect(items('dolfin')).toEqual(
       expect.arrayContaining(['ASP.NET Core Identity', 'HybridCache', 'Playwright']),
     )
-    // ...and each of those is genuinely specific: not present in the others.
     expect(items('dolfin')).not.toContain('RabbitMQ')
     expect(items('altitudelog')).not.toContain('RabbitMQ')
     expect(items('takeauction')).not.toContain('QuestPDF')
   })
 
-  // The owner asked for these to be dropped: Prometheus, OpenTelemetry, GSAP,
-  // Lenis, NSubstitute, k6 and CodeQL from TakeAuction, Respawn and
-  // NSubstitute from AltitudELog. Cleaning the technology lists was not
-  // enough - TakeAuction's closing paragraph went on naming three of them for
-  // a round afterwards, because prose and list are separate fields. The ban
-  // is checked across BOTH fields, for every project, so a name cannot come
-  // back through the door the first pass left open.
   it('names none of the technologies the owner removed, in a list or in prose', () => {
     const removed = [
       'Prometheus',

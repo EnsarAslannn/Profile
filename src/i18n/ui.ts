@@ -1,12 +1,5 @@
 import type { Localized } from './language'
 
-// Every interface string that is not owner content. Owner content - the about
-// copy, the projects, the timeline - stays in src/data/ beside its own type
-// and its own test; this file is only the chrome around it.
-//
-// One flat record rather than nested namespaces: there are forty of them, a
-// component wants one or two, and a flat key is what makes a missing
-// translation a compile error the moment the type is filled in.
 export type UiStrings = {
   skipToContent: string
   navAriaLabel: string

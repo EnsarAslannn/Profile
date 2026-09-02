@@ -12,13 +12,6 @@ import { CONTENT_CONTAINER } from '../lib/layout'
 import { SITE_NAME, truncateForDescription } from '../lib/siteMeta'
 import { useReveal } from '../lib/useReveal'
 
-// Where the Hakkımda section's "Tam metni oku" lands: the full four-paragraph
-// copy beside the profile card, the layout the home page carried before the
-// example.mp4 redesign moved the landing screen to a hero. Nothing new is
-// written here - it renders ABOUT_PARAGRAPHS whole, which is exactly what
-// "full version" means.
-// Derived, never hand-written - one description per language, each trimmed
-// from that language's own opening paragraph.
 const PAGE_DESCRIPTION: Localized<string> = {
   tr: truncateForDescription(ABOUT_PARAGRAPHS.tr[0].text),
   en: truncateForDescription(ABOUT_PARAGRAPHS.en[0].text),
@@ -38,13 +31,6 @@ export default function AboutPage() {
         image={profilePhoto}
         type="website"
       />
-      {/* tabIndex={-1} makes this a focus target for SkipLink: a fragment
-          link moves focus into its target only if the target can hold focus.
-          The outline is suppressed because this is not an interactive element
-          - it is a whole page region receiving programmatic focus, and a ring
-          drawn around the entire content area reads as a rendering fault. The
-          feedback a reader gets is the page jumping past the navbar and the
-          skip link disappearing. */}
       <main ref={revealRoot} id="main" tabIndex={-1} className={`focus:outline-none ${CONTENT_CONTAINER}`}>
         <div className="py-16">
           <Link
@@ -55,10 +41,6 @@ export default function AboutPage() {
             {ui.back}
           </Link>
 
-          {/* The same two-track grid the old home hero used: a fixed card
-              column and a prose column that absorbs all the slack. `min-w-0`
-              on the prose track is load-bearing - without it the long
-              paragraphs would refuse to shrink and blow the grid out. */}
           <div className="flex flex-col gap-10 lg:grid lg:grid-cols-[288px_minmax(0,1fr)] lg:items-start lg:gap-12 xl:grid-cols-[320px_minmax(0,1fr)] xl:gap-16">
             <div className="lg:sticky lg:top-28 lg:col-start-1">
               <ProfileCard />

@@ -6,7 +6,6 @@ import { UI } from '../i18n/ui'
 
 type Props = {
   value: string
-  /** What was copied, for the button's accessible name: "E-posta adresini kopyala". */
   label: string
 }
 
@@ -20,9 +19,6 @@ export default function CopyButton({ value, label }: Props) {
   const [state, setState] = useState<State>('idle')
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Clearing on unmount matters: the row lives in a revealed section, and a
-  // route change while the "Kopyalandı" state is showing would otherwise fire
-  // setState on a component that is gone.
   useEffect(() => () => {
     if (timer.current) clearTimeout(timer.current)
   }, [])
@@ -30,9 +26,6 @@ export default function CopyButton({ value, label }: Props) {
   const copy = async () => {
     if (timer.current) clearTimeout(timer.current)
     try {
-      // navigator.clipboard is undefined outside a secure context and can
-      // reject if the user denies permission - both are ordinary, so the
-      // button reports the failure instead of pretending it worked.
       if (!navigator.clipboard) throw new Error('clipboard unavailable')
       await navigator.clipboard.writeText(value)
       setState('copied')
@@ -58,9 +51,6 @@ export default function CopyButton({ value, label }: Props) {
           <CopyIcon className="h-4 w-4" />
         )}
       </button>
-      {/* The icon swap is invisible to a screen reader, and an aria-label that
-          changes after the click is announced unreliably. A polite live region
-          is what actually reports the outcome. */}
       <span aria-live="polite" className="sr-only">
         {state === 'copied' ? ui.copyAnnouncement(label) : ''}
         {state === 'failed' ? ui.copyFailedAnnouncement(label) : ''}

@@ -16,25 +16,12 @@ export default function About() {
   const ui = UI[language]
 
   return (
-    // The first deep-green band. `data-tone="dark"` is the WHOLE colour
-    // change: it redefines the role tokens for this subtree in src/index.css,
-    // so every ink-strong below becomes warm cream and the profile card's
-    // surface-raised becomes a lifted green, with not one class in here
-    // touched. It also paints the band, which is why there is no bg- utility.
-    //
-    // The section's old `border-t border-line-subtle` is gone, here and in
-    // every other section: a hairline drawn exactly where cream meets deep
-    // green reads as a seam, and the colour change is already the boundary.
     <section id="hakkimda" data-tone="dark" className="scroll-mt-24 py-20 sm:py-24">
       <div className={CONTENT_CONTAINER}>
         <div className="grid gap-12 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-16 xl:gap-24">
           <div>
             <SectionHeading title={ui.sectionAbout} />
 
-            {/* The reference drops a hairline from the heading into a small
-                identity card. The line is drawn with a border on a fixed-height
-                box rather than an <hr>: it is pure connective decoration, and an
-                <hr> would announce a thematic break that is not there. */}
             <div aria-hidden="true" className="ml-8 hidden h-16 w-px bg-line-strong lg:block" />
 
             <div
@@ -53,8 +40,6 @@ export default function About() {
               <p className="mt-4 text-xs font-semibold tracking-[0.2em] text-ink-strong uppercase">
                 {SITE_NAME}
               </p>
-              {/* lang="en": an English job title inside a lang="tr" document,
-                  rendered through CSS uppercase. See english-labels.test.tsx. */}
               <p lang="en" className="mt-1 text-xs tracking-widest text-ink-muted uppercase">
                 {SITE_ROLE}
               </p>

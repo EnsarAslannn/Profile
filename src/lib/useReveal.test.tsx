@@ -2,9 +2,6 @@ import { fireEvent, render, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { revealDelayClass, useReveal } from './useReveal'
 
-// jsdom does no layout, so every getBoundingClientRect() is a box of zeros -
-// i.e. "at the top of the viewport". Tests that care about position stub the
-// one element they are reasoning about and leave the rest at the default.
 const placeAt = (element: Element, top: number) => {
   element.getBoundingClientRect = () => ({ top }) as DOMRect
 }
@@ -34,8 +31,6 @@ describe('useReveal', () => {
   })
 
   it('holds an element below the fold back until it is scrolled to', async () => {
-    // Rendered, then pushed below the fold before the first sweep runs (it
-    // waits two animation frames, so this lands in time).
     const { getByTestId } = render(<Fixture />)
     const second = getByTestId('second')
     placeAt(second, 5000)
@@ -49,10 +44,6 @@ describe('useReveal', () => {
     await waitFor(() => expect(second.dataset.reveal).toBe('in'))
   })
 
-  // The reason this hook does not use IntersectionObserver. Jumping from the
-  // top of the page to the bottom takes elements from below the fold to above
-  // it without ever intersecting, and an observer's callback never fires for
-  // them - they stay invisible for the rest of the session.
   it('reveals an element that was scrolled clean past without ever being on screen', async () => {
     const { getByTestId } = render(<Fixture />)
     const second = getByTestId('second')
@@ -88,7 +79,6 @@ describe('revealDelayClass', () => {
     expect(revealDelayClass(0)).toBe('[--reveal-delay:0ms]')
     expect(revealDelayClass(2)).toBe('[--reveal-delay:160ms]')
     expect(revealDelayClass(5)).toBe('[--reveal-delay:400ms]')
-    // A seventh card must not fall off the end into undefined.
     expect(revealDelayClass(9)).toBe(revealDelayClass(5))
   })
 })

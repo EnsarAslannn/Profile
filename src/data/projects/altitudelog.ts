@@ -1,8 +1,3 @@
-// Content here is owner-supplied. The Turkish is verbatim; the English is a
-// translation of that same copy, not a second draft of it - no claim appears
-// in one language that is absent from the other. Do not edit, embellish, or
-// add fields (tech-stack chips, dates, repo links) without the owner - see
-// CLAUDE.md's no-fabrication rule.
 import type { ProjectInput } from './index'
 
 export const altitudelog: ProjectInput = {

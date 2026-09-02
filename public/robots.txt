@@ -1,6 +1,3 @@
-# Static, because it never varies. The sitemap beside it is generated after
-# the build (scripts/build-seo-files.mjs), since it has to list one URL per
-# project and that list lives in src/data/projects.
 User-agent: *
 Allow: /
 

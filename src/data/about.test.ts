@@ -45,11 +45,6 @@ describe('ABOUT_PARAGRAPHS.tr', () => {
 })
 
 describe('ABOUT_STATEMENT.tr', () => {
-  // The single sentence on this site that is not lifted verbatim from the
-  // owner. It is allowed to exist only because it states no new fact: the
-  // title is the one already shown in ProfileCard, and the adjectives are
-  // the owner's own. Both halves are pinned, so a rewrite that smuggles in a
-  // fresh claim ("5 yıllık deneyim", a framework nobody named) fails here.
   it('reads as one sentence and claims nothing new', () => {
     const joined = ABOUT_STATEMENT.tr.map((segment) => segment.text).join('')
     expect(joined).toBe(
@@ -69,9 +64,6 @@ describe('ABOUT_STATEMENT.tr', () => {
 })
 
 describe('ABOUT_TEASER.tr', () => {
-  // The section shows one paragraph before "Tam metni oku". Index 0 is the
-  // hero's and index 1 is what Yetenekler covers, so this is the first that
-  // repeats nothing already on the screen.
   it('is the tooling paragraph, so the home page never says the same thing twice', () => {
     expect(ABOUT_TEASER.tr.id).toBe('tooling')
     expect(ABOUT_TEASER.tr).toBe(ABOUT_PARAGRAPHS.tr[2])

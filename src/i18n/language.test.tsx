@@ -26,10 +26,6 @@ afterEach(() => {
 })
 
 describe('the two languages', () => {
-  // Both branches of every Localized record have to be filled in. TypeScript's
-  // Record<Language, T> already refuses a missing key, but it cannot see an
-  // English array that was left as a copy of the Turkish one - the commonest
-  // way a half-finished translation ships.
   it('translates every piece of owner content, rather than copying the Turkish', () => {
     expect(ABOUT_PARAGRAPHS.en.map((p) => p.text)).not.toEqual(
       ABOUT_PARAGRAPHS.tr.map((p) => p.text),
@@ -50,30 +46,21 @@ describe('the two languages', () => {
     }
   })
 
-  // The things that must NOT move. A translated anchor would break every link
-  // already shared, a translated slug would break every project URL, and a
-  // translated technology name would invent a product that does not exist.
   it('never translates an anchor, a slug, a URL or a technology name', () => {
     expect(NAV_LINKS.en.map((l) => l.anchor)).toEqual(NAV_LINKS.tr.map((l) => l.anchor))
     expect(PROJECTS.en.map((p) => p.slug)).toEqual(PROJECTS.tr.map((p) => p.slug))
     expect(PROJECTS.en.map((p) => p.liveUrl)).toEqual(PROJECTS.tr.map((p) => p.liveUrl))
     expect(PROJECTS.en.map((p) => p.title)).toEqual(PROJECTS.tr.map((p) => p.title))
     expect(PROJECTS.en.map((p) => p.technologies)).toEqual(PROJECTS.tr.map((p) => p.technologies))
-    // Dates are facts and never move.
     expect(ROADMAP_ENTRIES.en.map((e) => [e.start, e.end])).toEqual(
       ROADMAP_ENTRIES.tr.map((e) => [e.start, e.end]),
     )
-    // An employer with no English trading name keeps its registered one. The
-    // university is the deliberate exception - it publishes in English as
-    // Karabük University - and it is excluded here by id rather than by
-    // guessing, so a future entry has to be a considered decision too.
     const NAMED_ONLY_IN_TURKISH = ['brisa-staj', 'azr-staj']
     for (const id of NAMED_ONLY_IN_TURKISH) {
       const en = ROADMAP_ENTRIES.en.find((e) => e.id === id)
       const tr = ROADMAP_ENTRIES.tr.find((e) => e.id === id)
       expect(en?.organization, id).toBe(tr?.organization)
     }
-    // The handles are cut from the hrefs, so they cannot drift per language.
     expect(CONTACT_ROWS.en.map((r) => [r.value, r.href])).toEqual(
       CONTACT_ROWS.tr.map((r) => [r.value, r.href]),
     )
@@ -104,8 +91,6 @@ describe('LanguageToggle', () => {
     expect(screen.getByRole('button', { name: 'English' })).toHaveAttribute('aria-pressed', 'false')
   })
 
-  // Both stay in the tab order. A disabled active button would drop out of it,
-  // leaving a keyboard user with no way to hear which language they are in.
   it('keeps both controls reachable, marking the active one pressed', () => {
     render(
       <MemoryRouter>
@@ -136,14 +121,9 @@ describe('switching language', () => {
     )
     expect(screen.getByRole('heading', { name: UI.en.sectionProjects })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: UI.tr.sectionProjects })).not.toBeInTheDocument()
-    // Contact is rendered outside <Routes>, so this is also the check that the
-    // provider sits above the chrome and not merely above the page.
     expect(screen.getByRole('heading', { name: UI.en.sectionContact })).toBeInTheDocument()
   })
 
-  // CSS text-transform is locale-aware and Turkish maps i -> İ. Every
-  // uppercased label on the site depends on this attribute following the
-  // language, and nothing else on the page can compensate for it.
   it('moves the document lang attribute, which the uppercase casing depends on', () => {
     renderApp()
     expect(document.documentElement.lang).toBe('tr')
@@ -161,8 +141,6 @@ describe('switching language', () => {
     expect(window.localStorage.getItem(LANGUAGE_STORAGE_KEY)).toBe('en')
   })
 
-  // What makes an English page shareable at all. Without it the translation
-  // would be invisible to anyone the owner sends a link to.
   it('opens in the language the URL asks for, whatever was remembered', () => {
     window.localStorage.setItem(LANGUAGE_STORAGE_KEY, 'tr')
     renderApp('/?lang=en')

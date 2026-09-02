@@ -10,9 +10,6 @@ describe('getProjectCover', () => {
     }
   })
 
-  // Read back off the written .webp files, not computed - these exist to
-  // reserve the right space before the image loads, so a value that merely
-  // looks plausible is worse than no value at all.
   it('has the exact measured dimensions per project', () => {
     expect(getProjectCover('dolfin')).toMatchObject({ width: 1600, height: 2162 })
     expect(getProjectCover('takeauction')).toMatchObject({ width: 1375, height: 905 })

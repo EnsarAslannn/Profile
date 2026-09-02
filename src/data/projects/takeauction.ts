@@ -1,8 +1,3 @@
-// Content here is owner-supplied. The Turkish is verbatim; the English is a
-// translation of that same copy, not a second draft of it - no claim appears
-// in one language that is absent from the other. Do not edit, embellish, or
-// add fields (tech-stack chips, dates, repo links) without the owner - see
-// CLAUDE.md's no-fabrication rule.
 import type { ProjectInput } from './index'
 
 export const takeauction: ProjectInput = {
@@ -19,11 +14,6 @@ export const takeauction: ProjectInput = {
       'Teklif sistemi proxy mantığıyla çalışıyor. Kullanıcı bir fiyat değil, kimseye görünmeyen bir üst limit giriyor. Sistem onun adına yalnızca liderliği almaya yetecek kadar artırıyor. Kazanan, harcamaya razı olduğu tutarı değil, bir sonraki en yüksek tavanın bir artış payı üstünü ödüyor. Tavan değerleri hiçbir uçta ifşa edilmiyor. Ne detay yanıtında, ne teklif geçmişinde, ne de canlı bağlantı üzerinden görünüyor.',
       'Olay yayını Transactional Outbox deseniyle kurgulandı. Bir teklif ile onu duyuran olay aynı veritabanı işleminde yazılıyor, böylece sistemin "teklif kaydedildi ama kimseye haber verilmedi" durumuna düşmesi mümkün olmuyor. Arka plandaki dağıtıcı bu olayları RabbitMQ\'ya taşıyor, işlem tamamlandığı anda uyanıyor ve ayrıca periyodik olarak tarıyor. Kilitleri atlamalı olarak aldığı için birden fazla API kopyası aynı mesajı iki kez göndermiyor. Anlık teklif bildirimleri istemciye SignalR üzerinden ulaşıyor.',
       'Her lot, kapanması gereken saniye için kendi kapanışını önceden planlıyor. Periyodik tarama yalnızca kaybolan planlamalar için güvenlik ağı olarak duruyor. Kapanış idempotent olduğu için hangi tetikleyici ikinci gelirse gelsin lotu zaten kapanmış buluyor. Kapanış penceresine denk gelen bir teklif bitiş saatini eski bitişe göre değil kendi üzerine ileri itiyor, böylece son saniye teklifleri üst üste birikmiyor ve her biri aynı yanıt süresini alıyor.',
-      // Bu paragraf, sahibi OpenTelemetry / Prometheus / k6'yı teknoloji
-      // listesinden kaldırdığı için yeniden yazıldı. Anlatılan davranış
-      // (neyin ölçüldüğü, yükün nasıl doğrulandığı) deponun kendi belgesinden
-      // geliyor ve duruyor, araç adları ise artık geçmiyor. Listeden çıkarılmış
-      // bir aracı README'de görüp buraya geri yazma.
       'Sistem yalnızca çalışmakla kalmıyor, ölçülüyor. Eşzamanlılık çakışmaları, bir teklifin kaç denemede sonuçlandığı, uçtan uca teklif süresi ve olay kuyruğunun yetişip yetişmediği ölçüm altyapısına aktarılıyor. Her şeyin önünde duran nginx ağ geçidi hem yönlendirmeyi hem de ilk hız sınırlama katmanını üstleniyor. Yük altındaki davranış ise sürekli entegrasyonda çalışan bir teklif çakışması senaryosuyla doğrulanıyor.',
     ],
     en: [

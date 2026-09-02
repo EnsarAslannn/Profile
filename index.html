@@ -5,38 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ensar Aslan | Full Stack .NET Developer</title>
 
-    <!-- Icons. The SVG is the source of truth and every modern browser tab
-         takes it; the PNGs are generated from it by scripts/make-icons.mjs
-         for iOS home-screen bookmarks and the manifest, which do not accept
-         an SVG. theme-color is surface-base, the page's own warm cream. -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#f7f3ea" />
 
-    <!--
-      Static defaults. RouteMeta overwrites the title, description, canonical
-      and social tags per route at runtime, which JavaScript-executing
-      crawlers (Google) will see - but social-preview scrapers (LinkedIn, X,
-      Slack, WhatsApp) read this raw HTML and never run scripts, so THESE
-      values are what a shared link actually shows. og:image in particular is
-      only ever this one: a hashed bundle URL cannot be written into a static
-      file, which is why /og.jpg is a build artefact in public/ instead
-      (scripts/make-og-image.mjs).
-
-      scripts/build-seo-files.mjs rewrites the per-route copies of this file
-      in dist/ after the build, so a scraper hitting /hakkimda or
-      /projects/dolfin gets that route's own tags rather than these.
-    -->
     <meta
       name="description"
       content="Ensar Aslan - Full Stack .NET Developer. Ağırlıklı olarak C#, .NET ve React kullanarak projeler geliştiriyorum."
     />
     <link rel="canonical" href="https://ensaraslan.vercel.app/" />
 
-    <!-- The two language versions of the same URL. ?lang=en is not a
-         convenience parameter - it is the only address the English site has,
-         so without these a crawler has no way to discover it. -->
     <link rel="alternate" hreflang="tr" href="https://ensaraslan.vercel.app/" />
     <link rel="alternate" hreflang="en" href="https://ensaraslan.vercel.app/?lang=en" />
     <link rel="alternate" hreflang="x-default" href="https://ensaraslan.vercel.app/" />
@@ -67,19 +46,6 @@
     />
     <meta name="twitter:image" content="https://ensaraslan.vercel.app/og.jpg" />
 
-    <!--
-      Person structured data, static for the same reason the tags above are:
-      it describes the site's subject, which does not change per route.
-
-      Every value is already on the page or in src/data - the name and role
-      from siteMeta, the profile links from social.ts, the alumni entry from
-      the Özgeçmiş timeline. The e-mail address is deliberately NOT among
-      them: it is already on the page as plain text for a reader, and there is
-      no reason to hand harvesters a machine-readable copy as well. Nothing here is asserted that the site does not
-      say out loud somewhere, which is the whole rule for structured data:
-      markup that claims more than the page does is what gets a rich result
-      pulled.
-    -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",

@@ -31,9 +31,6 @@ describe('Hero', () => {
     )
   })
 
-  // A plain <a download>, not a router link: the CV is a static file in
-  // public/, and without the download attribute the browser would navigate
-  // the tab to a PDF viewer instead of saving it.
   it('offers the CV as a download rather than a navigation', () => {
     renderWithRouter(<Hero />)
     const cv = screen.getByRole('link', { name: /CV indir/ })
@@ -42,9 +39,6 @@ describe('Hero', () => {
     expect(cv.getAttribute('target')).toBeNull()
   })
 
-  // An English reader must not be handed the Turkish CV. They are two
-  // different documents (see hero.test.ts), so the button has to follow the
-  // language and not merely the label.
   it('serves the English CV when the page is in English', () => {
     render(
       <MemoryRouter>
@@ -60,9 +54,6 @@ describe('Hero', () => {
     expect(cv).toHaveAttribute('download')
   })
 
-  // The paragraph is the owner's own Hakkımda opening, split for emphasis.
-  // Rendering it segment-by-segment must still read as one continuous
-  // sentence - a stray space or a dropped fragment would only show up here.
   it('reads out as the owner-supplied paragraph, uninterrupted', () => {
     const { container } = renderWithRouter(<Hero />)
     const paragraph = container.querySelector('p')
@@ -75,15 +66,10 @@ describe('Hero', () => {
       img.getAttribute('src'),
     )
     for (const image of HERO_IMAGES) {
-      // Two columns, two copies each - but the columns hold different
-      // subsets, so the guarantee is "at least twice", never "exactly once".
       expect(sources.filter((src) => src === image.src).length).toBeGreaterThanOrEqual(2)
     }
   })
 
-  // The whole collage is decoration; the owner's name is the h1 and both
-  // screenshots are real content in Projeler. Every tile is also rendered
-  // twice, so exposing them would mean hearing the same list through twice.
   it('hides the decorative gallery from screen readers and gives no image an alt text', () => {
     const { container } = renderWithRouter(<Hero />)
     const images = Array.from(container.querySelectorAll('img'))

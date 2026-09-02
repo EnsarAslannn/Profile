@@ -13,9 +13,6 @@ export type ContactItem = {
   icon: ComponentType<{ className?: string }>
 }
 
-// Only the labels translate. The values are an e-mail address, a phone
-// number and a place name - none of them prose, and the location reads the
-// same either way.
 const items = (labels: { email: string; phone: string; location: string }): ContactItem[] => [
   {
     id: 'email',

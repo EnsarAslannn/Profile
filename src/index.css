@@ -1,201 +1,43 @@
-/* source(".") limits Tailwind's automatic content detection to src/, so class
-   names inside .agents/skills/ data files never leak into the bundle. */
 @import "tailwindcss" source(".");
 
-/* Semantic tokens for the cream / deep-green editorial palette (owner's
-   brief, this round). It replaces the blue-accent light theme wholesale - no
-   blue survives anywhere in the token layer, which is what makes the swap a
-   one-file edit rather than a sweep across every component.
-
-   Tokens are named by ROLE, not by literal colour, and that is now doing real
-   work rather than being a promise: the site alternates cream, deep-green and
-   light-neutral BANDS, and the dark band is expressed as a scoped
-   redefinition of these same variables (see the [data-tone='dark'] block
-   below the @theme). A component writes text-ink-strong once and gets
-   near-black on cream and warm cream on deep green, with no variant classes
-   and no second component tree. Introducing a literal-colour token here
-   (sage-500, green-800) would break exactly that, which is why the rule
-   against them stands. */
 @theme {
-  /* Surfaces - the three light bands, in order of recession.
-     surface-base is the warm cream the page rides on and the colour of the
-     hero, Projeler and Iletisim bands. surface-raised is the soft white cards
-     sit on: only a few points off cream on purpose, so a card is separated by
-     its hairline border rather than by a tonal jump (the owner asked for
-     borders over shadows). surface-sunken is the light neutral one step
-     BELOW the page ground - it is the Stacks band, the Marquee strip, and the
-     letterbox guard behind an image whose ratio does not exactly fill its
-     reserved box; those are the same role, a recessed neutral. */
-  --color-surface-base: #f7f3ea; /* warm cream - page ground, hero/projects/contact band */
-  --color-surface-raised: #fcfcf9; /* soft white - cards */
-  --color-surface-sunken: #e9e9e5; /* light neutral - stacks band, marquee, letterbox guard */
+  --color-surface-base: #f7f3ea;
+  --color-surface-raised: #fcfcf9;
+  --color-surface-sunken: #e9e9e5;
 
-  /* Lines. line-subtle is the owner's border colour and is purely decorative
-     (card hairlines, dividers, the navbar's underline); WCAG 1.4.11 exempts
-     it. line-strong is a real UI boundary (icon-link ring, the chip outline
-     on a roadmap card) and clears 3:1 on every surface it appears on: 4.87:1
-     on surface-base, 5.00:1 on surface-raised, 4.43:1 on surface-sunken. */
   --color-line-subtle: #d9dcd7;
   --color-line-strong: #686b68;
 
-  /* Ink. ink-strong is the owner's main black for headings and navigation
-     (15.4:1 on surface-base, 15.8:1 on surface-raised, 15.0:1 on
-     surface-sunken). ink-body is the owner's secondary gray taken a few steps
-     darker for running copy - 7.65:1 on cream, 6.96:1 on the neutral band -
-     because body text is the one role with no margin to spare. ink-muted IS
-     the owner's #686b68 exactly, for de-emphasised labels and captions:
-     4.87:1 on cream, 5.00:1 on soft white. It measures 4.43:1 on
-     surface-sunken, which is under the 4.5:1 floor - so ink-muted must not be
-     used for text sitting on the light-neutral band (Skills.tsx's ordinal
-     numbers use ink-body for exactly this reason). */
   --color-ink-strong: #111111;
   --color-ink-body: #4a4e4a;
   --color-ink-muted: #686b68;
 
-  /* Section headings, and the only ink role that is NOT a neutral. The owner
-     asked for PROJELER / STACKS / ILETISIM in the deep green rather than the
-     main black, which turns the h2 scale into the palette's second voice -
-     the page's biggest type carries the brand colour, and near-black is left
-     to do the reading. 12.0:1 on cream, 10.9:1 on the neutral band.
-
-     It is one token rather than three per-section classes because the dark
-     bands have to answer it: HAKKIMDA and OZGECMIS cannot be deep green on
-     deep green, so the tone scope maps this to warm cream and those two
-     headings keep the colour they already had. SectionHeading writes
-     text-ink-heading once and every band is correct. */
   --color-ink-heading: #17352d;
 
-  /* Accent - muted sage, replacing the blue outright. TWO steps, because one
-     sage cannot do both jobs and the arithmetic is what says so:
-
-     accent-soft is the sage FILL - the active language pill and the hover bar
-     on a project card. It carries accent-ink (near-black) on top at 5.11:1.
-     The buttons and the hero wordmark used to live here too and have since
-     moved to cta-* and ink-heading respectively, so this family now marks
-     only the quiet highlights.
-     accent-base is the READABLE accent - link text, icons, the focus ring -
-     at 5.33:1 on cream and 4.85:1 on the neutral band. hover and active go
-     darker still, the light-theme direction (a lighter tint fades toward
-     invisible on a pale ground).
-
-     accent-soft is the owner's #8fa58f taken one step deeper, which began as
-     a contrast fix: #8fa58f measures 2.39:1 against cream, and as the hero's
-     "PORTFOLYO" wordmark - large text, 3:1 floor - it failed. The wordmark has
-     since moved to ink-heading at the owner's request, so that particular
-     pressure is off, but the deeper value stays: it is what keeps accent-ink
-     legible on the fills that remain. The owner's exact #8fa58f survives as
-     the dark band's accent-active, where the ground is deep green and it
-     measures 5.03:1. */
-  --color-accent-soft: #748b74; /* sage fill - the language pill, a card's hover bar */
-  --color-accent-ink: #111111; /* the ink that sits ON an accent-soft fill */
-  --color-accent-base: #4f6b52; /* deep sage - links, icons, resting state */
+  --color-accent-soft: #748b74;
+  --color-accent-ink: #111111;
+  --color-accent-base: #4f6b52;
   --color-accent-hover: #3d5540;
   --color-accent-active: #2c3e2f;
 
-  /* The primary call to action - its own family, deliberately NOT the accent.
-     The owner asked for the deep green with a white label, and reusing
-     accent-soft for it would have dragged the two other things that fill with
-     accent-soft along: a project card's hover bar, which is meant to be a
-     subtle sage highlight rather than a strong block of colour, and the active
-     language pill. A button this emphatic is a different role from a quiet
-     highlight, so it gets different tokens.
-
-     hover goes LIGHTER here, inverted from the accent scale above. That is
-     forced rather than chosen: cta-base is already near the dark end of the
-     palette, so a darker hover reads as black rather than as a state change.
-     White measures 13.3:1 on base, 9.5:1 on hover and 15.9:1 on active. */
   --color-cta-base: #17352d;
   --color-cta-hover: #244d40;
   --color-cta-active: #0f261f;
   --color-cta-ink: #ffffff;
 
-  /* Focus - kept decoupled from accent-base so the ring's contrast can be
-     tuned without dragging every accent-coloured link along with it, even
-     though the two currently share a value. 5.33:1 on cream, 4.85:1 on the
-     neutral band, 5.18:1 on the backdrop wash - all above the 3:1 floor. */
   --color-focus: #4f6b52;
 
-  /* Gradient stops for PageBackdrop (src/components/PageBackdrop.tsx). The
-     old blue-100 wash is gone; what is left is a barely-there cool-sage
-     breath over the cream, which is what the owner asked a gradient to be.
-     backdrop-to is the EXACT hex of surface-base, not merely a similar light
-     colour - that identity is what makes the fade disappear into the flat
-     page ground instead of leaving an edge where the element ends.
-
-     Because the wash is now this close to cream, the old caveat that
-     ink-muted fails against backdrop-from no longer holds: ink-muted measures
-     4.73:1 at the gradient's strongest point, ink-body 7.43:1 and accent-base
-     5.18:1. Nothing on this site is unsafe on the bare page ground any more. */
   --color-backdrop-from: #eff1ea;
-  --color-backdrop-to: #f7f3ea; /* = surface-base, by design */
+  --color-backdrop-to: #f7f3ea;
 
-  /* Availability status. A role name, not a colour name - it marks 'open to
-     work'. Pulled into the sage family so it stops reading as a stray
-     saturated green beside a muted palette; it is only ever a small dot next
-     to a sentence that says the same thing, so it is not held to a text
-     contrast floor, and it clears the 3:1 non-text floor on cream (3.87:1). */
   --color-status-open: #5b8460;
 
-  /* Project screenshot ratio - nominal 1600x879 (see src/data/projectImages.ts),
-     simplified to 253/139 (~1.82:1). Used only by ProjectScreens (the narrated
-     detail-page walkthrough) for its per-screenshot figures - NOT by
-     ProjectCard and NOT by any project cover. Built-in aspect-video
-     (16/9 = 1.778) is measurably off this ratio, which is why an arbitrary
-     value is used at all.
-
-     Covers (src/data/projectCovers.ts) do NOT use this token, and still
-     never will - see five-owner-changes Task 3 for why. Below the `md:`
-     mosaic breakpoint a cover renders unprefixed `w-full h-auto`, at its own
-     true measured ratio, uncropped - a phone sees each screenshot whole.
-     At `md:` and up the mosaic `<ul>` (Projects.tsx) becomes a two-row grid
-     (`md:grid-rows-[1fr_1fr]`) sized by `md:aspect-[1600/1081]` on the `<ul>`
-     itself - an approximation of half the featured cover's own 1600x2161
-     ratio (2161/1600/2 ~= 0.6756, rounded to the clean 1600/1081 pair), close
-     enough that the featured crop stays small, exact only up to the row-gap
-     term the approximation ignores. Every cover `<img>` then fills its grid
-     cell with `md:h-full md:w-full md:object-cover md:object-center`, so
-     covers ARE cropped at `md:`+ - this is the opposite of what this file
-     used to say ("must keep their own silhouettes"). CLS is still prevented,
-     just by a different mechanism: the grid's own definite height (from the
-     `aspect-[]` utility) reserves the space before any image decodes, not
-     the covers' individual width/height attributes - those attributes stay
-     on the img tags for the natural-ratio mobile case and for the detail
-     page's LCP figure, where they still do the reserving directly. */
   --aspect-project-cover: 253 / 139;
 
-  /* Marquee motion for the example.mp4 redesign: one horizontal text strip
-     between sections, and the hero's two image columns drifting in opposite
-     directions. Registered as @theme --animate-* tokens rather than bare CSS
-     classes so they stay real Tailwind utilities (animate-marquee-x, etc.)
-     and compose with motion-reduce:animate-none like any other utility -
-     CLAUDE.md's utility-first rule with no @apply.
-
-     Every track renders its content TWICE and travels exactly 50%, which is
-     what makes the wrap seamless: at -50% the second copy sits precisely
-     where the first started, so the reset is invisible. Changing one without
-     the other (a third copy, a different distance) produces a visible jump. */
-  /* The image columns are deliberately much slower than the word strip, and
-     the gap widened when the gallery went from three images to six: twice the
-     tiles means twice the travel distance, so the same duration would have
-     doubled the apparent speed. 150s is slower per pixel than the 52s the
-     three-image version ran at, which is what the owner asked for - change
-     the image count and this number has to move with it. */
-  /* Same coupling as the columns below: the strip lists every technology, so
-     its track length follows src/data/skills.ts. Adding technologies without
-     raising this speeds the strip up. */
   --animate-marquee-x: marquee-x 115s linear infinite;
   --animate-drift-up: drift-up 95s linear infinite;
   --animate-drift-down: drift-down 95s linear infinite;
 
-  /* The rotating sweep behind a GlowButton's rim
-     (src/components/ui/GlowButton.tsx). Registered here rather than as the
-     inline <style> block the component was supplied with: a <style> tag
-     re-declares the same @keyframes once per rendered instance, and
-     CLAUDE.md's utility-first rule wants the animation addressable as a real
-     Tailwind utility so it composes with motion-reduce:animate-none like
-     every other one. 4s is the supplied duration, kept as-is - unlike the
-     marquee tokens above it is not coupled to any content length, because
-     the sweep travels one full turn regardless of how wide the button is. */
   --animate-glow-spin: glow-spin 4s linear infinite;
 
   @keyframes glow-spin {
@@ -232,62 +74,19 @@
   }
 }
 
-/* The deep-green band, expressed as a SCOPED REDEFINITION of the same role
-   tokens rather than as a second set of names. A section opts in with a bare
-   `data-tone="dark"`; from that element down, --color-ink-strong resolves to
-   warm cream instead of near-black, --color-surface-raised to a lifted green
-   instead of soft white, and so on. Every component inside keeps writing
-   text-ink-strong / bg-surface-raised / border-line-subtle exactly as it does
-   on cream - no dark: variants, no per-section colour props, no parallel
-   component tree. This is the payoff the role-based naming was always for.
-   (Hakkimda and Ozgecmis are the two dark bands; see HomePage.tsx.)
-
-   Unlayered on purpose. Tailwind v4 emits @theme variables inside
-   `@layer theme`, and an unlayered rule beats a layered one whatever the
-   specificity, so this block wins without needing !important or a doubled
-   selector.
-
-   `color` is re-declared here and that line is load-bearing, not tidiness.
-   `text-ink-body` on App.tsx's root computes to the literal #4a4e4a at the
-   root and children inherit that COMPUTED value, not the variable - so
-   redefining --color-ink-body alone would leave every unstyled run of text in
-   a dark section still painted dark grey on dark green. Re-declaring color
-   from the variable inside the scope is what makes it re-resolve.
-   background-color is set for the same reason it is convenient: a section
-   only has to carry the attribute, not the attribute plus a bg- utility that
-   could drift away from it. */
 [data-tone='dark'] {
-  /* Surfaces. surface-raised is a lifted green rather than a lighter neutral:
-     a card on this ground reads as raised by tone plus its hairline, the same
-     way a soft-white card does on cream. */
-  --color-surface-base: #17352d; /* the owner's deep green - the band itself */
-  --color-surface-raised: #1e4238; /* lifted green - cards */
-  --color-surface-sunken: #10261f; /* recessed green - letterbox guard */
+  --color-surface-base: #17352d;
+  --color-surface-raised: #1e4238;
+  --color-surface-sunken: #10261f;
 
-  /* Lines. line-strong still clears the 3:1 non-text floor on the band
-     (3.61:1); line-subtle stays decorative. */
   --color-line-subtle: #2e5247;
   --color-line-strong: #6e8c7f;
 
-  /* Ink. Warm cream rather than pure white for the headings, which is what
-     keeps the band editorial instead of corporate - and it measures 12.0:1.
-     ink-body 9.07:1, ink-muted 5.95:1, all on the band itself. */
   --color-ink-strong: #f7f3ea;
   --color-ink-body: #cfd8cb;
   --color-ink-muted: #a3b2a0;
-  /* Deep green on deep green would be invisible; on a dark band the heading
-     is the warm cream it always was. 12.0:1. */
   --color-ink-heading: #f7f3ea;
 
-  /* Accent. Inverted direction from the light theme: hover goes LIGHTER here,
-     because a darker sage disappears into deep green. accent-base 6.36:1,
-     accent-hover 8.35:1, accent-active 5.03:1 - and accent-active is the
-     owner's exact #8fa58f, which finally has a ground dark enough to carry it.
-     accent-soft/accent-ink is the owner's own prescription for a button on a
-     dark section: a cream face with deep-green text, 12.0:1. */
-  /* On a deep-green band the CTA flips: a cream face with deep-green ink,
-     12.0:1. No GlowButton sits in a dark band today, but the scope is kept
-     complete so that putting one there is a non-event rather than a bug. */
   --color-cta-base: #f7f3ea;
   --color-cta-hover: #ffffff;
   --color-cta-active: #e4dfd2;
@@ -306,19 +105,6 @@
   background-color: var(--color-surface-base);
 }
 
-/* Custom-property registrations for FooterWordmark's cursor-tracking mask
-   (src/components/FooterWordmark.tsx, six-owner-changes Task 9). A plain
-   CSS custom property is not interpolated by `transition` - only a
-   type-registered one is - so these two are declared with @property to let
-   a short transition ease the radial-gradient mask center as the pointer
-   moves, instead of the highlight snapping instantly from point to point.
-   Not a @theme entry: @property registers a custom-property TYPE, not a
-   design token consumed by a utility class, so it lives at the stylesheet's
-   top level like the `html` rule below, not inside the token block above.
-   initial-value -9999px keeps the highlight's spotlight fully off-canvas
-   until FooterWordmark's pointermove listener writes real coordinates -
-   the static, cursor-less state must render as if these rules did not
-   exist at all, which is exactly what an off-canvas center achieves. */
 @property --wordmark-x {
   syntax: '<length>';
   inherits: false;
@@ -330,22 +116,6 @@
   initial-value: -9999px;
 }
 
-/* Reveal-on-scroll / reveal-on-load (src/lib/useReveal.ts). An element opts in
-   by carrying a bare `data-reveal` attribute; the hook flips it to
-   data-reveal="in" once an IntersectionObserver says it is in view, and the
-   transition below does the rest. Elements already in the first viewport
-   intersect immediately on mount, which is what produces the initial-load
-   animation - there is no separate "page loaded" code path.
-
-   Not a @theme entry and not a utility: this is one base-layer behaviour
-   attached to an attribute, and expressing it as utilities would mean
-   repeating six classes on every revealed element. Per-element timing is
-   still a utility - `[--reveal-delay:160ms]` - so a stagger stays inline in
-   the JSX where the rest of that element's styling lives.
-
-   `will-change` is set only while hidden and dropped the moment the element
-   arrives: leaving it on permanently would keep a compositor layer alive for
-   every card on the page for no benefit. */
 [data-reveal] {
   opacity: 0;
   transform: translateY(1.5rem);
@@ -358,13 +128,6 @@
   will-change: opacity, transform;
 }
 
-/* `filter: none`, never `blur(0)`. Any non-none filter value makes the
-   element a containing block for absolutely-positioned and sticky
-   descendants - the same trap documented for `transform` in CLAUDE.md - so
-   leaving blur(0) behind would silently change layout for every revealed
-   element on the page, permanently. Interpolating a filter list to `none`
-   is well-defined (the list animates toward its identity), so the blur still
-   eases out; it just does not leave a containing block behind when it lands. */
 [data-reveal='in'] {
   opacity: 1;
   transform: none;
@@ -372,9 +135,6 @@
   will-change: auto;
 }
 
-/* The opt-out has to neutralise the hidden state too, not just the
-   transition - otherwise a reduced-motion visitor whose observer has not
-   fired yet sees nothing at all rather than seeing it instantly. */
 @media (prefers-reduced-motion: reduce) {
   [data-reveal],
   [data-reveal='in'] {
@@ -386,12 +146,6 @@
   }
 }
 
-/* Overscroll/rubber-band area outside the document bounds (mobile bounce,
-   trackpad overscroll) shows this color, not a themed element - it cannot
-   carry the gradient. Matched to surface-base, the color the page is flat
-   in for all but its very top, so the overscroll edge never reads as a
-   jarring color switch. Not a @theme token: this is a base-layer element
-   style, not a design token consumed by any utility class. */
 html {
   background-color: var(--color-surface-base);
 }

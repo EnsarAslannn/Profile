@@ -9,10 +9,6 @@ export default function Projects() {
   const { language } = useLanguage()
 
   return (
-    // Back to warm cream after the deep-green Hakkimda band. bg-surface-base
-    // is written explicitly rather than left to inherit the page ground: the
-    // section has to be opaque, or the neutral Marquee strip above it would
-    // read straight through where the two meet.
     <section id="projeler" className="scroll-mt-24 bg-surface-base py-20 sm:py-24">
       <div className={CONTENT_CONTAINER}>
         <SectionHeading title={UI[language].sectionProjects} />

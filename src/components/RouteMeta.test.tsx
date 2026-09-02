@@ -75,10 +75,6 @@ describe('RouteMeta', () => {
     )
   })
 
-  // Each language version is canonical to ITSELF, and the two are tied
-  // together by the hreflang pair. Pointing English at the Turkish URL would
-  // tell a crawler the English site is a duplicate and should not be indexed
-  // - which is the opposite of why ?lang=en exists.
   describe('canonical and hreflang', () => {
     it('makes the Turkish version canonical to its bare path', () => {
       renderMeta({}, '/hakkimda')
@@ -106,8 +102,6 @@ describe('RouteMeta', () => {
         expect(linkHref('link[rel="alternate"][hreflang="en"]')).toBe(
           `${origin}/projects/dolfin?lang=en`,
         )
-        // Turkish is the site's original, so it is where a reader whose
-        // language matches neither is sent.
         expect(linkHref('link[rel="alternate"][hreflang="x-default"]')).toBe(
           `${origin}/projects/dolfin`,
         )
@@ -115,8 +109,6 @@ describe('RouteMeta', () => {
       }
     })
 
-    // The alternates are told apart by hreflang alone - three links, one rel.
-    // A canonical selector that ignored it would keep overwriting the same tag.
     it('keeps the canonical link separate from the three alternates', () => {
       renderMeta({}, '/')
       expect(document.head.querySelectorAll('link[rel="alternate"]')).toHaveLength(3)

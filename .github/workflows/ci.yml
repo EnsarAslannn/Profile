@@ -1,11 +1,3 @@
-# The gate this repo was missing. 270 tests, a typecheck and a linter all pass
-# locally, but nothing ran them on the way to Vercel - so a red suite could
-# deploy and only be noticed by someone opening the site.
-#
-# All four checks run as separate steps of ONE job rather than as parallel
-# jobs: they share a single `npm ci`, which is the slow part, and the whole
-# run finishes well under a minute. Splitting them would cost four installs to
-# save nothing.
 name: CI
 
 on:
@@ -14,8 +6,6 @@ on:
   pull_request:
     branches: [main]
 
-# A second push to the same branch cancels the first: only the newest commit's
-# result is worth anything.
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -31,25 +21,15 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          # Vite 8 needs 20.19+ / 22.12+; 22 is the current LTS.
           node-version: '22'
           cache: npm
 
-      # `npm ci` and not `npm install`: it installs exactly what
-      # package-lock.json pins, so CI cannot pass against a dependency tree
-      # that no one else has.
       - run: npm ci
 
       - run: npm run lint
 
-      # Typecheck on its own, before the build. tsconfig.app.json sets
-      # noUnusedLocals/noUnusedParameters, so this catches things `vite dev`
-      # happily ignores.
       - run: npx tsc -b
 
       - run: npm test
 
-      # Last, because it is the only step that depends on everything else
-      # being sound - and because it runs Linux, where the case-sensitive
-      # filesystem catches an asset path that Windows resolves anyway.
       - run: npm run build

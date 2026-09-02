@@ -10,9 +10,6 @@ describe('About', () => {
     const { container } = renderWithRouter(<About />)
     expect(container.querySelector('section#hakkimda')).not.toBeNull()
     expect(screen.getByRole('heading', { level: 2, name: 'Hakkımda' })).toBeInTheDocument()
-    // The reference design's [001] kicker was reproduced and then removed at
-    // the owner's request. Asserting its absence keeps a later "the reference
-    // had numbers" pass from reinstating it by eye.
     expect(container.textContent).not.toMatch(/\[\d{3}]/)
   })
 
@@ -26,8 +23,6 @@ describe('About', () => {
   it('teases one paragraph and no more', () => {
     renderWithRouter(<About />)
     expect(screen.getByText(ABOUT_TEASER.tr.text)).toBeInTheDocument()
-    // The other three belong to /hakkimda. Showing them here would make
-    // "Tam metni oku" lead to a page the visitor has already read.
     for (const paragraph of ABOUT_PARAGRAPHS.tr) {
       if (paragraph.id === ABOUT_TEASER.tr.id) continue
       expect(screen.queryByText(paragraph.text)).not.toBeInTheDocument()
@@ -48,8 +43,6 @@ describe('About', () => {
     expect(container.textContent).toContain(SITE_ROLE)
   })
 
-  // The portrait is the same photo the profile card uses, at thumbnail size,
-  // next to the name in text. It carries no information of its own here.
   it('renders the portrait as decoration, with layout-stable dimensions', () => {
     const { container } = renderWithRouter(<About />)
     const image = container.querySelector('img')!

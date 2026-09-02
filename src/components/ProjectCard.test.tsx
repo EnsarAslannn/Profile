@@ -5,8 +5,6 @@ import { renderWithRouter } from '../test/renderWithRouter'
 import { getProjectBySlug } from '../data/projects'
 import { getProjectCover } from '../data/projectCovers'
 
-// Looked up by slug, not by index: the PROJECTS.tr array order is the home-page
-// grid display order and is expected to change without breaking this test.
 const dolfin = getProjectBySlug('dolfin')!
 
 describe('ProjectCard', () => {
@@ -39,11 +37,6 @@ describe('ProjectCard', () => {
     expect(screen.getByRole('link')).toHaveAccessibleName(/DOLFIN/)
   })
 
-  // The dimensions are DERIVED from the covers table rather than written out
-  // again here. src/data/projectCovers.test.ts is the one place that pins the
-  // literal numbers; this test is about the img carrying its intrinsics at
-  // all, so repeating them only meant that swapping a cover broke three files
-  // instead of one - which is exactly what happened.
   it('renders the cover image with the true intrinsic attributes', () => {
     const cover = getProjectCover('dolfin')!
     const { container } = renderWithRouter(
@@ -131,7 +124,6 @@ describe('ProjectCard', () => {
       </ul>,
     )
     const svgs = screen.getAllByRole('link')[0].querySelectorAll('svg')
-    // one cover-adjacent icon (the arrow); the cover itself is an <img>, not an svg
     expect(svgs).toHaveLength(1)
     expect(svgs[0]).toHaveAttribute('aria-hidden', 'true')
     expect(screen.getByRole('link')).toHaveAccessibleName(`${dolfin.title} - ${dolfin.subtitle}`)

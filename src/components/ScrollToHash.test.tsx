@@ -40,9 +40,6 @@ describe('ScrollToHash', () => {
   })
 
   it('re-scrolls on a repeat navigation to the same hash', () => {
-    // Navigates within ONE mounted tree, so the effect only re-runs if it
-    // genuinely depends on location.key. A remount-based test would pass even
-    // with an empty dependency array and would protect nothing.
     const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView')
 
     function GoToProjeler() {
@@ -65,10 +62,6 @@ describe('ScrollToHash', () => {
     expect(scrollIntoView).toHaveBeenCalledTimes(2)
   })
 
-  // A language switch is a `replace` navigation that changes only the query
-  // string, and React Router mints a fresh location.key for it - so without
-  // the search-only guard below this component fires scrollTo(0, 0) and throws
-  // a reader who had scrolled down to Projeler straight back to the top.
   it('does not scroll when a navigation changes only the query string', () => {
     const scrollTo = vi.spyOn(window, 'scrollTo')
 
@@ -85,10 +78,6 @@ describe('ScrollToHash', () => {
   })
 
   it('does not re-scroll to the hash when a query-only navigation keeps it', () => {
-    // The same switch, but from a URL that already carries an anchor.
-    // Re-running scrollIntoView is less violent than jumping to the top, but
-    // it is still a jump the reader did not ask for - they may well have
-    // scrolled on past the anchor before reaching for the language control.
     const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView')
 
     render(
@@ -105,8 +94,6 @@ describe('ScrollToHash', () => {
   })
 })
 
-// Shaped exactly like LanguageProvider.setLanguage: a replace navigation that
-// carries pathname and hash through untouched and only rewrites the search.
 function SwitchLanguage() {
   const navigate = useNavigate()
   const location = useLocation()
