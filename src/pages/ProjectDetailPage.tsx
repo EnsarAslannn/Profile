@@ -2,6 +2,7 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 import ArrowLeftIcon from '../components/icons/ArrowLeftIcon'
 import GlowButton from '../components/ui/GlowButton'
 import ArrowUpRightIcon from '../components/icons/ArrowUpRightIcon'
+import GitHubIcon from '../components/icons/GitHubIcon'
 import ProjectScreens from '../components/ProjectScreens'
 import ProjectTechnologies from '../components/ProjectTechnologies'
 import RouteMeta from '../components/RouteMeta'
@@ -22,7 +23,7 @@ export default function ProjectDetailPage() {
   const project = getProjectBySlug(slug, language)
 
   if (!project) {
-    return <Navigate to="/" replace />
+    return <Navigate to={localizedTo('/')} replace />
   }
 
   const cover = project.cover
@@ -73,12 +74,20 @@ export default function ProjectDetailPage() {
           <p className="mt-3 text-lg font-medium text-accent-base sm:text-xl">{project.subtitle}</p>
         </div>
 
-        {project.liveUrl && (
-          <div className="mt-6">
-            <GlowButton href={project.liveUrl} external>
-              {ui.openProject}
-              <ArrowUpRightIcon className="h-4 w-4 shrink-0" />
-            </GlowButton>
+        {(project.liveUrl || project.repoUrl) && (
+          <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-4">
+            {project.liveUrl && (
+              <GlowButton href={project.liveUrl} external>
+                {ui.openProject}
+                <ArrowUpRightIcon className="h-4 w-4 shrink-0" />
+              </GlowButton>
+            )}
+            {project.repoUrl && (
+              <GlowButton href={project.repoUrl} external>
+                {ui.sourceCode}
+                <GitHubIcon className="h-4 w-4 shrink-0" />
+              </GlowButton>
+            )}
           </div>
         )}
 

@@ -8,6 +8,7 @@ export const takeauction: ProjectInput = {
     en: 'Real-Time Auction System',
   },
   liveUrl: 'https://take-auction.vercel.app',
+  repoUrl: 'https://github.com/EnsarAslannn/TakeAuction',
   description: {
     tr: [
       'Satıcıların lot listelediği, alıcıların gizli tavan değerleriyle yarıştığı, yüksek trafikli ve eşzamanlı çalışan gerçek zamanlı bir açık artırma sistemi. Amaç yalnızca teklif butonu olan bir CRUD uygulaması değil, gerçek rekabet altında eşzamanlılığı, teslimat garantilerini ve kapanış mantığını doğru ele alan uçtan uca bir sistem kurmaktı. Kod yatay katmanlar yerine Vertical Slice Architecture ile örgütlendi. Her özellik kendi isteğini, işleyicisini ve doğrulamasını uçtan uca kendisi taşıyor.',

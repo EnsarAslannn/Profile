@@ -8,6 +8,7 @@ export const dolfin: ProjectInput = {
     en: 'Financial Portfolio Management Platform',
   },
   liveUrl: 'https://dol-fin.com',
+  repoUrl: 'https://github.com/EnsarAslannn/DOLFIN',
   description: {
     tr: [
       'Kullanıcıların sanal bir cüzdanla hisse senedi alıp satabildiği, portföylerinin dağılımını ve performansını izleyebildiği, hisse sayfalarına yorum bırakabildiği kurumsal odaklı bir finansal yönetim platformu. Uygulama harici bir piyasa verisi servisine bağlı değil. TSLA, NVDA, AAPL, GOOGL ve MSFT için elle hazırlanmış yerel bir veri seti üzerinde çalışıyor.',

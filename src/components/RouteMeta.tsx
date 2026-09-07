@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
-import { LANGUAGE_PARAM } from '../i18n/language'
+import { stripLanguage, withLanguage } from '../i18n/localizedPath'
 import { DEFAULT_TITLE } from '../lib/siteMeta'
 
 type Props = {
@@ -22,8 +22,9 @@ export default function RouteMeta({ title, description, image, type = 'website' 
     const origin = window.location.origin
     const absoluteImage = image.startsWith('http') ? image : `${origin}${image}`
 
-    const turkishUrl = `${origin}${location.pathname}`
-    const englishUrl = `${turkishUrl}?${LANGUAGE_PARAM}=en`
+    const basePath = stripLanguage(location.pathname)
+    const turkishUrl = `${origin}${withLanguage(basePath, 'tr')}`
+    const englishUrl = `${origin}${withLanguage(basePath, 'en')}`
     const canonical = language === 'en' ? englishUrl : turkishUrl
 
     const applied = [

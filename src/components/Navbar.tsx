@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import LanguageToggle from './LanguageToggle'
 import { useLanguage } from '../i18n/LanguageContext'
+import { stripLanguage } from '../i18n/localizedPath'
 import { useLocalizedTo } from '../i18n/useLocalizedTo'
 import { UI } from '../i18n/ui'
 import { NAV_LINKS, NO_ANCHORS, SECTION_ANCHORS } from '../data/navigation'
@@ -14,7 +15,7 @@ const LINK_CLASS =
 export default function Navbar() {
   const { language } = useLanguage()
   const localizedTo = useLocalizedTo()
-  const isHome = useLocation().pathname === '/'
+  const isHome = stripLanguage(useLocation().pathname) === '/'
   const ui = UI[language]
 
   const activeAnchor = useActiveSection(isHome ? SECTION_ANCHORS : NO_ANCHORS)

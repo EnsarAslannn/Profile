@@ -62,6 +62,29 @@ describe('ProjectDetailPage', () => {
     }
   })
 
+  it('links to the source repository of whichever project is on screen, opened safely', () => {
+    for (const slug of ['dolfin', 'takeauction', 'altitudelog']) {
+      const { unmount } = renderWithRouter(<App />, `/projects/${slug}`)
+      const link = screen.getByRole('link', { name: 'Kaynak kodu' })
+      expect(link).toHaveAttribute('href', getProjectBySlug(slug)!.repoUrl)
+      expect(link).toHaveAttribute('target', '_blank')
+      expect(link.getAttribute('rel')).toContain('noopener')
+      expect(link.getAttribute('rel')).toContain('noreferrer')
+      unmount()
+    }
+  })
+
+  it('keeps the demo and the repository as two separate links, demo first', () => {
+    renderWithRouter(<App />, '/projects/dolfin')
+    const demo = screen.getByRole('link', { name: 'Projeyi aç' })
+    const repo = screen.getByRole('link', { name: 'Kaynak kodu' })
+
+    expect(demo.getAttribute('href')).not.toBe(repo.getAttribute('href'))
+    expect(demo.compareDocumentPosition(repo) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(repo.contains(demo)).toBe(false)
+    expect(demo.contains(repo)).toBe(false)
+  })
+
   it('renders the technologies as a labelled description list, one row per group, for dolfin', () => {
     const { container } = renderWithRouter(<App />, '/projects/dolfin')
     const list = container.querySelector('dl[aria-label="Kullanılan teknolojiler"]')

@@ -52,10 +52,31 @@ describe('Navbar', () => {
       }
     })
 
-    it('marks no section current away from the home route', () => {
-      for (const route of ['/hakkimda', '/projects/dolfin']) {
+    it('marks no section current away from the home route, in either language', () => {
+      for (const route of ['/hakkimda', '/projects/dolfin', '/en/hakkimda', '/en/projects/dolfin']) {
         const { container, unmount } = renderWithRouter(<Navbar />, route)
-        expect(container.querySelectorAll('nav a[aria-current]')).toHaveLength(0)
+        expect(container.querySelectorAll('nav a[aria-current]'), route).toHaveLength(0)
+        unmount()
+      }
+    })
+
+    it('counts the English home as the home route, so tracking is not switched off there', () => {
+      for (const route of ['/', '/en']) {
+        const { unmount } = renderWithRouter(<Navbar />, route)
+        expect(screen.getByRole('link', { name: SITE_NAME }), route).toHaveAttribute(
+          'aria-current',
+          'page',
+        )
+        unmount()
+      }
+    })
+
+    it('leaves the wordmark uncurrent on every route that is not a home page', () => {
+      for (const route of ['/hakkimda', '/en/hakkimda', '/projects/dolfin', '/en/projects/dolfin']) {
+        const { unmount } = renderWithRouter(<Navbar />, route)
+        expect(screen.getByRole('link', { name: SITE_NAME }), route).not.toHaveAttribute(
+          'aria-current',
+        )
         unmount()
       }
     })

@@ -8,6 +8,7 @@ export const altitudelog: ProjectInput = {
     en: 'Flight & Crew Management System',
   },
   liveUrl: 'https://altitudelog.vercel.app',
+  repoUrl: 'https://github.com/EnsarAslannn/AltitudELog',
   description: {
     tr: [
       'Pilotların rütbeleriyle sisteme kayıt olduğu, uçuş kaydı oluşturduğu, her uçuşa mürettebat üyelerini görev rolleriyle atadığı ve isteğe bağlı olarak anonim CRM (Crew Resource Management) güvenlik raporu doldurabildiği bir uçuş ve mürettebat yönetim platformu. Hedef basit bir kayıt ekranı değil, rol tabanlı yetkilendirmeyi, arka plan işlerini, önbellek katmanını ve gerçek bir dağıtım sürecini bir araya getiren uçtan uca bir uygulamaydı.',

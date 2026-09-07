@@ -84,29 +84,39 @@ describe('RouteMeta', () => {
       expect(metaContent('meta[property="og:locale"]')).toBe('tr_TR')
     })
 
-    it('makes the English version canonical to its own ?lang=en address', () => {
-      renderMeta({}, '/hakkimda', 'en')
+    it('makes the English version canonical to its own /en address', () => {
+      renderMeta({}, '/en/hakkimda', 'en')
       const origin = window.location.origin
-      expect(linkHref('link[rel="canonical"]')).toBe(`${origin}/hakkimda?lang=en`)
-      expect(metaContent('meta[property="og:url"]')).toBe(`${origin}/hakkimda?lang=en`)
+      expect(linkHref('link[rel="canonical"]')).toBe(`${origin}/en/hakkimda`)
+      expect(metaContent('meta[property="og:url"]')).toBe(`${origin}/en/hakkimda`)
       expect(metaContent('meta[property="og:locale"]')).toBe('en_US')
     })
 
-    it('publishes both alternates and an x-default, in either language', () => {
+    it('publishes both alternates and an x-default, from either address', () => {
       const origin = window.location.origin
-      for (const language of ['tr', 'en'] as const) {
-        const { unmount } = renderMeta({}, '/projects/dolfin', language)
+      for (const [route, language] of [
+        ['/projects/dolfin', 'tr'],
+        ['/en/projects/dolfin', 'en'],
+      ] as const) {
+        const { unmount } = renderMeta({}, route, language)
         expect(linkHref('link[rel="alternate"][hreflang="tr"]')).toBe(
           `${origin}/projects/dolfin`,
         )
         expect(linkHref('link[rel="alternate"][hreflang="en"]')).toBe(
-          `${origin}/projects/dolfin?lang=en`,
+          `${origin}/en/projects/dolfin`,
         )
         expect(linkHref('link[rel="alternate"][hreflang="x-default"]')).toBe(
           `${origin}/projects/dolfin`,
         )
         unmount()
       }
+    })
+
+    it('points the English home at /en and the Turkish one at the root', () => {
+      const origin = window.location.origin
+      renderMeta({}, '/en', 'en')
+      expect(linkHref('link[rel="canonical"]')).toBe(`${origin}/en`)
+      expect(linkHref('link[rel="alternate"][hreflang="x-default"]')).toBe(`${origin}/`)
     })
 
     it('keeps the canonical link separate from the three alternates', () => {

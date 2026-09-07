@@ -9,43 +9,46 @@ function internalHrefs(container: HTMLElement): string[] {
     .filter((href) => !href.endsWith('.pdf'))
 }
 
-describe('carrying ?lang= across internal links', () => {
-  for (const route of ['/?lang=en', '/hakkimda?lang=en', '/projects/dolfin?lang=en']) {
-    it(`keeps lang=en on every internal link from ${route}`, () => {
+describe('carrying the /en prefix across internal links', () => {
+  for (const route of ['/en', '/en/hakkimda', '/en/projects/dolfin']) {
+    it(`keeps every internal link under /en from ${route}`, () => {
       const { container } = renderWithRouter(<App />, route)
       const hrefs = internalHrefs(container)
 
       expect(hrefs.length).toBeGreaterThan(5)
       for (const href of hrefs) {
-        expect(href, `${href} lost ?lang=en`).toContain('lang=en')
+        expect(href, `${href} fell back to the Turkish address`).toMatch(/^\/en(\/|#|$)/)
       }
     })
   }
 
-  it('puts the parameter before the fragment, not inside it', () => {
-    const { container } = renderWithRouter(<App />, '/?lang=en')
+  it('puts the prefix before the fragment, not inside it', () => {
+    const { container } = renderWithRouter(<App />, '/en')
     const hashLinks = internalHrefs(container).filter((href) => href.includes('#'))
 
     expect(hashLinks.length).toBeGreaterThan(0)
     for (const href of hashLinks) {
-      expect(href).toMatch(/^\/\?lang=en#[a-z]+$/)
+      expect(href).toMatch(/^\/en#[a-z]+$/)
     }
   })
 
-  it('adds nothing to a URL that does not already carry the parameter', () => {
+  it('never stacks the prefix on a link built from an already-English path', () => {
+    for (const route of ['/en', '/en/hakkimda', '/en/projects/dolfin']) {
+      const { container, unmount } = renderWithRouter(<App />, route)
+      for (const href of internalHrefs(container)) {
+        expect(href).not.toContain('/en/en')
+      }
+      unmount()
+    }
+  })
+
+  it('adds nothing to the links of the Turkish original', () => {
     const { container } = renderWithRouter(<App />, '/')
-    for (const href of internalHrefs(container)) {
-      expect(href).not.toContain('lang=')
-    }
-  })
-
-  it('carries an explicit lang=tr just as it carries lang=en', () => {
-    const { container } = renderWithRouter(<App />, '/?lang=tr')
     const hrefs = internalHrefs(container)
 
     expect(hrefs.length).toBeGreaterThan(5)
     for (const href of hrefs) {
-      expect(href).toContain('lang=tr')
+      expect(href).not.toMatch(/^\/en(\/|#|$)/)
     }
   })
 })

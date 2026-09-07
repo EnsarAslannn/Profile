@@ -25,6 +25,7 @@ export type UiStrings = {
   back: string
   backToProjects: string
   openProject: string
+  sourceCode: string
   technologiesUsed: string
   screensLabel: string
   projectScreenshot: (title: string, index: number) => string
@@ -65,6 +66,7 @@ export const UI: Localized<UiStrings> = {
     back: 'Geri',
     backToProjects: 'Projelere dön',
     openProject: 'Projeyi aç',
+    sourceCode: 'Kaynak kodu',
     technologiesUsed: 'Kullanılan teknolojiler',
     screensLabel: 'Ekran görüntüleri',
     projectScreenshot: (title, index) => `${title} ekran görüntüsü ${index}`,
@@ -103,6 +105,7 @@ export const UI: Localized<UiStrings> = {
     back: 'Back',
     backToProjects: 'Back to projects',
     openProject: 'Open the project',
+    sourceCode: 'Source code',
     technologiesUsed: 'Technologies used',
     screensLabel: 'Screenshots',
     projectScreenshot: (title, index) => `${title} screenshot ${index}`,

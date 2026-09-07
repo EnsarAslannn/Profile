@@ -1,23 +1,26 @@
 import { useCallback } from 'react'
-import { useLocation, type To } from 'react-router-dom'
-import { isLanguage, LANGUAGE_PARAM } from './language'
+import { type To } from 'react-router-dom'
+import { useLanguage } from './LanguageContext'
+import { DEFAULT_LANGUAGE } from './language'
+import { withLanguage } from './localizedPath'
 
 export function useLocalizedTo() {
-  const { search } = useLocation()
-  const value = new URLSearchParams(search).get(LANGUAGE_PARAM)
-  const carried = isLanguage(value) ? `?${LANGUAGE_PARAM}=${value}` : ''
+  const { language } = useLanguage()
 
   return useCallback(
     (to: To): To => {
-      if (!carried) return to
+      if (language === DEFAULT_LANGUAGE) return to
 
       if (typeof to === 'string') {
         const [pathname, hash] = to.split('#')
-        return { pathname, search: carried, ...(hash ? { hash: `#${hash}` } : {}) }
+        const localized = withLanguage(pathname, language)
+        return hash ? `${localized}#${hash}` : localized
       }
 
-      return { ...to, search: carried }
+      if (!to.pathname) return to
+
+      return { ...to, pathname: withLanguage(to.pathname, language) }
     },
-    [carried],
+    [language],
   )
 }

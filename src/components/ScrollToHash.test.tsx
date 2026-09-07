@@ -77,6 +77,57 @@ describe('ScrollToHash', () => {
     expect(scrollTo.mock.calls.length).toBe(before)
   })
 
+  it('does not scroll when a navigation only moves the path to the other language', () => {
+    const scrollTo = vi.spyOn(window, 'scrollTo')
+
+    render(
+      <MemoryRouter initialEntries={['/hakkimda']}>
+        <SwitchToEnglishPath />
+        <ScrollToHash />
+      </MemoryRouter>,
+    )
+
+    const before = scrollTo.mock.calls.length
+    fireEvent.click(screen.getByRole('button', { name: 'EN' }))
+    expect(scrollTo.mock.calls.length).toBe(before)
+  })
+
+  it('does not re-scroll to the hash when the language prefix appears and the hash stays', () => {
+    const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView')
+
+    render(
+      <MemoryRouter initialEntries={['/#projeler']}>
+        <section id="projeler">Projeler</section>
+        <SwitchToEnglishPath />
+        <ScrollToHash />
+      </MemoryRouter>,
+    )
+
+    expect(scrollIntoView).toHaveBeenCalledTimes(1)
+    fireEvent.click(screen.getByRole('button', { name: 'EN' }))
+    expect(scrollIntoView).toHaveBeenCalledTimes(1)
+  })
+
+  it('still scrolls when the reader genuinely navigates to another page', () => {
+    const scrollTo = vi.spyOn(window, 'scrollTo')
+
+    function GoToAbout() {
+      const navigate = useNavigate()
+      return <button onClick={() => navigate('/hakkimda')}>hakkimda</button>
+    }
+
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <GoToAbout />
+        <ScrollToHash />
+      </MemoryRouter>,
+    )
+
+    const before = scrollTo.mock.calls.length
+    fireEvent.click(screen.getByRole('button', { name: 'hakkimda' }))
+    expect(scrollTo.mock.calls.length).toBe(before + 1)
+  })
+
   it('does not re-scroll to the hash when a query-only navigation keeps it', () => {
     const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView')
 
@@ -93,6 +144,23 @@ describe('ScrollToHash', () => {
     expect(scrollIntoView).toHaveBeenCalledTimes(1)
   })
 })
+
+function SwitchToEnglishPath() {
+  const navigate = useNavigate()
+  const location = useLocation()
+  return (
+    <button
+      onClick={() =>
+        navigate(
+          { pathname: `/en${location.pathname}`, search: location.search, hash: location.hash },
+          { replace: true },
+        )
+      }
+    >
+      EN
+    </button>
+  )
+}
 
 function SwitchLanguage() {
   const navigate = useNavigate()

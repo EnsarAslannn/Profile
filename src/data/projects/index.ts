@@ -26,6 +26,7 @@ export type Project = {
   title: string
   subtitle: string
   liveUrl: string | undefined
+  repoUrl: string | undefined
   description: readonly string[]
   technologies: readonly TechGroup[]
   cover: ProjectCover | undefined
@@ -37,6 +38,7 @@ export type ProjectInput = {
   title: string
   subtitle: Localized<string>
   liveUrl?: string
+  repoUrl?: string
   description: Localized<readonly string[]>
   technologies: readonly TechGroup[]
   screens: readonly ProjectScreenInput[]
@@ -67,6 +69,7 @@ const resolve = (language: Language): Project[] =>
     title: input.title,
     subtitle: input.subtitle[language],
     liveUrl: input.liveUrl,
+    repoUrl: input.repoUrl,
     description: input.description[language],
     technologies: input.technologies,
     cover: getProjectCover(input.slug),

@@ -8,6 +8,7 @@ import {
   LANGUAGE_STORAGE_KEY,
   type Language,
 } from './language'
+import { languageFromPath, withLanguage } from './localizedPath'
 
 function storedLanguage(): Language | null {
   try {
@@ -25,6 +26,15 @@ function remember(language: Language): void {
   }
 }
 
+function withoutLanguageParam(search: string): { search: string; changed: boolean } {
+  const params = new URLSearchParams(search)
+  if (!params.has(LANGUAGE_PARAM)) return { search, changed: false }
+
+  params.delete(LANGUAGE_PARAM)
+  const remaining = params.toString()
+  return { search: remaining ? `?${remaining}` : '', changed: true }
+}
+
 type Props = {
   children: ReactNode
 }
@@ -33,6 +43,8 @@ export default function LanguageProvider({ children }: Props) {
   const location = useLocation()
   const navigate = useNavigate()
 
+  const pathLanguage = languageFromPath(location.pathname)
+
   const paramLanguage = useMemo(() => {
     const value = new URLSearchParams(location.search).get(LANGUAGE_PARAM)
     return isLanguage(value) ? value : null
@@ -40,21 +52,31 @@ export default function LanguageProvider({ children }: Props) {
 
   const [remembered, setRemembered] = useState<Language | null>(() => storedLanguage())
 
-  const language = paramLanguage ?? remembered ?? DEFAULT_LANGUAGE
+  const language = pathLanguage ?? paramLanguage ?? remembered ?? DEFAULT_LANGUAGE
 
   useEffect(() => {
     document.documentElement.lang = language
   }, [language])
+
+  useEffect(() => {
+    const { search, changed } = withoutLanguageParam(location.search)
+    const pathname = withLanguage(location.pathname, language)
+    if (pathname === location.pathname && !changed) return
+
+    navigate({ pathname, search, hash: location.hash }, { replace: true })
+  }, [language, location.hash, location.pathname, location.search, navigate])
 
   const setLanguage = useCallback(
     (next: Language) => {
       setRemembered(next)
       remember(next)
 
-      const params = new URLSearchParams(location.search)
-      params.set(LANGUAGE_PARAM, next)
       navigate(
-        { pathname: location.pathname, search: `?${params.toString()}`, hash: location.hash },
+        {
+          pathname: withLanguage(location.pathname, next),
+          search: withoutLanguageParam(location.search).search,
+          hash: location.hash,
+        },
         { replace: true },
       )
     },

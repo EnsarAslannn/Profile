@@ -4,7 +4,7 @@
 
 Ensar Aslan's personal portfolio site. It presents the About, Projects, Resume, Stacks and Contact sections on a single page.
 
-**Live:** https://ensaraslan.vercel.app
+**Live:** https://ensaraslan.vercel.app/en
 
 ![Home page - hero section with the intro copy and call-to-action buttons](src/assets/homepage.webp)
 

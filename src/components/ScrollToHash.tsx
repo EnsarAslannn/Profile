@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
+import { stripLanguage } from '../i18n/localizedPath'
 
 export default function ScrollToHash() {
   const location = useLocation()
@@ -13,12 +14,12 @@ export default function ScrollToHash() {
       hash: location.hash,
     }
 
-    const searchOnly =
+    const sameSection =
       from !== null &&
-      from.pathname === location.pathname &&
+      stripLanguage(from.pathname) === stripLanguage(location.pathname) &&
       from.hash === location.hash &&
-      from.search !== location.search
-    if (searchOnly) return
+      (from.pathname !== location.pathname || from.search !== location.search)
+    if (sameSection) return
 
     if (location.hash) {
       document.getElementById(location.hash.slice(1))?.scrollIntoView()

@@ -13,41 +13,48 @@ const server = await createServer({
   logLevel: 'error',
 })
 
-let siteMeta, projects, ui, about
+let siteMeta, projects, ui, about, language, localizedPath
 try {
   siteMeta = await server.ssrLoadModule('/src/lib/siteMeta.ts')
   projects = await server.ssrLoadModule('/src/data/projects/index.ts')
   ui = await server.ssrLoadModule('/src/i18n/ui.ts')
   about = await server.ssrLoadModule('/src/data/about.ts')
+  language = await server.ssrLoadModule('/src/i18n/language.ts')
+  localizedPath = await server.ssrLoadModule('/src/i18n/localizedPath.ts')
 } finally {
   await server.close()
 }
 
 const { SITE_NAME, SITE_URL, truncateForDescription, firstSentence } = siteMeta
+const { LANGUAGES, DEFAULT_LANGUAGE } = language
+const { withLanguage } = localizedPath
 
 const SITE_IMAGE = `${SITE_URL}/og.jpg`
-const SITE_IMAGE_ALT =
-  'Ensar Aslan portfolyo sitesinin ana sayfası: isim, Full Stack .NET Developer tanıtımı ve proje görselleri.'
+const SITE_IMAGE_ALT = {
+  tr: 'Ensar Aslan portfolyo sitesinin ana sayfası: isim, Full Stack .NET Developer tanıtımı ve proje görselleri.',
+  en: 'The home page of Ensar Aslan portfolio site: the name, the Full Stack .NET Developer introduction and project images.',
+}
+const OG_LOCALE = { tr: 'tr_TR', en: 'en_US' }
 
-const ROUTES = [
+const pagesFor = (lang) => [
   {
-    path: '/',
+    base: '/',
     title: siteMeta.DEFAULT_TITLE,
-    description: truncateForDescription(about.ABOUT_PARAGRAPHS.tr[0].text),
+    description: truncateForDescription(about.ABOUT_PARAGRAPHS[lang][0].text),
     image: SITE_IMAGE,
-    imageAlt: SITE_IMAGE_ALT,
+    imageAlt: SITE_IMAGE_ALT[lang],
     type: 'website',
   },
   {
-    path: '/hakkimda',
-    title: `${ui.UI.tr.aboutPageTitle} | ${SITE_NAME}`,
-    description: truncateForDescription(about.ABOUT_PARAGRAPHS.tr[0].text),
+    base: '/hakkimda',
+    title: `${ui.UI[lang].aboutPageTitle} | ${SITE_NAME}`,
+    description: truncateForDescription(about.ABOUT_PARAGRAPHS[lang][0].text),
     image: SITE_IMAGE,
-    imageAlt: SITE_IMAGE_ALT,
+    imageAlt: SITE_IMAGE_ALT[lang],
     type: 'website',
   },
-  ...projects.PROJECTS.tr.map((project) => ({
-    path: `/projects/${project.slug}`,
+  ...projects.PROJECTS[lang].map((project) => ({
+    base: `/projects/${project.slug}`,
     title: `${project.title} | ${SITE_NAME}`,
     description: truncateForDescription(firstSentence(project.description[0])),
     image: `${SITE_URL}/og-${project.slug}.jpg`,
@@ -56,20 +63,34 @@ const ROUTES = [
   })),
 ]
 
+const ROUTES = LANGUAGES.flatMap((lang) =>
+  pagesFor(lang).map((page) => ({
+    ...page,
+    language: lang,
+    path: withLanguage(page.base, lang),
+  })),
+)
+
 const escapeXml = (value) =>
   value.replace(/[<>&'"]/g, (c) => `&${{ '<': 'lt', '>': 'gt', '&': 'amp', "'": 'apos', '"': 'quot' }[c]};`)
+
+const absolute = (base, lang) => {
+  const localized = withLanguage(base, lang)
+  return `${SITE_URL}${localized === '/' ? '/' : localized}`
+}
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${ROUTES.map(({ path: routePath }) => {
-  const tr = `${SITE_URL}${routePath}`
-  const en = `${tr}${routePath.includes('?') ? '&' : '?'}lang=en`
+${ROUTES.map(({ base, language: lang }) => {
+  const alternates = LANGUAGES.map(
+    (code) =>
+      `    <xhtml:link rel="alternate" hreflang="${code}" href="${escapeXml(absolute(base, code))}" />`,
+  ).join('\n')
   return `  <url>
-    <loc>${escapeXml(tr)}</loc>
-    <xhtml:link rel="alternate" hreflang="tr" href="${escapeXml(tr)}" />
-    <xhtml:link rel="alternate" hreflang="en" href="${escapeXml(en)}" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(tr)}" />
+    <loc>${escapeXml(absolute(base, lang))}</loc>
+${alternates}
+    <xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(absolute(base, DEFAULT_LANGUAGE))}" />
   </url>`
 }).join('\n')}
 </urlset>
@@ -112,7 +133,8 @@ const setLink = (html, rel, extra, value) =>
 for (const route of ROUTES) {
   if (route.path === '/') continue
 
-  const canonical = `${SITE_URL}${route.path}`
+  const canonical = absolute(route.base, route.language)
+  const alternate = LANGUAGES.find((code) => code !== route.language)
   let html = template
 
   html = replaceOne(html, /<title>[^<]*<\/title>/, `<title>${escapeXml(route.title)}</title>`, '<title>')
@@ -129,10 +151,23 @@ for (const route of ROUTES) {
 
   html = setMeta(html, 'property', 'og:image:alt', route.imageAlt)
 
+  html = setMeta(html, 'property', 'og:locale', OG_LOCALE[route.language])
+  html = setMeta(html, 'property', 'og:locale:alternate', OG_LOCALE[alternate])
+
+  if (route.language !== DEFAULT_LANGUAGE) {
+    html = replaceOne(
+      html,
+      new RegExp(`<html lang="${DEFAULT_LANGUAGE}">`),
+      `<html lang="${route.language}">`,
+      '<html lang> tag',
+    )
+  }
+
   html = setLink(html, 'canonical', '', canonical)
-  html = setLink(html, 'alternate', ' hreflang="tr"', canonical)
-  html = setLink(html, 'alternate', ' hreflang="en"', `${canonical}?lang=en`)
-  html = setLink(html, 'alternate', ' hreflang="x-default"', canonical)
+  for (const code of LANGUAGES) {
+    html = setLink(html, 'alternate', ` hreflang="${code}"`, absolute(route.base, code))
+  }
+  html = setLink(html, 'alternate', ' hreflang="x-default"', absolute(route.base, DEFAULT_LANGUAGE))
 
   const outDir = path.join(dist, route.path.replace(/^\//, ''))
   await fs.mkdir(outDir, { recursive: true })

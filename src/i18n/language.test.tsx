@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, useLocation } from 'react-router-dom'
 import { afterEach, describe, expect, it } from 'vitest'
 import App from '../App'
 import LanguageProvider from './LanguageProvider'
@@ -50,6 +50,7 @@ describe('the two languages', () => {
     expect(NAV_LINKS.en.map((l) => l.anchor)).toEqual(NAV_LINKS.tr.map((l) => l.anchor))
     expect(PROJECTS.en.map((p) => p.slug)).toEqual(PROJECTS.tr.map((p) => p.slug))
     expect(PROJECTS.en.map((p) => p.liveUrl)).toEqual(PROJECTS.tr.map((p) => p.liveUrl))
+    expect(PROJECTS.en.map((p) => p.repoUrl)).toEqual(PROJECTS.tr.map((p) => p.repoUrl))
     expect(PROJECTS.en.map((p) => p.title)).toEqual(PROJECTS.tr.map((p) => p.title))
     expect(PROJECTS.en.map((p) => p.technologies)).toEqual(PROJECTS.tr.map((p) => p.technologies))
     expect(ROADMAP_ENTRIES.en.map((e) => [e.start, e.end])).toEqual(
@@ -143,7 +144,7 @@ describe('switching language', () => {
 
   it('opens in the language the URL asks for, whatever was remembered', () => {
     window.localStorage.setItem(LANGUAGE_STORAGE_KEY, 'tr')
-    renderApp('/?lang=en')
+    renderApp('/en')
     expect(screen.getByRole('heading', { name: UI.en.sectionProjects })).toBeInTheDocument()
   })
 
@@ -158,3 +159,85 @@ describe('switching language', () => {
     expect(screen.getByRole('heading', { name: UI.tr.sectionProjects })).toBeInTheDocument()
   })
 })
+
+describe('the English address', () => {
+  const renderAt = (entry: string) =>
+    render(
+      <MemoryRouter initialEntries={[entry]}>
+        <App />
+        <CurrentUrl />
+      </MemoryRouter>,
+    )
+
+  const url = () => screen.getByTestId('url').textContent
+
+  it('serves each English page from its own path, so a scraper can be handed one', () => {
+    for (const [entry, heading] of [
+      ['/en', UI.en.sectionProjects],
+      ['/en/hakkimda', UI.en.aboutPageTitle],
+    ] as const) {
+      const { unmount } = renderAt(entry)
+      expect(screen.getAllByRole('heading', { name: heading }).length).toBeGreaterThan(0)
+      expect(url()).toBe(entry)
+      unmount()
+    }
+  })
+
+  it('renders the English project detail page under the same slug', () => {
+    renderAt('/en/projects/dolfin')
+    expect(screen.getByRole('heading', { level: 1, name: 'DOLFIN' })).toBeInTheDocument()
+    expect(screen.getByText(PROJECTS.en[0].subtitle)).toBeInTheDocument()
+  })
+
+  it('moves the URL when the reader switches language, and back again', () => {
+    renderAt('/hakkimda')
+    expect(url()).toBe('/hakkimda')
+
+    fireEvent.click(screen.getByRole('button', { name: 'English' }))
+    expect(url()).toBe('/en/hakkimda')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Türkçe' }))
+    expect(url()).toBe('/hakkimda')
+  })
+
+  it('upgrades a legacy ?lang=en link to the path it now lives at', () => {
+    renderAt('/hakkimda?lang=en')
+    expect(url()).toBe('/en/hakkimda')
+    expect(screen.getAllByRole('heading', { name: UI.en.aboutPageTitle }).length).toBeGreaterThan(0)
+  })
+
+  it('leaves no parameter behind when a reader arrives on a legacy link and switches back', () => {
+    renderAt('/hakkimda?lang=en')
+    fireEvent.click(screen.getByRole('button', { name: 'Türkçe' }))
+    expect(url()).toBe('/hakkimda')
+    expect(screen.getAllByRole('heading', { name: UI.tr.aboutPageTitle }).length).toBeGreaterThan(0)
+  })
+
+  it('moves a remembered English reader onto the English path, so URL and content agree', () => {
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, 'en')
+    renderAt('/')
+    expect(url()).toBe('/en')
+    expect(screen.getByRole('heading', { name: UI.en.sectionProjects })).toBeInTheDocument()
+  })
+
+  it('leaves a Turkish reader on the bare path, with no prefix and no parameter', () => {
+    renderAt('/hakkimda')
+    expect(url()).toBe('/hakkimda')
+  })
+
+  it('sends an unknown English path to the English home, not the Turkish one', () => {
+    renderAt('/en/bilinmeyen')
+    expect(url()).toBe('/en')
+    expect(screen.getByRole('heading', { name: UI.en.sectionProjects })).toBeInTheDocument()
+  })
+
+  it('sends an unknown English project slug to the English home', () => {
+    renderAt('/en/projects/yoktur')
+    expect(url()).toBe('/en')
+  })
+})
+
+function CurrentUrl() {
+  const location = useLocation()
+  return <output data-testid="url">{`${location.pathname}${location.search}`}</output>
+}

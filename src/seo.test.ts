@@ -51,7 +51,7 @@ describe('static SEO files', () => {
       expect(indexHtml).toContain(`<link rel="canonical" href="${SITE_URL}/" />`)
       expect(indexHtml).toContain(`<meta property="og:url" content="${SITE_URL}/" />`)
       expect(indexHtml).toContain(`hreflang="tr" href="${SITE_URL}/"`)
-      expect(indexHtml).toContain(`hreflang="en" href="${SITE_URL}/?lang=en"`)
+      expect(indexHtml).toContain(`hreflang="en" href="${SITE_URL}/en"`)
       expect(indexHtml).toContain(`hreflang="x-default" href="${SITE_URL}/"`)
     })
 
@@ -82,6 +82,35 @@ describe('static SEO files', () => {
     it('lists exactly the profile URLs in social.ts', () => {
       const expected = SOCIAL_LINKS.tr.map((link) => link.href)
       expect([...person.sameAs].sort()).toEqual([...expected].sort())
+    })
+  })
+
+  describe('vercel.json', () => {
+    const vercel = JSON.parse(read('vercel.json'))
+    const basePaths = ['/', '/hakkimda', ...PROJECTS.tr.map((p) => `/projects/${p.slug}`)]
+
+    it('sends every legacy ?lang=en address to the path that English page now lives at', () => {
+      expect(vercel.redirects.map((redirect: { source: string }) => redirect.source)).toEqual(
+        basePaths,
+      )
+
+      for (const redirect of vercel.redirects) {
+        expect(redirect.has).toEqual([{ type: 'query', key: 'lang', value: 'en' }])
+        expect(redirect.destination).toBe(
+          redirect.source === '/' ? '/en' : `/en${redirect.source}`,
+        )
+        expect(redirect.permanent).toBe(true)
+      }
+    })
+
+    it('never redirects from an address that is already English, which would loop', () => {
+      for (const redirect of vercel.redirects) {
+        expect(redirect.source).not.toMatch(/^\/en(\/|$)/)
+      }
+    })
+
+    it('leaves the SPA catch-all rewrite alone, so the prerender stays fail-safe', () => {
+      expect(vercel.rewrites).toEqual([{ source: '/(.*)', destination: '/index.html' }])
     })
   })
 

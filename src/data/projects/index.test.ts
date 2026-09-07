@@ -246,3 +246,28 @@ describe('getProjectBySlug', () => {
     expect(getProjectBySlug(undefined)).toBeUndefined()
   })
 })
+
+describe('repoUrl', () => {
+  it('gives every project an https link to its own public repository', () => {
+    for (const project of PROJECTS.tr) {
+      expect(project.repoUrl, project.slug).toBeDefined()
+      expect(project.repoUrl).toMatch(/^https:\/\/github\.com\/EnsarAslannn\//)
+      expect(project.repoUrl).not.toMatch(/\/$/)
+    }
+  })
+
+  it('points each project at the repository its technologies were sourced from', () => {
+    const urls = Object.fromEntries(PROJECTS.tr.map((p) => [p.slug, p.repoUrl]))
+    expect(urls).toEqual({
+      dolfin: 'https://github.com/EnsarAslannn/DOLFIN',
+      takeauction: 'https://github.com/EnsarAslannn/TakeAuction',
+      altitudelog: 'https://github.com/EnsarAslannn/AltitudELog',
+    })
+  })
+
+  it('is a different address from the demo', () => {
+    for (const project of PROJECTS.tr) {
+      expect(project.repoUrl, project.slug).not.toBe(project.liveUrl)
+    }
+  })
+})

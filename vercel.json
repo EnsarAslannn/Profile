@@ -1,3 +1,35 @@
 {
+  "redirects": [
+    {
+      "source": "/",
+      "has": [{ "type": "query", "key": "lang", "value": "en" }],
+      "destination": "/en",
+      "permanent": true
+    },
+    {
+      "source": "/hakkimda",
+      "has": [{ "type": "query", "key": "lang", "value": "en" }],
+      "destination": "/en/hakkimda",
+      "permanent": true
+    },
+    {
+      "source": "/projects/dolfin",
+      "has": [{ "type": "query", "key": "lang", "value": "en" }],
+      "destination": "/en/projects/dolfin",
+      "permanent": true
+    },
+    {
+      "source": "/projects/takeauction",
+      "has": [{ "type": "query", "key": "lang", "value": "en" }],
+      "destination": "/en/projects/takeauction",
+      "permanent": true
+    },
+    {
+      "source": "/projects/altitudelog",
+      "has": [{ "type": "query", "key": "lang", "value": "en" }],
+      "destination": "/en/projects/altitudelog",
+      "permanent": true
+    }
+  ],
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
