@@ -5,9 +5,19 @@ import { renderWithRouter } from '../test/renderWithRouter'
 import type { ProjectScreen } from '../data/projects'
 
 const SCREENS: ProjectScreen[] = [
-  { name: 'homePage', src: '/homePage.webp', caption: 'İlk ekran açıklaması.' },
-  { name: 'homePage2', src: '/homePage2.webp', caption: undefined },
-  { name: 'searchPage', src: '/searchPage.webp', caption: 'Arama ekranı açıklaması.' },
+  {
+    name: 'homePage',
+    src: '/homePage.webp',
+    srcSet: '/homePage-400w.webp 400w, /homePage.webp 1600w',
+    caption: 'İlk ekran açıklaması.',
+  },
+  { name: 'homePage2', src: '/homePage2.webp', srcSet: undefined, caption: undefined },
+  {
+    name: 'searchPage',
+    src: '/searchPage.webp',
+    srcSet: undefined,
+    caption: 'Arama ekranı açıklaması.',
+  },
 ]
 
 describe('ProjectScreens', () => {

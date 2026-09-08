@@ -1,7 +1,10 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import LanguageProvider from './i18n/LanguageProvider'
 import { withLanguage } from './i18n/localizedPath'
+import AppError from './components/AppError'
 import Contact from './components/Contact'
+import ErrorBoundary from './components/ErrorBoundary'
 import Navbar from './components/Navbar'
 import PageBackdrop from './components/PageBackdrop'
 import ScrollToHash from './components/ScrollToHash'
@@ -19,6 +22,8 @@ const pageRoutes = () => [
 ]
 
 export default function App() {
+  const { pathname } = useLocation()
+
   return (
     <LanguageProvider>
       <div className="relative isolate min-h-screen bg-surface-base text-ink-body">
@@ -26,13 +31,16 @@ export default function App() {
         <PageBackdrop />
         <ScrollToHash />
         <Navbar />
-        <Routes>
-          <Route path="/">{pageRoutes()}</Route>
-          <Route path={ENGLISH_HOME}>{pageRoutes()}</Route>
-          <Route path={`${ENGLISH_HOME}/*`} element={<Navigate to={ENGLISH_HOME} replace />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <ErrorBoundary key={pathname} fallback={<AppError />}>
+          <Routes>
+            <Route path="/">{pageRoutes()}</Route>
+            <Route path={ENGLISH_HOME}>{pageRoutes()}</Route>
+            <Route path={`${ENGLISH_HOME}/*`} element={<Navigate to={ENGLISH_HOME} replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </ErrorBoundary>
         <Contact />
+        <Analytics />
       </div>
     </LanguageProvider>
   )

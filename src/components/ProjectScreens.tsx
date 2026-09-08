@@ -19,6 +19,8 @@ export default function ProjectScreens({ screens, projectTitle }: Props) {
             <div className="overflow-hidden rounded-2xl bg-surface-sunken">
               <img
                 src={screen.src}
+                srcSet={screen.srcSet}
+                sizes="(min-width: 768px) 768px, 100vw"
                 alt={getProjectImageAlt(projectTitle, index, language)}
                 width={PROJECT_IMAGE_WIDTH}
                 height={PROJECT_IMAGE_HEIGHT}

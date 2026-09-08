@@ -25,6 +25,8 @@ export default function ProjectCard({ project, index }: Props) {
         {cover && (
           <img
             src={cover.src}
+            srcSet={cover.srcSet}
+            sizes="(min-width: 1280px) 620px, (min-width: 768px) 50vw, 100vw"
             alt=""
             width={cover.width}
             height={cover.height}

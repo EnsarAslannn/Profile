@@ -22,6 +22,8 @@ export default function RoadmapCard({ entry, index }: Props) {
         {entry.photo && (
           <img
             src={entry.photo.src}
+            srcSet={entry.photo.srcSet}
+            sizes="(min-width: 768px) 560px, 100vw"
             alt=""
             width={entry.photo.width}
             height={entry.photo.height}

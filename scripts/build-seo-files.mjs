@@ -13,7 +13,7 @@ const server = await createServer({
   logLevel: 'error',
 })
 
-let siteMeta, projects, ui, about, language, localizedPath
+let siteMeta, projects, ui, about, language, localizedPath, structuredData, hero, social, contact
 try {
   siteMeta = await server.ssrLoadModule('/src/lib/siteMeta.ts')
   projects = await server.ssrLoadModule('/src/data/projects/index.ts')
@@ -21,6 +21,10 @@ try {
   about = await server.ssrLoadModule('/src/data/about.ts')
   language = await server.ssrLoadModule('/src/i18n/language.ts')
   localizedPath = await server.ssrLoadModule('/src/i18n/localizedPath.ts')
+  structuredData = await server.ssrLoadModule('/src/lib/structuredData.ts')
+  hero = await server.ssrLoadModule('/src/data/hero.ts')
+  social = await server.ssrLoadModule('/src/data/social.ts')
+  contact = await server.ssrLoadModule('/src/data/contact.ts')
 } finally {
   await server.close()
 }
@@ -60,6 +64,10 @@ const pagesFor = (lang) => [
     image: `${SITE_URL}/og-${project.slug}.jpg`,
     imageAlt: project.screens[0].caption,
     type: 'article',
+    jsonLd: [
+      structuredData.projectJsonLd(project, lang, `${SITE_URL}/og-${project.slug}.jpg`),
+      structuredData.projectBreadcrumbJsonLd(project, lang),
+    ],
   })),
 ]
 
@@ -130,9 +138,31 @@ const setLink = (html, rel, extra, value) =>
     `rel="${rel}"${extra} link`,
   )
 
-for (const route of ROUTES) {
-  if (route.path === '/') continue
+const escapeHtml = (value) =>
+  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
+function noscriptFor(lang) {
+  const strings = ui.UI[lang]
+  const email = contact.CONTACT_ITEMS[lang].find((item) => item.id === 'email')
+  const links = [
+    `<li><a href="${hero.CV_FILE[lang]}" download>${escapeHtml(strings.heroCv)}</a></li>`,
+    ...social.SOCIAL_LINKS[lang].map(
+      (link) => `<li><a href="${link.href}">${escapeHtml(link.label)}</a></li>`,
+    ),
+  ].join('\n        ')
+
+  return `<noscript>
+      <h1>${escapeHtml(SITE_NAME)}</h1>
+      <p>${escapeHtml(siteMeta.SITE_ROLE)}</p>
+      <p>${escapeHtml(strings.noscriptNotice)}</p>
+      <ul>
+        ${links}
+      </ul>
+      <p>${escapeHtml(email.label)}: ${escapeHtml(email.value)}</p>
+    </noscript>`
+}
+
+for (const route of ROUTES) {
   const canonical = absolute(route.base, route.language)
   const alternate = LANGUAGES.find((code) => code !== route.language)
   let html = template
@@ -168,6 +198,26 @@ for (const route of ROUTES) {
     html = setLink(html, 'alternate', ` hreflang="${code}"`, absolute(route.base, code))
   }
   html = setLink(html, 'alternate', ' hreflang="x-default"', absolute(route.base, DEFAULT_LANGUAGE))
+
+  html = replaceOne(
+    html,
+    /<noscript>[\s\S]*?<\/noscript>/,
+    () => noscriptFor(route.language),
+    '<noscript> block',
+  )
+
+  if (route.jsonLd) {
+    const blocks = route.jsonLd
+      .map(
+        (data) =>
+          `    <script type="application/ld+json">\n${JSON.stringify(data, null, 2)
+            .split('\n')
+            .map((line) => `      ${line}`)
+            .join('\n')}\n    </script>`,
+      )
+      .join('\n')
+    html = replaceOne(html, /\n  <\/head>/, `\n${blocks}\n  </head>`, '</head> tag')
+  }
 
   const outDir = path.join(dist, route.path.replace(/^\//, ''))
   await fs.mkdir(outDir, { recursive: true })

@@ -1,4 +1,5 @@
 import type { Localized } from '../i18n/language'
+import { SITE_GROUP, srcSetFor } from './imageSrcSet'
 import photo2020 from '../assets/2020.webp'
 import photo2023 from '../assets/2023.webp'
 import photo2024 from '../assets/2024.webp'
@@ -110,17 +111,36 @@ export function toMachineDate(value: string): string {
   return `${year}-${month}`
 }
 
+export type TimelinePhoto = {
+  src: string
+  width: number
+  height: number
+  srcSet: string | undefined
+}
+
 export type RoadmapEntry = ResumeEntry & {
   kind: string
   year: string
-  photo?: { src: string; width: number; height: number }
+  photo?: TimelinePhoto
 }
 
-const PHOTOS: Record<string, { src: string; width: number; height: number }> = {
-  '2020': { src: photo2020, width: 1040, height: 778 },
-  '2023': { src: photo2023, width: 614, height: 767 },
-  '2024': { src: photo2024, width: 574, height: 767 },
-  '2025': { src: photo2025, width: 1200, height: 654 },
+const timelinePhoto = (
+  year: string,
+  src: string,
+  width: number,
+  height: number,
+): TimelinePhoto => ({
+  src,
+  width,
+  height,
+  srcSet: srcSetFor(`${SITE_GROUP}/${year}`, { src, width }),
+})
+
+const PHOTOS: Record<string, TimelinePhoto> = {
+  '2020': timelinePhoto('2020', photo2020, 1040, 778),
+  '2023': timelinePhoto('2023', photo2023, 614, 767),
+  '2024': timelinePhoto('2024', photo2024, 574, 767),
+  '2025': timelinePhoto('2025', photo2025, 1200, 654),
 }
 
 const toRoadmap = (groups: ResumeGroup[]): RoadmapEntry[] =>

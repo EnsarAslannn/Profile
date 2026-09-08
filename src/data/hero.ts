@@ -6,6 +6,7 @@ import portrait from '../assets/ea.webp'
 import takeauctionShot from '../assets/takeauction/homePage.webp'
 import type { Localized } from '../i18n/language'
 import type { TextSegment } from './about'
+import { SITE_GROUP, srcSetFor } from './imageSrcSet'
 
 
 export const HERO_TITLE_LINES: Localized<readonly string[]> = {
@@ -47,13 +48,22 @@ export type HeroImage = {
   src: string
   width: number
   height: number
+  srcSet: string | undefined
 }
 
+const heroImage = (
+  id: string,
+  key: string,
+  src: string,
+  width: number,
+  height: number,
+): HeroImage => ({ id, src, width, height, srcSet: srcSetFor(key, { src, width }) })
+
 export const HERO_IMAGES: HeroImage[] = [
-  { id: 'portrait', src: portrait, width: 640, height: 853 },
-  { id: 'dolfin', src: dolfinShot, width: 1600, height: 880 },
-  { id: 'altitudelog', src: altitudelogShot, width: 1600, height: 878 },
-  { id: 'takeauction', src: takeauctionShot, width: 1600, height: 875 },
-  { id: 'erasmus', src: erasmus, width: 614, height: 767 },
-  { id: 'brisa', src: brisa, width: 574, height: 767 },
+  heroImage('portrait', `${SITE_GROUP}/ea`, portrait, 640, 853),
+  heroImage('dolfin', 'dolfin/homePage', dolfinShot, 1600, 880),
+  heroImage('altitudelog', 'altitudelog/homePage', altitudelogShot, 1600, 878),
+  heroImage('takeauction', 'takeauction/homePage', takeauctionShot, 1600, 875),
+  heroImage('erasmus', `${SITE_GROUP}/2023`, erasmus, 614, 767),
+  heroImage('brisa', `${SITE_GROUP}/2024`, brisa, 574, 767),
 ]

@@ -26,6 +26,9 @@ export type UiStrings = {
   backToProjects: string
   openProject: string
   sourceCode: string
+  previousProject: string
+  nextProject: string
+  projectPagerLabel: string
   technologiesUsed: string
   screensLabel: string
   projectScreenshot: (title: string, index: number) => string
@@ -34,6 +37,12 @@ export type UiStrings = {
   copiedAriaLabel: (label: string) => string
   copyAnnouncement: (label: string) => string
   copyFailedAnnouncement: (label: string) => string
+
+  errorTitle: string
+  errorBody: string
+  errorAction: string
+
+  noscriptNotice: string
 
   availability: string
   rightsReserved: string
@@ -67,6 +76,9 @@ export const UI: Localized<UiStrings> = {
     backToProjects: 'Projelere dön',
     openProject: 'Projeyi aç',
     sourceCode: 'Kaynak kodu',
+    previousProject: 'Önceki proje',
+    nextProject: 'Sonraki proje',
+    projectPagerLabel: 'Diğer projeler',
     technologiesUsed: 'Kullanılan teknolojiler',
     screensLabel: 'Ekran görüntüleri',
     projectScreenshot: (title, index) => `${title} ekran görüntüsü ${index}`,
@@ -75,6 +87,14 @@ export const UI: Localized<UiStrings> = {
     copiedAriaLabel: (label) => `${label} kopyalandı`,
     copyAnnouncement: (label) => `${label} panoya kopyalandı`,
     copyFailedAnnouncement: (label) => `${label} kopyalanamadı`,
+
+    errorTitle: 'Bir şeyler ters gitti',
+    errorBody:
+      'Bu bölüm yüklenirken beklenmedik bir hata oluştu. Sayfayı yenilemek çoğu zaman yeterli oluyor.',
+    errorAction: 'Ana sayfaya dön',
+
+    noscriptNotice:
+      'Bu site içeriğini JavaScript ile getiriyor. Tarayıcınızda JavaScript kapalı olduğu için sayfanın tamamını göremiyorsunuz. Aşağıdaki bağlantılar JavaScript olmadan da çalışır.',
 
     availability: 'Yeni fırsatlara açık',
     rightsReserved: 'Tüm hakları saklıdır.',
@@ -106,6 +126,9 @@ export const UI: Localized<UiStrings> = {
     backToProjects: 'Back to projects',
     openProject: 'Open the project',
     sourceCode: 'Source code',
+    previousProject: 'Previous project',
+    nextProject: 'Next project',
+    projectPagerLabel: 'Other projects',
     technologiesUsed: 'Technologies used',
     screensLabel: 'Screenshots',
     projectScreenshot: (title, index) => `${title} screenshot ${index}`,
@@ -114,6 +137,14 @@ export const UI: Localized<UiStrings> = {
     copiedAriaLabel: (label) => `${label} copied`,
     copyAnnouncement: (label) => `${label} copied to the clipboard`,
     copyFailedAnnouncement: (label) => `${label} could not be copied`,
+
+    errorTitle: 'Something went wrong',
+    errorBody:
+      'This section hit an unexpected error while loading. Refreshing the page is usually enough.',
+    errorAction: 'Back to the home page',
+
+    noscriptNotice:
+      'This site fetches its content with JavaScript. JavaScript is turned off in your browser, so you are not seeing the whole page. The links below work without it.',
 
     availability: 'Open to new opportunities',
     rightsReserved: 'All rights reserved.',

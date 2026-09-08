@@ -38,6 +38,8 @@ export default function HeroGallery() {
                   >
                     <img
                       src={image.src}
+                      srcSet={image.srcSet}
+                      sizes="(min-width: 1024px) 216px, 45vw"
                       alt=""
                       width={image.width}
                       height={image.height}

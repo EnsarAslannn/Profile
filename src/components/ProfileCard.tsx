@@ -1,4 +1,4 @@
-import profilePhoto from '../assets/ea.webp'
+import { PROFILE_PHOTO } from '../data/profilePhoto'
 import ContactList from './ContactList'
 import SocialLinks from './SocialLinks'
 import { SITE_NAME, SITE_ROLE } from '../lib/siteMeta'
@@ -10,10 +10,12 @@ export default function ProfileCard() {
       className="mx-auto w-full max-w-xs rounded-2xl border border-line-subtle bg-surface-raised p-6 shadow-sm shadow-black/5 sm:p-8 lg:mx-0 lg:max-w-none lg:p-5 xl:p-6"
     >
       <img
-        src={profilePhoto}
+        src={PROFILE_PHOTO.src}
+        srcSet={PROFILE_PHOTO.srcSet}
+        sizes="(min-width: 1024px) 416px, 100vw"
         alt="Ensar Aslan"
-        width={640}
-        height={853}
+        width={PROFILE_PHOTO.width}
+        height={PROFILE_PHOTO.height}
         loading="eager"
         fetchPriority="high"
         decoding="async"

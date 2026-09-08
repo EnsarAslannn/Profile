@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import profilePhoto from '../assets/ea.webp'
+import { PROFILE_PHOTO } from '../data/profilePhoto'
 import ArrowUpRightIcon from './icons/ArrowUpRightIcon'
 import SectionHeading from './SectionHeading'
 import SegmentedText from './SegmentedText'
@@ -29,10 +29,12 @@ export default function About() {
               className="mt-8 inline-flex flex-col items-center rounded-2xl border border-line-subtle bg-surface-raised px-8 py-7 text-center shadow-sm shadow-black/5 lg:mt-0"
             >
               <img
-                src={profilePhoto}
+                src={PROFILE_PHOTO.src}
+                srcSet={PROFILE_PHOTO.srcSet}
+                sizes="64px"
                 alt=""
-                width={640}
-                height={853}
+                width={PROFILE_PHOTO.width}
+                height={PROFILE_PHOTO.height}
                 loading="lazy"
                 decoding="async"
                 className="h-16 w-16 rounded-full object-cover ring-1 ring-line-subtle"

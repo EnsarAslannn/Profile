@@ -3,10 +3,11 @@ import ArrowLeftIcon from '../components/icons/ArrowLeftIcon'
 import GlowButton from '../components/ui/GlowButton'
 import ArrowUpRightIcon from '../components/icons/ArrowUpRightIcon'
 import GitHubIcon from '../components/icons/GitHubIcon'
+import ProjectPager from '../components/ProjectPager'
 import ProjectScreens from '../components/ProjectScreens'
 import ProjectTechnologies from '../components/ProjectTechnologies'
 import RouteMeta from '../components/RouteMeta'
-import { getProjectBySlug } from '../data/projects'
+import { getProjectBySlug, getProjectNeighbours } from '../data/projects'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useLocalizedTo } from '../i18n/useLocalizedTo'
 import { UI } from '../i18n/ui'
@@ -21,6 +22,7 @@ export default function ProjectDetailPage() {
   const localizedTo = useLocalizedTo()
   const ui = UI[language]
   const project = getProjectBySlug(slug, language)
+  const { previous, next } = getProjectNeighbours(slug, language)
 
   if (!project) {
     return <Navigate to={localizedTo('/')} replace />
@@ -56,6 +58,8 @@ export default function ProjectDetailPage() {
           <figure data-reveal className="mb-8 overflow-hidden rounded-2xl border border-line-subtle bg-surface-sunken sm:mb-10">
             <img
               src={cover.src}
+              srcSet={cover.srcSet}
+              sizes="(min-width: 768px) 768px, 100vw"
               alt=""
               width={cover.width}
               height={cover.height}
@@ -107,6 +111,8 @@ export default function ProjectDetailPage() {
         <div className="mt-12 sm:mt-16">
           <ProjectScreens screens={project.screens} projectTitle={project.title} />
         </div>
+
+        <ProjectPager previous={previous} next={next} />
 
         <Link
           to={localizedTo({ pathname: '/', hash: '#projeler' })}

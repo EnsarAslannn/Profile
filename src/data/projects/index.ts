@@ -13,6 +13,7 @@ export type ProjectScreenInput = {
 export type ProjectScreen = {
   name: string
   src: string
+  srcSet: string | undefined
   caption: string | undefined
 }
 
@@ -59,6 +60,7 @@ function buildScreens(
   return images.map((image) => ({
     name: image.name,
     src: image.src,
+    srcSet: image.srcSet,
     caption: captionsByName.get(image.name),
   }))
 }
@@ -79,6 +81,22 @@ const resolve = (language: Language): Project[] =>
 export const PROJECTS: Localized<Project[]> = {
   tr: resolve('tr'),
   en: resolve('en'),
+}
+
+export type ProjectNeighbours = {
+  previous: Project | undefined
+  next: Project | undefined
+}
+
+export function getProjectNeighbours(
+  slug: string | undefined,
+  language: Language = DEFAULT_LANGUAGE,
+): ProjectNeighbours {
+  const projects = PROJECTS[language]
+  const index = projects.findIndex((project) => project.slug === slug)
+  if (index === -1) return { previous: undefined, next: undefined }
+
+  return { previous: projects[index - 1], next: projects[index + 1] }
 }
 
 export function getProjectBySlug(

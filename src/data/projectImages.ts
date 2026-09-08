@@ -1,9 +1,11 @@
 import { DEFAULT_LANGUAGE, type Language } from '../i18n/language'
 import { UI } from '../i18n/ui'
+import { srcSetFor } from './imageSrcSet'
 
 export type ProjectImage = {
   name: string
   src: string
+  srcSet: string | undefined
 }
 
 export const PROJECT_IMAGE_WIDTH = 1600
@@ -24,7 +26,11 @@ function collectImagesByFolder(): ImagesByFolder {
     if (!match) continue
     const [, folder, name] = match
     grouped[folder] ??= []
-    grouped[folder].push({ name, src })
+    grouped[folder].push({
+      name,
+      src,
+      srcSet: srcSetFor(`${folder}/${name}`, { src, width: PROJECT_IMAGE_WIDTH }),
+    })
   }
   for (const images of Object.values(grouped)) {
     images.sort((a, b) => a.name.localeCompare(b.name))

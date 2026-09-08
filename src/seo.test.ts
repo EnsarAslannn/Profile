@@ -3,6 +3,9 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { PROJECTS } from './data/projects'
 import { SOCIAL_LINKS } from './data/social'
+import { CONTACT_ITEMS } from './data/contact'
+import { CV_FILE } from './data/hero'
+import { UI } from './i18n/ui'
 import { DEFAULT_TITLE, SITE_NAME, SITE_ROLE, SITE_URL } from './lib/siteMeta'
 
 const root = path.resolve(__dirname, '..')
@@ -85,6 +88,34 @@ describe('static SEO files', () => {
     })
   })
 
+  describe('the no-JavaScript fallback', () => {
+    const noscript = indexHtml.match(/<noscript>([\s\S]*?)<\/noscript>/)?.[1] ?? ''
+    const collapsed = noscript.replace(/\s+/g, ' ')
+
+    it('exists, and says what it says in the UI strings rather than in a second copy', () => {
+      expect(noscript.length).toBeGreaterThan(0)
+      expect(collapsed).toContain(UI.tr.noscriptNotice)
+    })
+
+    it('names the same person and role the rest of the site does', () => {
+      expect(collapsed).toContain(SITE_NAME)
+      expect(collapsed).toContain(SITE_ROLE)
+    })
+
+    it('offers the CV and both profiles as links that work without JavaScript', () => {
+      expect(noscript).toContain(`href="${CV_FILE.tr}"`)
+      for (const link of SOCIAL_LINKS.tr) {
+        expect(noscript).toContain(`href="${link.href}"`)
+      }
+    })
+
+    it('prints the e-mail as text and not as a mailto, exactly as the contact row does', () => {
+      const email = CONTACT_ITEMS.tr.find((item) => item.id === 'email')!
+      expect(collapsed).toContain(email.value)
+      expect(noscript).not.toContain('mailto:')
+    })
+  })
+
   describe('vercel.json', () => {
     const vercel = JSON.parse(read('vercel.json'))
     const basePaths = ['/', '/hakkimda', ...PROJECTS.tr.map((p) => `/projects/${p.slug}`)]
@@ -111,6 +142,65 @@ describe('static SEO files', () => {
 
     it('leaves the SPA catch-all rewrite alone, so the prerender stays fail-safe', () => {
       expect(vercel.rewrites).toEqual([{ source: '/(.*)', destination: '/index.html' }])
+    })
+
+    describe('security headers', () => {
+      const forEveryPath = vercel.headers.find(
+        (entry: { source: string }) => entry.source === '/(.*)',
+      )
+      const header = (key: string) =>
+        forEveryPath.headers.find((h: { key: string }) => h.key === key)?.value
+
+      it('sends the four headers a static site gets for free', () => {
+        expect(header('X-Content-Type-Options')).toBe('nosniff')
+        expect(header('X-Frame-Options')).toBe('DENY')
+        expect(header('Referrer-Policy')).toBe('strict-origin-when-cross-origin')
+        expect(header('Permissions-Policy')).toContain('camera=()')
+      })
+
+      it('allows subresources from this origin only, which is all the built site loads', () => {
+        const csp = header('Content-Security-Policy') as string
+        for (const directive of [
+          "default-src 'self'",
+          "script-src 'self'",
+          "style-src 'self'",
+          "img-src 'self'",
+          "connect-src 'self'",
+        ]) {
+          expect(csp).toContain(directive)
+        }
+      })
+
+      it('leaves no room for an injected inline script, a data: image or a framing page', () => {
+        const csp = header('Content-Security-Policy') as string
+        expect(csp).not.toContain('unsafe-inline')
+        expect(csp).not.toContain('unsafe-eval')
+        expect(csp).not.toContain('data:')
+        expect(csp).toContain("frame-ancestors 'none'")
+        expect(csp).toContain("object-src 'none'")
+        expect(csp).toContain("base-uri 'none'")
+      })
+
+      it('is matched by a build that inlines nothing, or img-src would block the small assets', () => {
+        const csp = header('Content-Security-Policy') as string
+        expect(csp).toContain("img-src 'self'")
+        expect(read('vite.config.ts')).toMatch(/assetsInlineLimit:\s*0/)
+      })
+
+      it('caches the content-hashed assets forever and nothing else', () => {
+        const assets = vercel.headers.find(
+          (entry: { source: string }) => entry.source === '/assets/(.*)',
+        )
+        const cacheControl = assets.headers.find(
+          (h: { key: string }) => h.key === 'Cache-Control',
+        )?.value
+
+        expect(cacheControl).toContain('immutable')
+        expect(cacheControl).toContain('max-age=31536000')
+        expect(forEveryPath.headers.map((h: { key: string }) => h.key)).not.toContain(
+          'Cache-Control',
+        )
+      })
     })
   })
 
