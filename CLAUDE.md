@@ -33,6 +33,8 @@ Those last three are **not** part of `npm run build`. The first two write into `
 
 Tests run on Vitest + React Testing Library in a `jsdom` environment. `vitest.config.ts` merges `vite.config.ts`, so components compile under test exactly as they do in dev and build. Test files live next to the component as `src/**/*.{test,spec}.{ts,tsx}`; shared setup is `src/test/setup.ts`.
 
+**The pool is `vmThreads`, and that is a measured choice.** The suite spends most of its time building a jsdom environment once per test file - 49 of them - so the default `forks` pool paid for a process and a fresh jsdom every time. `vmThreads` reuses worker threads with a `node:vm` context per file, which keeps per-file isolation while cutting the run from **6.1s to 4.7s wall, and Vitest's own reported duration from 5.6s to 3.7s**. Verified over seven consecutive runs and once with `--sequence.shuffle`, which is what would expose state leaking between files; the tests that mutate shared globals - `RouteMeta` on `document.head`, `language.test` on `localStorage` and `documentElement.lang` - all still pass. **Do not reach for `isolate: false` for the next increment.** It shares one environment across files rather than per file, and those same three suites are exactly what it would break. The remaining headroom is elsewhere: roughly a third of the files (`seo`, `contrast`, `theme`, `structuredData`, most of `src/data`) never touch the DOM and are paying for a jsdom they do not use.
+
 Vitest globals are **off** - import `describe` / `it` / `expect` from `vitest` explicitly. `passWithNoTests` is `false`, so a broken `include` glob fails loudly instead of reporting a green run with zero tests collected.
 
 ## What this is
